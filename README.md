@@ -11,6 +11,6 @@ This is a static GitHub Pages site. Open `index.html` directly, or serve the rep
 1. Push the repository to GitHub.
 2. Open **Settings → Pages**.
 3. Under **Build and deployment**, select **Deploy from a branch**.
-4. Select the `testing` branch and the `/ (root)` folder, then select **Save**.
+4. Select the `main` branch and the `/ (root)` folder, then select **Save**.
 
 The site has no build step. `index.html`, `styles.css`, `script.js`, and the `assets` folder are all served as-is.
