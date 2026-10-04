@@ -1616,7 +1616,7 @@ html[data-theme="dark"] .skip-link {
 
 }
 
-@media(max-width:1160px) {
+@media(max-width:1200px) {
   .menu-toggle {
     width: 40px;
     height: 40px;
@@ -1770,6 +1770,38 @@ html[data-theme="dark"] .skip-link {
 html[data-theme="dark"] .hero-feature {
   background: #c2ded5;
   color: #123c45;
+}
+
+/* Longer Spanish navigation labels need tighter desktop spacing. */
+@media(min-width:1201px) {
+  html[lang="es"] .site-nav {
+    gap: 12px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  html[lang="es"] .nav-cta {
+    padding: 9px 10px;
+  }
+
+  html[lang="es"] .brand {
+    gap: 8px;
+  }
+
+  html[lang="es"] .brand-copy small {
+    font-size: 9px;
+    letter-spacing: .04em;
+  }
+
+  html[lang="es"] .header-tools {
+    gap: 6px;
+  }
+
+  html[lang="es"] .header-tools .header-language-toggle,
+  html[lang="es"] .header-tools .theme-toggle {
+    padding: 7px 8px;
+    font-size: 10px;
+  }
 }
 
 @media(max-width:900px) {
@@ -2104,7 +2136,7 @@ html[data-theme="dark"] .safety-card .spanish-copy strong {
   color: #fff;
 }
 
-html[data-theme="dark"] @media(max-width:640px) {
+@media(max-width:640px) {
   .safety-heading-copy {
     width: 100%;
     gap: 10px;

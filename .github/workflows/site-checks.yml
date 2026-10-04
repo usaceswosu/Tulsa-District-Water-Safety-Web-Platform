@@ -1,0 +1,20 @@
+name: Static site checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-local-site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate local assets, resource data, and page links
+        shell: pwsh
+        run: ./scripts/check-site.ps1

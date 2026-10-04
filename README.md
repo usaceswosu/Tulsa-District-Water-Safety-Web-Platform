@@ -24,6 +24,8 @@ The site has no build step. GitHub Pages serves these files and folders directly
 - `data/resources.js` — resource metadata and Spanish display titles. Keep the official filenames exactly as stored in `assets/`.
 - `data/translations.js` — Spanish interface copy, separated from page behavior.
 - `scripts/main.js` — resource rendering, search/filter behavior, language/theme controls, navigation, and the keyboard easter egg.
+- `scripts/check-site.ps1` — verifies resource files, local links, duplicate IDs, and key accessibility hooks.
+- `.github/workflows/site-checks.yml` — runs the static integrity check for pushes and pull requests.
 - `assets/bobber-logo.png` — site brand image.
 - `assets/graphics/` — official thumbnail artwork and retained source graphics.
 - `assets/pdfs/` — self-hosted original resource and program PDFs.
@@ -31,6 +33,8 @@ The site has no build step. GitHub Pages serves these files and folders directly
 ## Updating resources
 
 Add a PDF to `assets/pdfs/` and its preview image to `assets/graphics/`, then add a record to `resources` in `data/resources.js` with a `pdfs/`-prefixed file path. Add its Spanish display title to `resourceTitlesEs` there if needed. Keep source filenames intact; the app URL-encodes spaces and punctuation when creating links. Put page-interface translations in `data/translations.js` and interactions in `scripts/main.js`.
+
+To run the integrity check locally on Windows: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-site.ps1`.
 
 External video and official program links point to YouTube and USACE websites. The safety reminders are educational and do not replace local rules, adult supervision, or professional guidance.
 
