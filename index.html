@@ -1,435 +1,396 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bobber | Tulsa District Water Safety</title>
-    <meta name="description" content="Water safety resources, videos, activities and printable materials from the U.S. Army Corps of Engineers Tulsa District.">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        water: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
-                        },
-                        safety: {
-                            400: '#fb923c',
-                            500: '#f97316',
-                            600: '#ea580c',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Custom wave background for the hero section */
-        .wave-bottom {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            overflow: hidden;
-            line-height: 0;
-            transform: rotate(180deg);
-        }
-        .wave-bottom svg {
-            position: relative;
-            display: block;
-            width: calc(100% + 1.3px);
-            height: 60px;
-        }
-        .wave-bottom .shape-fill {
-            fill: #f8fafc; /* Matches Tailwind bg-slate-50 */
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123c45">
+  <meta name="description" content="Meet Bobber the Water Safety Dog. Explore family-friendly water safety videos, printable activities, posters, coloring sheets, and storybooks from the U.S. Army Corps of Engineers Tulsa District.">
+  <title>Bobber the Water Safety Dog | Tulsa District, USACE</title>
+  <link rel="icon" type="image/png" href="assets/bobber-logo.png">
+  <script>
+    try {
+      document.documentElement.dataset.theme = localStorage.getItem("bobber-theme") ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.dataset.locale = localStorage.getItem("bobber-language") || "en";
+    } catch {
+      document.documentElement.dataset.theme = "light";
+      document.documentElement.dataset.locale = "en";
+    }
+  </script>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans flex flex-col min-h-screen">
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#top" aria-label="Bobber water safety home">
+        <img class="brand-logo" src="assets/bobber-logo.png" alt="">
+        <span class="brand-copy"><strong>Bobber</strong><small>Water Safety Dog</small></span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+        <a href="#meet-bobber">Meet Bobber</a>
+        <a href="#safety">Stay safe</a>
+        <a href="#visit">Plan a visit</a>
+        <a href="#videos">Watch</a>
+        <a href="#resources">Free resources</a>
+        <a href="#educators">For educators</a>
+        <a class="nav-cta" href="#resources">Explore the library <span aria-hidden="true">↗</span></a>
+      </nav>
+      <div class="header-tools">
+        <button class="header-language-toggle" id="header-language-toggle" type="button" aria-label="Switch to Spanish / Cambiar a español" aria-pressed="false" aria-controls="main"><span class="language-code" aria-hidden="true">ES</span><span class="language-name" lang="es">Español</span></button>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode"><span class="theme-icon" aria-hidden="true">◐</span><span class="theme-label">Dark</span></button>
+        <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open navigation"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
 
-    <header class="sticky top-0 z-50 bg-water-800 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex items-center space-x-4">
-                    <!-- Logo Placeholder -->
-                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md">
-                        <i class="fa-solid fa-life-ring text-safety-500 text-2xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold tracking-tight">Water Safety Program</h1>
-                        <p class="text-xs text-water-100 uppercase tracking-wider hidden sm:block">US Army Corps of Engineers</p>
-                    </div>
-                </div>
-                <!-- Desktop Nav -->
-                <nav class="hidden md:flex space-x-6 lg:space-x-8 font-semibold">
-                    <a href="#cartoons" class="hover:text-safety-400 transition-colors duration-200">Cartoons</a>
-                    <a href="#activities" class="hover:text-safety-400 transition-colors duration-200">Activity Sheets</a>
-                    <a href="#posters" class="hover:text-safety-400 transition-colors duration-200">Posters & Coloring</a>
-                    <a href="#storybooks" class="hover:text-safety-400 transition-colors duration-200">Storybooks</a>
-                </nav>
-                <!-- Mobile Menu Button -->
-                <div class="md:hidden flex items-center">
-                    <button id="mobile-menu-btn" class="text-white hover:text-safety-400 focus:outline-none">
-                        <i class="fa-solid fa-bars text-2xl"></i>
-                    </button>
-                </div>
-            </div>
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-watermark" aria-hidden="true">〰</div>
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Tulsa District · U.S. Army Corps of Engineers</p>
+          <h1 id="hero-title">Big fun.<br><span>Water-safe</span> adventures.</h1>
+          <p class="hero-description">Say hello to Bobber, the Water Safety Dog. He’s here to help kids and families make every trip to the water a safer one.</p>
+          <div class="hero-actions">
+            <a class="button button-coral" href="#safety">Learn the safety basics <span aria-hidden="true">↓</span></a>
+            <a class="text-link text-link-light" href="#videos">Watch Bobber’s cartoons <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="hero-note"><span class="note-icon" aria-hidden="true">✦</span><span>Made for little learners, families, and the grown-ups who keep watch.</span></div>
         </div>
-        <!-- Mobile Nav Dropdown -->
-        <div id="mobile-menu" class="hidden md:hidden bg-water-900 border-t border-water-700">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#cartoons" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-water-700 hover:text-safety-400">Cartoons</a>
-                <a href="#activities" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-water-700 hover:text-safety-400">Activity Sheets</a>
-                <a href="#posters" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-water-700 hover:text-safety-400">Posters & Coloring</a>
-                <a href="#storybooks" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-water-700 hover:text-safety-400">Storybooks</a>
-            </div>
-        </div>
-    </header>
-
-    <section class="relative bg-gradient-to-r from-water-700 to-water-500 pt-20 pb-32 text-center text-white overflow-hidden">
-        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <span class="inline-block py-1 px-3 rounded-full bg-water-800 text-water-100 text-sm font-semibold mb-6 shadow-sm border border-water-600">Educational Resources</span>
-            <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight text-white drop-shadow-md">
-                Water Safety Graphics Library
-            </h2>
-            <p class="text-lg md:text-xl text-water-50 font-light mb-10 max-w-2xl mx-auto leading-relaxed drop-shadow">
-                Explore our collection of family-friendly cartoons, informative posters, fun activity sheets, and engaging storybooks designed to keep everyone safe around the water.
-            </p>
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="#activities" class="bg-safety-500 hover:bg-safety-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:-translate-y-1">
-                    Explore Activities <i class="fa-solid fa-arrow-down ml-2"></i>
-                </a>
-            </div>
-        </div>
-        
-        <!-- Wave Separator -->
-        <div class="wave-bottom">
-            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path>
+        <aside class="hero-feature" aria-label="Bobber’s water safety reminder">
+          <div class="feature-topline"><span>Bobber’s lake-day reminder</span><span aria-hidden="true">✦</span></div>
+          <div class="life-jacket-art" aria-hidden="true">
+            <svg viewBox="0 0 240 220" role="presentation" xmlns="http://www.w3.org/2000/svg">
+              <path d="m91 20-30 12-26 30-20 35 25 17 18-22 4 91c33 20 83 20 116 0l4-91 18 22 25-17-20-35-26-30-30-12-29 22-29-22Z" fill="#f17658" stroke="#123c45" stroke-linejoin="round" stroke-width="8"/>
+              <path d="m91 20 29 22 29-22-8 40h-42l-8-40Z" fill="#f8f6ef" stroke="#123c45" stroke-linejoin="round" stroke-width="7"/>
+              <path d="M120 44v158" fill="none" stroke="#123c45" stroke-linecap="round" stroke-width="7"/>
+              <path d="m66 88 22 7m86-7-22 7M63 137l25 7m89-7-25 7" fill="none" stroke="#f7d978" stroke-linecap="round" stroke-width="12"/>
+              <path d="M110 72h20m-20 30h20m-20 30h20" fill="none" stroke="#123c45" stroke-linecap="round" stroke-width="6"/>
             </svg>
-        </div>
+          </div>
+          <p class="feature-title">Wear your life jacket.</p>
+          <p class="feature-description">Every trip. Every time you’re in, on, or around open water.</p>
+          <a class="feature-link" href="#safety">See Bobber’s safety reminders <span aria-hidden="true">→</span></a>
+        </aside>
+      </div>
+      <div class="hero-ripple" aria-hidden="true"><span></span><span></span><span></span></div>
     </section>
 
-    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-24">
-        
-        <!-- Cartoons Section -->
-        <section id="cartoons" class="scroll-mt-24">
-            <div class="text-center mb-12">
-                <h3 class="text-3xl font-bold text-water-900 mb-4">Educational Cartoons</h3>
-                <div class="w-24 h-1 bg-safety-500 mx-auto rounded"></div>
-                <p class="mt-4 text-gray-600">Watch our entertaining and educational videos in English or Spanish.</p>
-            </div>
+    <section class="quick-strip" aria-label="Explore the site">
+      <a href="#safety">
+        <span class="quick-icon">01</span>
+        <span><strong>Start safe</strong><small>Simple habits that matter</small></span>
+        <b aria-hidden="true">↗</b>
+      </a>
+      <a href="#videos">
+        <span class="quick-icon">02</span>
+        <span><strong>Watch & learn</strong><small>Cartoons in English & Spanish</small></span>
+        <b aria-hidden="true">↗</b>
+      </a>
+      <a href="#resources">
+        <span class="quick-icon">03</span>
+        <span><strong>Print & play</strong><small>Free Bobber activities</small></span>
+        <b aria-hidden="true">↗</b>
+      </a>
+    </section>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Episode 1 -->
-                <div class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-water-500 flex flex-col sm:flex-row items-center gap-6 hover:shadow-lg transition-shadow">
-                    <div class="bg-water-100 text-water-700 p-4 rounded-full">
-                        <i class="fa-brands fa-youtube text-4xl"></i>
-                    </div>
-                    <div class="flex-grow text-center sm:text-left">
-                        <h4 class="text-xl font-bold text-gray-800">Episode 1</h4>
-                        <p class="text-gray-600 font-medium mb-4">Dog Paddling Puppies</p>
-                        <div class="flex justify-center sm:justify-start gap-3">
-                            <a href="https://www.youtube.com/watch?v=MahvLCAvMeY" target="_blank" class="text-sm bg-water-600 hover:bg-water-700 text-white py-2 px-4 rounded-lg transition-colors"><i class="fa-solid fa-play mr-2"></i>English</a>
-                            <a href="https://www.youtube.com/watch?v=w3-Rvg3Nn1M" target="_blank" class="text-sm bg-water-50 hover:bg-water-100 text-water-700 border border-water-300 py-2 px-4 rounded-lg transition-colors"><i class="fa-solid fa-play mr-2"></i>Español</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Episode 2 -->
-                <div class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-water-500 flex flex-col sm:flex-row items-center gap-6 hover:shadow-lg transition-shadow">
-                    <div class="bg-water-100 text-water-700 p-4 rounded-full">
-                        <i class="fa-brands fa-youtube text-4xl"></i>
-                    </div>
-                    <div class="flex-grow text-center sm:text-left">
-                        <h4 class="text-xl font-bold text-gray-800">Episode 2</h4>
-                        <p class="text-gray-600 font-medium mb-4">Don't Blow a Day at the Beach</p>
-                        <div class="flex justify-center sm:justify-start gap-3">
-                            <a href="https://www.youtube.com/watch?v=X65Jan-2oi4" target="_blank" class="text-sm bg-water-600 hover:bg-water-700 text-white py-2 px-4 rounded-lg transition-colors"><i class="fa-solid fa-play mr-2"></i>English</a>
-                            <a href="https://www.youtube.com/watch?v=4BBhqaPcdgs" target="_blank" class="text-sm bg-water-50 hover:bg-water-100 text-water-700 border border-water-300 py-2 px-4 rounded-lg transition-colors"><i class="fa-solid fa-play mr-2"></i>Español</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Episode 3 -->
-                <div class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-water-500 flex flex-col sm:flex-row items-center gap-6 hover:shadow-lg transition-shadow">
-                    <div class="bg-water-100 text-water-700 p-4 rounded-full">
-                        <i class="fa-brands fa-youtube text-4xl"></i>
-                    </div>
-                    <div class="flex-grow text-center sm:text-left">
-                        <h4 class="text-xl font-bold text-gray-800">Episode 3</h4>
-                        <p class="text-gray-600 font-medium mb-4">Sinker Has a Fit</p>
-                        <div class="flex justify-center sm:justify-start gap-3">
-                            <a href="https://www.youtube.com/watch?v=A7PVncKdTyQ" target="_blank" class="text-sm bg-water-600 hover:bg-water-700 text-white py-2 px-4 rounded-lg transition-colors"><i class="fa-solid fa-play mr-2"></i>English</a>
-                            <a href="https://www.youtube.com/watch?v=uGVuEizAx2I" target="_blank" class="text-sm bg-water-50 hover:bg-water-100 text-water-700 border border-water-300 py-2 px-4 rounded-lg transition-colors"><i class="fa-solid fa-play mr-2"></i>Español</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Episode 4 -->
-                <div class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-water-500 flex flex-col sm:flex-row items-center gap-6 hover:shadow-lg transition-shadow">
-                    <div class="bg-water-100 text-water-700 p-4 rounded-full">
-                        <i class="fa-brands fa-youtube text-4xl"></i>
-                    </div>
-                    <div class="flex-grow text-center sm:text-left">
-                        <h4 class="text-xl font-bold text-gray-800">Episode 4</h4>
-                        <p class="text-gray-600 font-medium mb-4">Who's Your Buddy</p>
-                        <div class="flex justify-center sm:justify-start gap-3">
-                            <a href="https://www.youtube.com/watch?v=OJebZ1pcq2U" target="_blank" class="text-sm bg-water-600 hover:bg-water-700 text-white py-2 px-4 rounded-lg transition-colors"><i class="fa-solid fa-play mr-2"></i>English</a>
-                            <a href="https://www.youtube.com/watch?v=ciY6YUUWaWM" target="_blank" class="text-sm bg-water-50 hover:bg-water-100 text-water-700 border border-water-300 py-2 px-4 rounded-lg transition-colors"><i class="fa-solid fa-play mr-2"></i>Español</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Activity Sheets Section -->
-        <section id="activities" class="scroll-mt-24 bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-10 pb-4 border-b border-gray-100">
-                <div>
-                    <h3 class="text-3xl font-bold text-water-900 mb-2">Activity Sheets</h3>
-                    <p class="text-gray-500">Printable puzzles, games, and crafts.</p>
-                </div>
-                <div class="mt-4 md:mt-0 text-water-500 opacity-20">
-                    <i class="fa-solid fa-puzzle-piece text-6xl"></i>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Activity Card Template -->
-                <script>
-                    const activities = [
-                        { title: "Bobber Boating Items", file: "Bobber Boating Items Actitvty Sheet.pdf" },
-                        { title: "Bobber Bookmarks", file: "Bobber Bookmarks Activity Sheets.pdf" },
-                        { title: "Bobber Cold Water Bookmarks", file: "Bobber Cold Water Bookmarks Activity Sheet.pdf" },
-                        { title: "Bobber Dot to Dot", file: "Bobber Dot to Dot Activity Sheet.pdf" },
-                        { title: "Bobber Draw A Line", file: "Bobber Draw A Line Activity Sheet.pdf" },
-                        { title: "Bobber Floating Fun Puzzle", file: "Bobber Floating Fun Puzzle Activity Sheet.pdf" },
-                        { title: "Bobber Holiday Ornaments", file: "Bobber Holiday Ornaments Activity Sheet.pdf" },
-                        { title: "Bobber Life_Jacket-o-lantern", file: "Bobber Life_Jacket-o-lantern Activity Sheet.pdf" },
-                        { title: "Bobber Maze", file: "Bobber Maze Activity Sheet.pdf" },
-                        { title: "Bobber Predictifier", file: "Bobber Predictifier Activity Sheet.pdf" },
-                        { title: "Bobber Pumpkin Stencils", file: "Bobber Pumpkin Stencils and Mask Activity Sheets.pdf" },
-                        { title: "Bobber Thanksgiving Puzzle", file: "Bobber Thanksgiving Puzzle Activity Sheet.pdf" },
-                        { title: "Bobber Valentines Cards", file: "Bobber Valentines Cards Activity Sheets.pdf" },
-                        { title: "Splash Trading Card Game", file: "Splash_Trading_Card_Game.pdf" }
-                    ];
-                    
-                    document.write(activities.map(item => `
-                        <div class="group bg-slate-50 rounded-xl overflow-hidden border border-slate-200 hover:border-safety-400 hover:shadow-xl transition-all duration-300 flex flex-col h-full">
-                            <div class="aspect-[4/3] bg-gray-200 overflow-hidden relative">
-                                <img src="https://placehold.co/400x300/0ea5e9/ffffff?text=${encodeURIComponent(item.title)}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
-                                <div class="absolute inset-0 bg-water-900 bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
-                            </div>
-                            <div class="p-5 flex-grow flex flex-col justify-between">
-                                <h4 class="font-bold text-gray-800 mb-3 leading-tight group-hover:text-water-700 transition-colors">${item.title}</h4>
-                                <a href="./assets/${encodeURIComponent(item.file)}" target="_blank" class="w-full mt-auto bg-white border-2 border-water-500 text-water-600 font-bold py-2 px-4 rounded-lg hover:bg-water-500 hover:text-white transition duration-300 flex items-center justify-center gap-2">
-                                    <i class="fa-regular fa-file-pdf"></i> View PDF
-                                </a>
-                            </div>
-                        </div>
-                    `).join(''));
-                </script>
-            </div>
-        </section>
-
-        <!-- Posters and Coloring Sheets Section -->
-        <section id="posters" class="scroll-mt-24">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-10 pb-4">
-                <div>
-                    <h3 class="text-3xl font-bold text-water-900 mb-2">Posters & Coloring Sheets</h3>
-                    <p class="text-gray-500">Visual guides and coloring pages for all seasons.</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Posters Card Template -->
-                <script>
-                    const posters = [
-                        { title: "Bobber Never Dive", file: "Bobber  Never Dive Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber 4th of July", file: "Bobber 4th of July Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Best Friend", file: "Bobber Best Friend Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Cold Water", file: "Bobber Cold Water Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Easter Bunny", file: "Bobber Easter Bunny Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Friends Make Friends", file: "Bobber Friends Make Friends Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Good Pup", file: "Bobber Good Pup Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Groundhog Day", file: "Bobber Groundhog Day Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Happy Friday", file: "Bobber Happy Friday Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Happy New Year", file: "Bobber Happy New Year Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Inflatable Toys", file: "Bobber Inflatable Toys Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber InVest in Safety", file: "Bobber_InVest_in_Safety_Poster&Coloring.pdf" },
-                        { title: "Bobber Life Jacket", file: "Bobber Life Jacket Coloring Sheet.pdf" },
-                        { title: "Bobber Paddling", file: "Bobber Paddling Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Pals", file: "Bobber Pals Posters and Coloring Sheets.pdf" },
-                        { title: "Bobber Reach Throw Row Don't Go", file: "Bobber Reach Throw Row Don't Go Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Safe Boating Week", file: "Bobber Safe Boating Week Poster and coloring sheet.pdf" },
-                        { title: "Bobber Safe Hunters", file: "Bobber Safe Hunters Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Season's Greeting", file: "Bobber Season's Greeting Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber St. Patrick's Day", file: "Bobber St. Patrick's Day Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Swim with a Buddy", file: "Bobber Swim with a Buddy Poster and Coloring Sheet.pdf" },
-                        { title: "Bobber Thanksgiving", file: "Bobber Thanksgiving Poster and Coloring Sheet.pdf" },
-                        { title: "Fishing is Best in a Life Vest", file: "Fishing is Best in a Life Vest Poster&Coloing.pdf" }
-                    ];
-                    
-                    document.write(posters.map(item => `
-                        <div class="group bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 hover:border-water-400 hover:shadow-lg transition-all duration-300 flex flex-col h-full transform hover:-translate-y-1">
-                            <div class="aspect-[3/4] bg-gray-200 overflow-hidden">
-                                <img src="https://placehold.co/300x400/fb923c/ffffff?text=${encodeURIComponent(item.title)}" alt="${item.title}" class="w-full h-full object-cover group-hover:opacity-90 transition-opacity" loading="lazy">
-                            </div>
-                            <div class="p-4 flex-grow flex flex-col justify-between border-t-4 border-safety-400">
-                                <h4 class="font-bold text-gray-800 text-center mb-3 text-sm">${item.title}</h4>
-                                <a href="./assets/${encodeURIComponent(item.file)}" target="_blank" class="w-full mt-auto bg-slate-100 text-gray-700 hover:bg-safety-500 hover:text-white font-semibold py-2 px-4 rounded transition duration-200 flex items-center justify-center gap-2 text-sm">
-                                    <i class="fa-solid fa-download"></i> Download
-                                </a>
-                            </div>
-                        </div>
-                    `).join(''));
-                </script>
-            </div>
-        </section>
-
-        <!-- Storybooks Section -->
-        <section id="storybooks" class="scroll-mt-24 bg-water-50 p-8 rounded-3xl border border-water-100 mb-12">
-            <div class="text-center mb-10">
-                <h3 class="text-3xl font-bold text-water-900 mb-4">Storybooks</h3>
-                <div class="w-24 h-1 bg-water-500 mx-auto rounded"></div>
-                <p class="mt-4 text-water-800">Read along with Bobber the Water Safety Dog.</p>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                <!-- Storybooks Card Template -->
-                <script>
-                    const storybooks = [
-                        { title: "A Holiday Visit from Bobber Book", file: "241210-A-GC580-0001_Bobber_Hoilday_Book.pdf" },
-                        { title: "Bobber Activity Book", file: "Bobber Activity Book.pdf" },
-                        { title: "Bobber Fun Book", file: "Bobber_Fun_Book_Printable.pdf" },
-                        { title: "Bobber Goes to the Beach", file: "Bobber Goes to the Beach Story Book.pdf" },
-                        { title: "Bobber's Birthday Story", file: "250403-A-GC580-0001_Bobber_Birthday_Story.pdf" }
-                    ];
-                    
-                    document.write(storybooks.map(item => `
-                        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
-                            <div class="aspect-square bg-water-200 flex items-center justify-center p-6 relative">
-                                <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iMiIgZmlsbD0iIzAwMCIvPjwvc3ZnPg==')]"></div>
-                                <img src="https://placehold.co/400x400/0369a1/ffffff?text=${encodeURIComponent(item.title.split(' ').slice(0,3).join(' ')+'\n...')}" alt="${item.title}" class="w-full h-full object-cover rounded shadow-inner z-10" loading="lazy">
-                            </div>
-                            <div class="p-4 flex-grow flex flex-col justify-between text-center">
-                                <h4 class="font-bold text-gray-800 mb-3 text-sm h-10 overflow-hidden">${item.title}</h4>
-                                <a href="./assets/${encodeURIComponent(item.file)}" target="_blank" class="w-full bg-water-600 text-white hover:bg-water-700 font-semibold py-2 px-3 rounded-md transition duration-200 flex items-center justify-center gap-2 text-sm">
-                                    <i class="fa-solid fa-book-open"></i> Read Book
-                                </a>
-                            </div>
-                        </div>
-                    `).join(''));
-                </script>
-            </div>
-        </section>
-
-    </main>
-
-    <footer class="bg-water-900 text-water-100 pt-16 pb-8 border-t-4 border-safety-500">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-                
-                <!-- Brand Info -->
-                <div class="col-span-1 lg:col-span-1">
-                    <div class="flex items-center space-x-3 mb-6">
-                        <i class="fa-solid fa-life-ring text-safety-500 text-3xl"></i>
-                        <span class="text-xl font-bold text-white tracking-tight">Water Safety<br>Program</span>
-                    </div>
-                    <p class="text-water-200 text-sm mb-6 leading-relaxed">
-                        Dedicated to promoting water safety education and reducing public recreation fatalities at lakes and rivers nationwide.
-                    </p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-water-400 hover:text-white transition-colors"><i class="fa-brands fa-facebook text-xl"></i></a>
-                        <a href="#" class="text-water-400 hover:text-white transition-colors"><i class="fa-brands fa-twitter text-xl"></i></a>
-                        <a href="#" class="text-water-400 hover:text-white transition-colors"><i class="fa-brands fa-youtube text-xl"></i></a>
-                    </div>
-                </div>
-
-                <!-- Program Info -->
-                <div>
-                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Program Information</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Home</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">At a Glance</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Program Summary</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Charter</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Committee Members</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Water Safety Program Statistics</a></li>
-                    </ul>
-                </div>
-
-                <!-- Resources & Tools -->
-                <div>
-                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Resources & Tools</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Policy & Procedures</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">FAQs</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Toolbox</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">References</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Training and Conferences</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Good Enough to Share</a></li>
-                    </ul>
-                </div>
-
-                <!-- Campaigns & Outreach -->
-                <div>
-                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Campaigns & Outreach</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Life Jackets Worn…Nobody Mourns</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Bobber the Water Safety Dog</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Junior Ranger Program</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Seamoor</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">NWSP Marketing Plan</a></li>
-                        <li><a href="#" class="hover:text-safety-400 transition-colors">Army Summer Safety</a></li>
-                    </ul>
-                </div>
-
-            </div>
-            
-            <div class="border-t border-water-800 pt-8 mt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-water-400">
-                <p>&copy; 2026 Water Safety Program. All rights reserved.</p>
-                <div class="flex space-x-6">
-                    <a href="#" class="hover:text-white transition-colors">Technical Problems</a>
-                    <a href="#" class="hover:text-white transition-colors">Accessibility</a>
-                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-                </div>
-            </div>
+    <section class="intro section-wrap" id="meet-bobber">
+      <div class="intro-label">
+        <span class="section-kicker">Your water safety sidekick</span>
+        <span class="intro-line"></span>
+      </div>
+      <div class="intro-content">
+        <h2>Good dogs know:<br><em>water safety comes first.</em></h2>
+        <div class="intro-text">
+          <p>Bobber helps young people learn how to enjoy lakes, rivers, pools, and beaches more safely. His advice is easy to remember, and even easier to share with your family.</p>
+          <a class="text-link" href="#resources">Find something fun to print <span aria-hidden="true">→</span></a>
+          <div class="bobber-note">
+            <img src="assets/graphics/Bobber_Birthday_Story_tb_L7cc.png" alt="Bobber the Water Safety Dog with Ranger Buck">
+            <span><small>Meet your lake-day buddy</small><strong>Bobber’s got your back.</strong></span>
+          </div>
         </div>
-    </footer>
+      </div>
+    </section>
 
-    <script>
-        // Mobile menu toggle script
-        const btn = document.getElementById('mobile-menu-btn');
-        const menu = document.getElementById('mobile-menu');
+    <section class="safety-section" id="safety" aria-labelledby="safety-title">
+      <div class="section-wrap safety-inner">
+        <div class="safety-heading">
+          <div>
+            <span class="section-kicker">Bobber’s water-wise reminders</span>
+            <h2 id="safety-title" tabindex="-1">Make safety<br>part of the fun.</h2>
+          </div>
+          <div class="safety-heading-copy">
+            <p>A few good habits go a long way. Talk through these reminders before your next day near the water.</p>
+            <p class="safety-language-hint" id="safety-language-hint">Use the Español control in the header menu to show Spanish translations for these safety reminders.</p>
+          </div>
+        </div>
+        <div class="safety-grid">
+          <article class="safety-card">
+            <span class="safety-number" aria-hidden="true">01</span>
+            <span class="safety-symbol" aria-hidden="true">◉</span>
+            <h3>Wear your life jacket</h3>
+            <p>Wear a properly fitted, U.S. Coast Guard-approved life jacket when you’re in, on, or around open water.</p>
+            <div class="spanish-copy" id="safety-es-lifejacket" lang="es" hidden>
+              <span>ESPAÑOL · BORRADOR</span>
+              <p><strong>Usa tu chaleco salvavidas.</strong> Debe ser de la talla correcta y estar aprobado por la Guardia Costera de EE. UU. Úsalo dentro, sobre o cerca de aguas abiertas.</p>
+            </div>
+          </article>
+          <article class="safety-card">
+            <span class="safety-number" aria-hidden="true">02</span>
+            <span class="safety-symbol" aria-hidden="true">⌁</span>
+            <h3>Swim with a buddy</h3>
+            <p>Choose a designated swimming area, follow posted rules, and make sure a responsible adult is watching.</p>
+            <div class="spanish-copy" id="safety-es-buddy" lang="es" hidden>
+              <span>ESPAÑOL · BORRADOR</span>
+              <p><strong>Nada acompañado.</strong> Elige una zona designada para nadar, sigue las reglas publicadas y asegúrate de que un adulto responsable te vigile.</p>
+            </div>
+          </article>
+          <article class="safety-card">
+            <span class="safety-number" aria-hidden="true">03</span>
+            <span class="safety-symbol" aria-hidden="true">↗</span>
+            <h3>Reach or throw. Don’t go.</h3>
+            <p>If someone is in trouble, get an adult and call 911. Reach with something long or throw something that floats—don’t enter the water.</p>
+            <div class="spanish-copy" id="safety-es-rescue" lang="es" hidden>
+              <span>ESPAÑOL · BORRADOR</span>
+              <p><strong>Alcanza o lanza; no te metas.</strong> Si alguien está en peligro, avisa a un adulto y llama al 911. Extiende algo largo o lanza algo que flote. No entres al agua.</p>
+            </div>
+          </article>
+          <article class="safety-card">
+            <span class="safety-number" aria-hidden="true">04</span>
+            <span class="safety-symbol" aria-hidden="true">❄</span>
+            <h3>Respect cold water</h3>
+            <p>Cold water can be dangerous even on a warm day. Dress for the water, stay alert, and don’t take chances.</p>
+            <div class="spanish-copy" id="safety-es-cold" lang="es" hidden>
+              <span>ESPAÑOL · BORRADOR</span>
+              <p><strong>Ten cuidado con el agua fría.</strong> Puede ser peligrosa incluso en un día cálido. Usa ropa adecuada para el agua fría, mantente alerta y no corras riesgos.</p>
+            </div>
+          </article>
+        </div>
+        <p class="safety-footnote">These reminders support—not replace—local rules, adult supervision, and guidance from water safety professionals.</p>
+      </div>
+    </section>
 
-        btn.addEventListener('click', () => {
-            menu.classList.toggle('hidden');
-        });
+    <section class="visit-section" id="visit" aria-labelledby="visit-title">
+      <div class="section-wrap visit-inner">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">Your next lake day starts here</span>
+            <h2 id="visit-title">Plan a safer visit.</h2>
+          </div>
+          <p>Check official lake information before you go, and follow local notices and posted rules when you arrive.</p>
+        </div>
+        <div class="visit-grid">
+          <article class="visit-card">
+            <span class="visit-number" aria-hidden="true">01</span>
+            <span class="visit-icon" aria-hidden="true">⌖</span>
+            <span class="visit-kicker">Explore</span>
+            <h3>Find a Tulsa District lake</h3>
+            <p>Browse lake pages for recreation areas, facilities, local rules, and project news or notices.</p>
+            <a href="https://www.swt.usace.army.mil/Locations/Tulsa-District-Lakes/" target="_blank" rel="noopener noreferrer">Browse official lake pages <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="visit-card">
+            <span class="visit-number" aria-hidden="true">02</span>
+            <span class="visit-icon" aria-hidden="true">〰</span>
+            <span class="visit-kicker">Check</span>
+            <h3>Lake levels & water data</h3>
+            <p>Open the Tulsa District Water Control site for reservoir levels and water-management information.</p>
+            <a href="https://www.swt-wc.usace.army.mil/" target="_blank" rel="noopener noreferrer">View water data <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="visit-card">
+            <span class="visit-number" aria-hidden="true">03</span>
+            <span class="visit-icon" aria-hidden="true">☎</span>
+            <span class="visit-kicker">Ask</span>
+            <h3>Contact a lake office</h3>
+            <p>Find project office phone numbers and the official contact form for lake-specific questions.</p>
+            <a href="https://www.swt.usace.army.mil/Contact/Contact-a-Lake/" target="_blank" rel="noopener noreferrer">Get lake office contacts <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="visit-card">
+            <span class="visit-number" aria-hidden="true">04</span>
+            <span class="visit-icon" aria-hidden="true">⌂</span>
+            <span class="visit-kicker">Reserve</span>
+            <h3>Find camping</h3>
+            <p>Search federal recreation areas and campsites, then check the lake page for local details.</p>
+            <a href="https://www.recreation.gov/" target="_blank" rel="noopener noreferrer">Search Recreation.gov <span aria-hidden="true">↗</span></a>
+          </article>
+        </div>
+        <p class="visit-note"><strong>Before you go:</strong> Water levels are not a measure of water quality or swimming safety. Check the individual lake’s current notices and follow all posted warnings and instructions.</p>
+      </div>
+    </section>
 
-        // Optional: Close mobile menu when clicking a link
-        const mobileLinks = menu.querySelectorAll('a');
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                menu.classList.add('hidden');
-            });
-        });
-    </script>
+    <section class="videos-section section-wrap" id="videos" aria-labelledby="videos-title">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">Screen time with a purpose</span>
+          <h2 id="videos-title">Watch Bobber in action.</h2>
+        </div>
+        <p>Short cartoons with big water safety lessons. Pick an episode and choose a language.</p>
+      </div>
+      <div class="video-grid">
+        <article class="video-card">
+          <span class="episode">Episode 01</span>
+          <div class="video-play" aria-hidden="true">▶</div>
+          <h3>Dog Paddling Puppies</h3>
+          <div class="video-links">
+            <a href="https://www.youtube.com/watch?v=MahvLCAvMeY" target="_blank" rel="noopener noreferrer">English <span aria-hidden="true">↗</span></a>
+            <a href="https://www.youtube.com/watch?v=w3-Rvg3Nn1M" target="_blank" rel="noopener noreferrer">Español <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        <article class="video-card">
+          <span class="episode">Episode 02</span>
+          <div class="video-play" aria-hidden="true">▶</div>
+          <h3>Don’t Blow a Day at the Beach</h3>
+          <div class="video-links">
+            <a href="https://www.youtube.com/watch?v=X65Jan-2oi4" target="_blank" rel="noopener noreferrer">English <span aria-hidden="true">↗</span></a>
+            <a href="https://www.youtube.com/watch?v=4BBhqaPcdgs" target="_blank" rel="noopener noreferrer">Español <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        <article class="video-card">
+          <span class="episode">Episode 03</span>
+          <div class="video-play" aria-hidden="true">▶</div>
+          <h3>Sinker Has a Fit</h3>
+          <div class="video-links">
+            <a href="https://www.youtube.com/watch?v=A7PVncKdTyQ" target="_blank" rel="noopener noreferrer">English <span aria-hidden="true">↗</span></a>
+            <a href="https://www.youtube.com/watch?v=uGVuEizAx2I" target="_blank" rel="noopener noreferrer">Español <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        <article class="video-card">
+          <span class="episode">Episode 04</span>
+          <div class="video-play" aria-hidden="true">▶</div>
+          <h3>Who’s Your Buddy?</h3>
+          <div class="video-links">
+            <a href="https://www.youtube.com/watch?v=OJebZ1pcq2U" target="_blank" rel="noopener noreferrer">English <span aria-hidden="true">↗</span></a>
+            <a href="https://www.youtube.com/watch?v=ciY6YUUWaWM" target="_blank" rel="noopener noreferrer">Español <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+      </div>
+      <p class="source-note">Videos open on YouTube. Content provided by the U.S. Army Corps of Engineers National Water Safety Program.</p>
+    </section>
+
+    <section class="library-section" id="resources" aria-labelledby="resources-title">
+      <div class="section-wrap library-inner">
+        <div class="section-heading library-heading">
+          <div>
+            <span class="section-kicker">Free downloads for curious kids</span>
+            <h2 id="resources-title">The Bobber library.</h2>
+          </div>
+          <p>Color, play, and learn together. Every resource below is ready to open or print.</p>
+        </div>
+        <div class="library-tools">
+          <label class="search-box" for="resource-search">
+            <span aria-hidden="true">⌕</span>
+            <input id="resource-search" type="search" aria-label="Search Bobber resources" placeholder="Search activities, posters, books…" autocomplete="off">
+            <kbd aria-hidden="true">/</kbd>
+          </label>
+          <div class="filters" role="group" aria-label="Filter resources">
+            <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">All <span id="count-all"></span></button>
+            <button class="filter-button" type="button" data-filter="activity" aria-pressed="false">Activities</button>
+            <button class="filter-button" type="button" data-filter="poster" aria-pressed="false">Posters & coloring</button>
+            <button class="filter-button" type="button" data-filter="storybook" aria-pressed="false">Storybooks</button>
+          </div>
+        </div>
+        <p class="results-message" id="results-message" aria-live="polite"></p>
+        <div class="resource-grid" id="resource-grid"></div>
+        <div class="empty-state" id="empty-state" hidden>
+          <span aria-hidden="true">🐾</span>
+          <h3>No matching resources</h3>
+          <p>Try another search or choose a different category.</p>
+          <button class="reset-search" id="reset-search" type="button">Show everything</button>
+        </div>
+        <p class="library-note">
+          These printable materials are shared by the
+          <a href="https://corpslakes.erdc.dren.mil/employees/watersafety/graphics.cfm?Option=Cartoons" target="_blank" rel="noopener noreferrer">USACE National Water Safety Program</a>.
+          Select a card to open its PDF. Check each file for available languages.
+        </p>
+      </div>
+    </section>
+
+    <section class="educator-section" id="educators" aria-labelledby="educator-title">
+      <div class="section-wrap educator-inner">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">Bring Bobber to your program</span>
+            <h2 id="educator-title">For educators & outreach teams.</h2>
+          </div>
+          <p>Official USACE teaching and program materials for educators, lake staff, and community partners.</p>
+        </div>
+        <div class="educator-grid">
+          <article class="educator-card">
+            <span class="educator-label">Teaching guide · Grades 2–6</span>
+            <h3>Bobber & the PFD program</h3>
+            <p>An interpretive water-safety guide with a Bobber life-jacket program outline, activities, and presentation ideas.</p>
+            <a href="assets/pdfs/Water%20Safety%20Resource%20Guide%202021.pdf" target="_blank" rel="noopener">Open the USACE program guide <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="educator-card">
+            <span class="educator-label">Official program PDF · Grades K–4</span>
+            <h3>Bobber’s Golden Rules</h3>
+            <p>A 30-minute lesson outline for teaching students Bobber’s four Golden Rules for staying safe in or near water.</p>
+            <a href="assets/pdfs/Bobber%20Water%20Safety%20Golden%20Rules.pdf" target="_blank" rel="noopener">Open Golden Rules PDF <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="educator-card">
+            <span class="educator-label">USACE staff resource</span>
+            <h3>Costume care & use</h3>
+            <p>Review official care and use guidance before planning a Bobber costume appearance or outreach event.</p>
+            <a href="assets/pdfs/Bobber%20Costume%20Care%20and%20Use%20Guidelines.pdf" target="_blank" rel="noopener">Open costume guidelines PDF <span aria-hidden="true">↗</span></a>
+          </article>
+        </div>
+        <p class="educator-note">These local copies are official USACE materials. Check the <a href="https://corpslakes.erdc.dren.mil/employees/watersafety/bobber.cfm" target="_blank" rel="noopener noreferrer">Bobber program page</a> for updated versions.</p>
+      </div>
+    </section>
+
+    <section class="closing section-wrap">
+      <img class="closing-logo" src="assets/bobber-logo.png" alt="Bobber the Water Safety Dog">
+      <div>
+        <span class="section-kicker">Before you head out</span>
+        <h2>Have a plan. Wear a life jacket. Look out for each other.</h2>
+      </div>
+      <a class="button button-dark" href="#safety">Remember the basics <span aria-hidden="true">↑</span></a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand brand-light" href="#top">
+          <img class="brand-logo" src="assets/bobber-logo.png" alt="">
+          <span class="brand-copy"><strong>Bobber</strong><small>Water Safety Dog</small></span>
+        </a>
+        <p>A water safety education resource from the U.S. Army Corps of Engineers, Tulsa District.</p>
+      </div>
+      <div class="footer-links">
+        <span class="footer-label">Keep exploring</span>
+        <a href="#safety">Water safety basics</a>
+        <a href="#visit">Plan a lake visit</a>
+        <a href="#videos">Bobber cartoons</a>
+        <a href="#resources">Printable resources</a>
+        <a href="#educators">Educator materials</a>
+      </div>
+      <div class="footer-links">
+        <span class="footer-label">Official resources</span>
+        <a href="https://www.usace.army.mil/Missions/Civil-Works/Recreation/National-Water-Safety_Program/" target="_blank" rel="noopener noreferrer">National Water Safety Program ↗</a>
+        <a href="https://corpslakes.erdc.dren.mil/employees/watersafety/bobber.cfm" target="_blank" rel="noopener noreferrer">Bobber program ↗</a>
+        <a href="https://www.swt.usace.army.mil/" target="_blank" rel="noopener noreferrer">Tulsa District ↗</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>U.S. Army Corps of Engineers · Tulsa District</span>
+      <a href="https://www.usace.army.mil/" target="_blank" rel="noopener noreferrer">Official U.S. Army website ↗</a>
+    </div>
+  </footer>
+  <dialog class="easter-dialog" id="easter-dialog" aria-labelledby="easter-title" aria-describedby="easter-copy">
+    <div class="easter-confetti" id="easter-confetti" aria-hidden="true"></div>
+    <button class="easter-close" id="easter-close" type="button" aria-label="Close secret mission">×</button>
+    <img class="easter-logo" src="assets/bobber-logo.png" alt="Bobber the Water Safety Dog">
+    <p class="easter-kicker" id="easter-kicker">Secret mission unlocked</p>
+    <h2 id="easter-title">You found Bobber!</h2>
+    <p id="easter-copy">Your secret mission: bring a buddy, wear a life jacket, and share one water-safety tip.</p>
+    <button class="button button-coral" id="easter-return" type="button">
+      <span id="easter-return-label">Back to the adventure</span>
+      <span aria-hidden="true">→</span>
+    </button>
+  </dialog>
+  <script src="data/resources.js" defer></script>
+  <script src="data/translations.js" defer></script>
+  <script src="scripts/main.js" defer></script>
 </body>
-    <script src="script.js"></script>
 </html>
