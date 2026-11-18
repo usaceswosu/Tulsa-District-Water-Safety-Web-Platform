@@ -202,7 +202,7 @@ function setLanguage(language) {
   document.querySelector("#resource-search").setAttribute("aria-label", isSpanish ? "Buscar recursos de Bobber" : "Search Bobber resources");
   document.querySelector("#resource-search").placeholder = isSpanish ? "Buscar actividades, afiches y cuentos…" : "Search activities, posters, books…";
   document.querySelector(".hero-feature").setAttribute("aria-label", isSpanish ? "Consejo de seguridad acuática de Bobber" : "Bobber’s water safety reminder");
-  document.querySelector(".bobber-note img").alt = isSpanish ? "Bobber, el perro de seguridad acuática, con Ranger Buck" : "Bobber the Water Safety Dog with Ranger Buck";
+  document.querySelector(".bobber-note img").alt = isSpanish ? "Bobber, el perro de seguridad acuática" : "Bobber the Water Safety Dog";
 
   englishSafetyCopy.forEach((copy) => { copy.hidden = isSpanish; });
   spanishSafetyCopy.forEach((copy) => { copy.hidden = !isSpanish; });

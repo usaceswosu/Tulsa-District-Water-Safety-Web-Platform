@@ -29,7 +29,9 @@ The site has no build step. GitHub Pages serves these files and folders directly
 - `scripts/check-site.ps1` — verifies resource files, local links, duplicate IDs, and key accessibility hooks.
 - `.github/workflows/site-checks.yml` — runs the static integrity check for pushes and pull requests.
 - `assets/bobber-logo.png` — site brand image.
-- `assets/graphics/` — official thumbnail artwork and retained source graphics.
+- `assets/graphics/` — preview images for the printable library.
+- `assets/graphics/videos/` — YouTube preview images for the cartoon episodes.
+- `assets/bobber/` — standalone Bobber clipart from the USACE Water Safety Graphics Library, used on the page.
 - `assets/pdfs/` — self-hosted original resource and program PDFs.
 
 ## Updating resources
