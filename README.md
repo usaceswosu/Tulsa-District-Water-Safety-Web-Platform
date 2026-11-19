@@ -34,7 +34,7 @@ The site has no build step. GitHub Pages serves these files and folders directly
 - `assets/bobber-logo.png` — site brand image.
 - `assets/graphics/` — preview images for the printable library.
 - `assets/graphics/videos/` — YouTube preview images for the cartoon episodes.
-- `assets/bobber/` — standalone Bobber clipart from the USACE Water Safety Graphics Library, used on the page.
+- `assets/bobber/` — Bobber artwork used on the page, including the checklist images for Bobber without his life jacket, with it, and with his buddy.
 - `assets/pdfs/` — self-hosted original resource and program PDFs.
 
 ## Updating resources

@@ -373,8 +373,25 @@ const readyBoxes = [...document.querySelectorAll(".lake-check-list input")];
 const readyProgress = document.querySelector("#lake-check-progress");
 const readyDone = document.querySelector("#lake-check-done");
 const readyBobber = document.querySelector(".lake-check-bobber");
+const readyBobberImg = document.querySelector("#lake-check-bobber-img");
 const readySay = document.querySelector("#lake-check-say");
 const reactions = [...document.querySelectorAll(".reaction")];
+const bobberLooks = {
+  bare: "assets/bobber/bobber-no-jacket.webp",
+  jacket: "assets/bobber/bobber-sitting.png",
+  buddy: "assets/bobber/bobber-buddy.webp"
+};
+Object.values(bobberLooks).forEach((src) => { const preload = new Image(); preload.src = src; });
+
+// Bobber starts without his life jacket; ticking the boxes dresses him and adds his buddy.
+function updateBobberLook() {
+  if (!readyBobberImg) return;
+  const jacketOn = Boolean(readyBoxes[0]?.checked);
+  const buddyOn = Boolean(readyBoxes[1]?.checked);
+  const next = buddyOn ? bobberLooks.buddy : jacketOn ? bobberLooks.jacket : bobberLooks.bare;
+  if (readyBobberImg.getAttribute("src") !== next) readyBobberImg.src = next;
+  readyBobber?.classList.toggle("is-buddy", buddyOn);
+}
 
 // Each tick makes Bobber react: he hops, and the matching prop pops in beside him.
 const checklistReactions = [
@@ -389,6 +406,7 @@ function updateChecklist(reactedBox) {
   const done = readyBoxes.filter((box) => box.checked).length;
   readyBoxes.forEach((box) => box.closest("label").classList.toggle("is-checked", box.checked));
   reactions.forEach((reaction, index) => reaction.classList.toggle("is-on", Boolean(readyBoxes[index]?.checked)));
+  updateBobberLook();
   readyProgress.textContent = currentLanguage === "es"
     ? `${done} de ${readyBoxes.length} listos`
     : `${done} of ${readyBoxes.length} ready`;
@@ -399,7 +417,7 @@ function updateChecklist(reactedBox) {
     const reaction = index >= 0 ? checklistReactions[index] : null;
     if (reaction && reactedBox.checked) {
       readySay.textContent = currentLanguage === "es" ? reaction.say.es : reaction.say.en;
-    } else if (!reactedBox) {
+    } else {
       readySay.textContent = currentLanguage === "es" ? "¡Marca cada uno!" : "Tick each one!";
     }
   }
