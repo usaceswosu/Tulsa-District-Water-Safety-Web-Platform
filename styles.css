@@ -920,8 +920,10 @@ body {
 }
 
 .safety-art {
-  width: 118px;
-  height: 80px;
+  width: 100%;
+  max-width: 190px;
+  height: 112px;
+  object-position: left center;
 }
 
 .safety-footnote, .visit-note, .educator-note, .source-note, .library-note, .results-message {
@@ -1093,8 +1095,9 @@ body {
   }
 
   .safety-art {
-    width: 96px;
-    height: 66px;
+    width: 100%;
+    max-width: 140px;
+    height: 92px;
   }
 
   .resource-body h3 {
@@ -3614,3 +3617,18 @@ html[data-theme="dark"] .ar-section {
   }
 }
 
+
+/* Larger safety-card artwork */
+.safety-art {
+  width: 100%;
+  max-width: 190px;
+  height: 112px;
+  object-position: left center;
+}
+
+@media(max-width:640px) {
+  .safety-art {
+    max-width: 150px;
+    height: 96px;
+  }
+}
