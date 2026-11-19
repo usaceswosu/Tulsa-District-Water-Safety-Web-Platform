@@ -4402,3 +4402,44 @@ html:has(.pdf-reader[open]) {
     flex-basis: 100%;
   }
 }
+
+/* Team credit and SWOSU mark in the footer */
+.footer-credit {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  border-top: 1px solid #ffffff1c;
+}
+
+.footer-credit img {
+  display: block;
+  width: auto;
+  height: 34px;
+}
+
+.footer-credit p {
+  margin: 0;
+  color: #a9c0b8;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.footer-credit a:hover img {
+  opacity: .85;
+}
+
+@media(max-width:640px) {
+  .footer-credit {
+    margin: 0 23px;
+    padding: 16px 0;
+    gap: 12px;
+  }
+
+  .footer-credit img {
+    height: 28px;
+  }
+}
