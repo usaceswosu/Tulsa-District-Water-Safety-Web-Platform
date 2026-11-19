@@ -2005,6 +2005,366 @@ html[data-theme="dark"] .hero-feature {
   margin-top: 6px;
 }
 
+/* Kid-friendly pass: bigger headings, sticker buttons, speech bubble, and a peeking mascot */
+.intro h2, .section-heading h2, .safety-heading h2 {
+  font-size: clamp(40px,5vw,58px);
+  letter-spacing: -.02em;
+}
+
+@media(max-width:640px) {
+  .intro h2, .section-heading h2, .safety-heading h2 {
+    font-size: 38px;
+  }
+}
+
+.button {
+  border-width: 4px;
+}
+
+.button-coral {
+  transform: rotate(-2deg);
+}
+
+.button-coral:hover {
+  transform: rotate(1deg) scale(1.04);
+}
+
+.reveal {
+  opacity: 0;
+  translate: 0 28px;
+  transition: opacity .6s ease, translate .6s cubic-bezier(.34,1.56,.64,1), transform .2s, box-shadow .2s;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .reveal {
+    opacity: 1;
+    translate: none;
+    transition: none;
+  }
+}
+
+h1, h2 {
+  text-wrap: balance;
+}
+
+/* Storybook section edges: each colour block rises into the one above it. */
+.safety-section, .visit-section, .ar-section, .library-section, .educator-section {
+  position: relative;
+}
+
+.safety-section::before, .visit-section::before, .ar-section::before, .library-section::before, .educator-section::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 22px;
+  pointer-events: none;
+  background: var(--wave);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='22'%3E%3Cpath d='M0 0H60V12C45 22 15 22 0 12Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='22'%3E%3Cpath d='M0 0H60V12C45 22 15 22 0 12Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-size: 60px 22px;
+  mask-size: 60px 22px;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+}
+
+.safety-section, .ar-section, .educator-section {
+  --wave: #fffefa;
+}
+
+.visit-section {
+  --wave: #e5f1eb;
+}
+
+.ar-section {
+  --wave: #fffefa;
+}
+
+.library-section {
+  --wave: #e5f1eb;
+}
+
+.educator-section {
+  --wave: #f5f3eb;
+}
+
+html[data-theme="dark"] .safety-section,
+html[data-theme="dark"] .ar-section {
+  --wave: #101c20;
+}
+
+html[data-theme="dark"] .visit-section,
+html[data-theme="dark"] .library-section {
+  --wave: #182a2d;
+}
+
+html[data-theme="dark"] .educator-section {
+  --wave: #0d191d;
+}
+
+/* Kids' motion: icons wiggle when a card is hovered or tapped. */
+@keyframes bobber-wiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-8deg) scale(1.06); }
+  55% { transform: rotate(7deg) scale(1.04); }
+  80% { transform: rotate(-4deg); }
+}
+
+.safety-card:hover .safety-symbol,
+.visit-card:hover .visit-icon,
+.safety-card:focus-within .safety-symbol,
+.visit-card:focus-within .visit-icon {
+  animation: bobber-wiggle .65s ease;
+}
+
+.video-card:hover .video-play,
+.video-card:focus-within .video-play {
+  animation: bobber-wiggle .65s ease;
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .safety-card:hover .safety-symbol,
+  .visit-card:hover .visit-icon,
+  .safety-card:focus-within .safety-symbol,
+  .visit-card:focus-within .visit-icon,
+  .video-card:hover .video-play,
+  .video-card:focus-within .video-play {
+    animation: none;
+  }
+}
+
+/* The lake-ready checklist */
+.lake-check {
+  position: relative;
+  z-index: 1;
+  margin-top: 30px;
+  padding: 24px 26px;
+  display: grid;
+  grid-template-columns: 1fr 1.15fr auto;
+  align-items: center;
+  gap: 24px;
+  background: #fffefa;
+  border: 3px solid var(--outline);
+  border-radius: 22px;
+  box-shadow: var(--pop-shadow);
+}
+
+.lake-check-copy h3 {
+  margin: 10px 0 4px;
+  font: 800 22px/1.2 var(--display);
+}
+
+.lake-check-copy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.lake-check-list {
+  display: grid;
+  gap: 8px;
+}
+
+.lake-check-list label {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 13px;
+  background: #f2f7f3;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, transform .15s;
+}
+
+.lake-check-list label:hover {
+  border-color: var(--teal);
+  transform: translateX(3px);
+}
+
+.lake-check-list input {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  flex: 0 0 auto;
+  accent-color: #167e79;
+  cursor: pointer;
+}
+
+.lake-check-list label.is-checked {
+  background: #d4ece2;
+  border-color: #2f8f83;
+}
+
+.lake-check-list label.is-checked span {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  color: #2d5f57;
+}
+
+.lake-check-side {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-width: 150px;
+}
+
+.lake-check-side img {
+  width: 84px;
+  height: auto;
+}
+
+.lake-check-progress {
+  margin: 0;
+  color: var(--teal);
+  font: 800 15px var(--display);
+  text-align: center;
+}
+
+.lake-check-done {
+  margin: 2px 0 0;
+  padding: 10px 12px;
+  background: var(--yellow);
+  color: #123c45;
+  border: 2px solid var(--outline);
+  border-radius: 14px;
+  font: 800 14px/1.3 var(--display);
+  text-align: center;
+  animation: bobber-pop .45s cubic-bezier(.34,1.56,.64,1);
+}
+
+.lake-check-done[hidden] {
+  display: none;
+}
+
+@keyframes bobber-pop {
+  from { transform: scale(.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+html[data-theme="dark"] .lake-check {
+  background: #1d3033;
+}
+
+html[data-theme="dark"] .lake-check-list label {
+  background: #22383a;
+  border-color: #3a5050;
+}
+
+html[data-theme="dark"] .lake-check-list label.is-checked {
+  background: #2c4c48;
+  border-color: #6fae9f;
+}
+
+html[data-theme="dark"] .lake-check-list label.is-checked span {
+  color: #cfe8e0;
+}
+
+@media(max-width:900px) {
+  .lake-check {
+    grid-template-columns: 1fr;
+  }
+
+  .lake-check-side {
+    order: -1;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .lake-check-done {
+    animation: none;
+  }
+}
+
+.speech-bubble {
+  position: relative;
+  align-self: center;
+  margin: 12px 0 0;
+  padding: 9px 14px;
+  background: #fffefa;
+  color: #123c45;
+  border: 3px solid var(--outline);
+  border-radius: 18px;
+  box-shadow: 3px 3px 0 var(--outline);
+  font: 800 15px/1.2 var(--display);
+  transform: rotate(-4deg);
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  margin-left: -10px;
+  bottom: -15px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 15px solid var(--outline);
+}
+
+.speech-bubble::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  margin-left: -7px;
+  bottom: -9px;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 10px solid #fffefa;
+  z-index: 1;
+}
+
+.visit-inner {
+  position: relative;
+  padding-bottom: 120px;
+}
+
+.visit-peek {
+  position: absolute;
+  right: 40px;
+  bottom: 18px;
+  width: 110px;
+  height: auto;
+  pointer-events: none;
+}
+
+.visit-inner .visit-note {
+  padding-right: 150px;
+}
+
+@media(max-width:900px) {
+  .visit-inner {
+    padding-bottom: 83px;
+  }
+
+  .visit-peek {
+    display: none;
+  }
+
+  .visit-inner .visit-note {
+    padding-right: 0;
+  }
+}
+
+@media(max-width:640px) {
+  .visit-inner {
+    padding-bottom: 64px;
+  }
+}
+
 html[data-theme="dark"] .visit-section {
   background: #0d191d;
 }

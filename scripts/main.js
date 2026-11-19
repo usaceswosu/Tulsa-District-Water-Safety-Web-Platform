@@ -224,6 +224,8 @@ function setLanguage(language) {
   updateThemeControl();
   updateExternalLinkLabels();
   updateEasterDialogLanguage();
+  updateSpeechBubble();
+  updateChecklist();
 }
 
 headerLanguageToggle.addEventListener("click", () => {
@@ -319,4 +321,51 @@ themeToggle.addEventListener("click", () => {
   savePreference("bobber-theme", nextTheme);
   updateThemeControl();
 });
+// Bobber shares a different tip each day, and the lake-ready checklist celebrates a full set of ticks.
+const dailyTips = [
+  { en: "Wear your life jacket every time!", es: "¡Usa tu chaleco salvavidas siempre!" },
+  { en: "Swim with a buddy!", es: "¡Nada acompañado!" },
+  { en: "Reach or throw. Don’t go!", es: "¡Alcanza o lanza; no te metas!" },
+  { en: "Cold water is sneaky—stay alert!", es: "El agua fría es traicionera: ¡mantente alerta!" },
+  { en: "Ask a grown-up before you go!", es: "¡Pregunta a un adulto antes de ir!" },
+  { en: "Look out for each other!", es: "¡Cuídense entre todos!" }
+];
+const speechBubble = document.querySelector(".speech-bubble");
+const dailyTip = dailyTips[Math.floor(Date.now() / 86400000) % dailyTips.length];
+
+function updateSpeechBubble() {
+  if (speechBubble) speechBubble.textContent = currentLanguage === "es" ? dailyTip.es : dailyTip.en;
+}
+
+const readyBoxes = [...document.querySelectorAll(".lake-check-list input")];
+const readyProgress = document.querySelector("#lake-check-progress");
+const readyDone = document.querySelector("#lake-check-done");
+
+function updateChecklist() {
+  const done = readyBoxes.filter((box) => box.checked).length;
+  readyBoxes.forEach((box) => box.closest("label").classList.toggle("is-checked", box.checked));
+  readyProgress.textContent = currentLanguage === "es"
+    ? `${done} de ${readyBoxes.length} listos`
+    : `${done} of ${readyBoxes.length} ready`;
+  readyDone.hidden = done !== readyBoxes.length;
+}
+
+readyBoxes.forEach((box) => box.addEventListener("change", updateChecklist));
+updateSpeechBubble();
+updateChecklist();
+
+// Cards and headings bounce in as they scroll into view. Skipped for reduced motion, and content stays visible without scripts.
+const revealTargets = document.querySelectorAll(".section-heading, .safety-card, .visit-card, .educator-card, .video-card, .app-download, .ar-card");
+if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  revealTargets.forEach((element) => element.classList.add("reveal"));
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      revealObserver.unobserve(entry.target);
+    });
+  }, { threshold: 0.15 });
+  revealTargets.forEach((element) => revealObserver.observe(element));
+}
+
 setLanguage(document.documentElement.dataset.locale === "es" ? "es" : "en");

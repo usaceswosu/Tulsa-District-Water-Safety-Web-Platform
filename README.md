@@ -8,6 +8,8 @@ A responsive, static website that brings together Bobber the Water Safety Dog re
 
 No build tools or server-side code are required. Open `index.html` in a browser, or serve this folder with any static web server. Styles, scripts, fonts (system fonts), artwork, and PDFs load from the repository; there are no CDN or hosted font dependencies.
 
+For local preview without stale browser caches, run `python scripts/serve.py` and open <http://localhost:8000/index.html>.
+
 The links to YouTube, USACE, Recreation.gov, and other official sources are outbound links only. The site itself does not need those services to load; video playback and live lake information do require visiting the respective source.
 
 ## Publish with GitHub Pages
