@@ -67,12 +67,15 @@ foreach ($page in $pages) {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { Add-SiteProblem "Missing local asset in ${name}: $url" }
   }
 
-  $scriptOrder = @('data/resources.js', 'data/translations.js', 'scripts/main.js')
-  $lastIndex = -1
-  foreach ($script in $scriptOrder) {
-    $index = $html.IndexOf("<script src=`"$script`"", [StringComparison]::Ordinal)
-    if ($index -lt 0 -or $index -le $lastIndex) { Add-SiteProblem "Missing or out-of-order app script in ${name}: $script" }
-    $lastIndex = $index
+  # 404.html is intentionally self-contained; GitHub Pages serves it from any missing path.
+  if ($name -ne '404.html') {
+    $scriptOrder = @('data/resources.js', 'data/translations.js', 'scripts/main.js')
+    $lastIndex = -1
+    foreach ($script in $scriptOrder) {
+      $index = $html.IndexOf("<script src=`"$script`"", [StringComparison]::Ordinal)
+      if ($index -lt 0 -or $index -le $lastIndex) { Add-SiteProblem "Missing or out-of-order app script in ${name}: $script" }
+      $lastIndex = $index
+    }
   }
 }
 

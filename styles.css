@@ -3632,3 +3632,100 @@ html[data-theme="dark"] .ar-section {
     height: 96px;
   }
 }
+
+/* Bobber's pals and episode summaries */
+.friends {
+  margin-top: 54px;
+}
+
+.friends-title {
+  margin: 0 0 18px;
+  font: 900 26px/1.2 var(--display);
+  letter-spacing: -.02em;
+}
+
+.friends-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.friends-row li {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 4px;
+  padding: 16px 10px 14px;
+  background: var(--paper);
+  border: 3px solid var(--outline);
+  border-radius: 18px;
+  box-shadow: var(--pop-shadow);
+  text-align: center;
+}
+
+.friends-row img {
+  height: 120px;
+  width: auto;
+  max-width: 100%;
+}
+
+.friends-row strong {
+  font: 800 15px var(--display);
+}
+
+.friends-row small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.video-summary {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+@media(max-width:900px) {
+  .friends-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .friends-row img {
+    height: 104px;
+  }
+}
+
+@media(max-width:640px) {
+  .friends-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .friends-row img {
+    height: 92px;
+  }
+}
+
+/* Keep episode buttons aligned when summaries differ in length */
+.video-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.video-links {
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+@media(max-width:640px) {
+  .friends-row li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 8px);
+  }
+}
