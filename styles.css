@@ -497,32 +497,6 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   letter-spacing: .1em;
 }
 
-.safety-symbol {
-  width: 66px;
-  height: 66px;
-  display: grid;
-  place-items: center;
-  background: #e5f1eb;
-  border-radius: 50%;
-  color: var(--teal);
-  font-size: 30px;
-}
-
-.safety-card:nth-child(2) .safety-symbol {
-  background: #fbf2d7;
-  color: #a98229;
-}
-
-.safety-card:nth-child(3) .safety-symbol {
-  background: #fce9e2;
-  color: var(--coral-dark);
-}
-
-.safety-card:nth-child(4) .safety-symbol {
-  background: #e5f1f3;
-  color: #508995;
-}
-
 .safety-card h3 {
   margin: 18px 0 8px;
   font: 800 17px/1.25 var(--display);
@@ -1171,12 +1145,6 @@ html[data-theme="dark"] .library-note a {
     padding: 18px 14px;
   }
 
-  .safety-symbol {
-    width: 37px;
-    height: 37px;
-    font-size: 20px;
-  }
-
   .safety-card h3 {
     margin: 14px 0 7px;
     font-size: 15px;
@@ -1470,26 +1438,6 @@ html[data-theme="dark"] .safety-heading>p, html[data-theme="dark"] .safety-card 
 html[data-theme="dark"] .safety-card {
   background: #213336;
   box-shadow: 0 8px 24px #00000015;
-}
-
-html[data-theme="dark"] .safety-card:nth-child(1) .safety-symbol {
-  background: #2c4947;
-  color: #a1dfd0;
-}
-
-html[data-theme="dark"] .safety-card:nth-child(2) .safety-symbol {
-  background: #49432f;
-  color: #f0d276;
-}
-
-html[data-theme="dark"] .safety-card:nth-child(3) .safety-symbol {
-  background: #4a3531;
-  color: #ff9a7d;
-}
-
-html[data-theme="dark"] .safety-card:nth-child(4) .safety-symbol {
-  background: #2b4145;
-  color: #a1d4dc;
 }
 
 html[data-theme="dark"] .safety-footnote, html[data-theme="dark"] .source-note {
@@ -2164,9 +2112,9 @@ html[data-theme="dark"] .educator-section {
   80% { transform: rotate(-4deg); }
 }
 
-.safety-card:hover .safety-symbol,
+.safety-card:hover .safety-art,
 .visit-card:hover .visit-icon,
-.safety-card:focus-within .safety-symbol,
+.safety-card:focus-within .safety-art,
 .visit-card:focus-within .visit-icon {
   animation: bobber-wiggle .65s ease;
 }
@@ -2177,9 +2125,9 @@ html[data-theme="dark"] .educator-section {
 }
 
 @media(prefers-reduced-motion:reduce) {
-  .safety-card:hover .safety-symbol,
+  .safety-card:hover .safety-art,
   .visit-card:hover .visit-icon,
-  .safety-card:focus-within .safety-symbol,
+  .safety-card:focus-within .safety-art,
   .visit-card:focus-within .visit-icon,
   .video-card:hover .video-play,
   .video-card:focus-within .video-play {
@@ -3122,10 +3070,6 @@ html[data-theme="dark"] {
 
 .safety-card:nth-child(4) {
   --bar: #65a1ac;
-}
-
-.safety-symbol {
-  border: 3px solid var(--outline);
 }
 
 .video-card:hover, .resource-card:hover, .visit-card:hover, .educator-card:hover {
