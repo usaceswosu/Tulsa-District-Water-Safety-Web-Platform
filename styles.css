@@ -126,6 +126,12 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   color: var(--teal);
 }
 
+.site-nav>a[aria-current="page"] {
+  color: var(--teal);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .nav-cta {
   padding: 11px 16px;
   background: var(--deep);
@@ -2052,6 +2058,30 @@ h1, h2 {
   text-wrap: balance;
 }
 
+/* Grown-ups page header */
+.page-head {
+  padding: 66px 0 56px;
+  background: #e5f1eb;
+}
+
+.page-head h1 {
+  margin: 14px 0 12px;
+  font: 900 clamp(40px,5vw,58px)/1.04 var(--display);
+  letter-spacing: -.02em;
+}
+
+.page-head-copy {
+  max-width: 600px;
+  margin: 0 0 26px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+html[data-theme="dark"] .page-head {
+  background: #182a2d;
+}
+
 /* Storybook section edges: each colour block rises into the one above it. */
 .safety-section, .visit-section, .ar-section, .library-section, .educator-section {
   position: relative;
@@ -2219,9 +2249,77 @@ html[data-theme="dark"] .educator-section {
   min-width: 150px;
 }
 
-.lake-check-side img {
-  width: 84px;
+.lake-check-bobber {
+  position: relative;
+  width: 96px;
+}
+
+.lake-check-bobber img {
+  width: 100%;
   height: auto;
+  display: block;
+}
+
+.reaction {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  opacity: 0;
+  transform: scale(.3) rotate(-14deg);
+  transition: opacity .2s, transform .35s cubic-bezier(.34,1.56,.64,1);
+  pointer-events: none;
+}
+
+.reaction.is-on {
+  opacity: 1;
+  transform: scale(1) rotate(0);
+}
+
+.reaction-jacket { left: -32px; bottom: -2px; }
+.reaction-buddy { right: -26px; bottom: 2px; }
+.reaction-grownup { right: -18px; top: -10px; }
+.reaction-throw { left: -26px; top: -12px; }
+
+.reaction-jacket.is-on {
+  animation: bobber-drop .55s cubic-bezier(.34,1.56,.64,1);
+}
+
+@keyframes bobber-drop {
+  from { transform: translateY(-46px) scale(.5) rotate(-10deg); opacity: 0; }
+  to { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
+}
+
+.lake-check-bobber.is-happy img {
+  animation: bobber-hop .55s cubic-bezier(.34,1.56,.64,1);
+}
+
+@keyframes bobber-hop {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  30% { transform: translateY(-12px) rotate(-4deg); }
+  60% { transform: translateY(0) rotate(3deg); }
+}
+
+.lake-check-say {
+  max-width: 200px;
+  margin: 8px 0 0;
+  padding: 7px 12px;
+  background: #fffefa;
+  color: #123c45;
+  border: 2px solid var(--outline);
+  border-radius: 14px;
+  box-shadow: 2px 2px 0 var(--outline);
+  font: 800 12px/1.3 var(--display);
+  text-align: center;
+}
+
+html[data-theme="dark"] .lake-check-say {
+  background: #263b3d;
+  color: #e4eeea;
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .reaction { transition: none; }
+  .lake-check-bobber.is-happy img { animation: none; }
 }
 
 .lake-check-progress {
@@ -2334,6 +2432,7 @@ html[data-theme="dark"] .lake-check-list label.is-checked span {
 
 .visit-peek {
   position: absolute;
+  z-index: 2;
   right: 40px;
   bottom: 18px;
   width: 110px;

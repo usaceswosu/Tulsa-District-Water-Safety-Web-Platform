@@ -70,6 +70,7 @@ function makeCard(resource) {
 }
 
 function renderResources() {
+  if (!grid || !searchInput) return;
   const query = searchInput.value.trim().toLocaleLowerCase();
   const visibleResources = resources.filter((resource) => {
     const matchesCategory = activeFilter === "all" || resource.category === activeFilter;
@@ -85,31 +86,37 @@ function renderResources() {
     : `${visibleResources.length} ${visibleResources.length === 1 ? "resource" : "resources"}${query ? ` matching “${searchInput.value.trim()}”` : ""}`;
 }
 
-filterButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    activeFilter = button.dataset.filter;
-    filterButtons.forEach((item) => {
-      const selected = item === button;
-      item.classList.toggle("is-active", selected);
-      item.setAttribute("aria-pressed", String(selected));
-    });
-    renderResources();
-  });
-});
-
-searchInput.addEventListener("input", renderResources);
-document.querySelector("#reset-search").addEventListener("click", () => {
-  searchInput.value = "";
-  activeFilter = "all";
+if (grid && searchInput) {
   filterButtons.forEach((button) => {
-    const selected = button.dataset.filter === "all";
-    button.classList.toggle("is-active", selected);
-    button.setAttribute("aria-pressed", String(selected));
+    button.addEventListener("click", () => {
+      activeFilter = button.dataset.filter;
+      filterButtons.forEach((item) => {
+        const selected = item === button;
+        item.classList.toggle("is-active", selected);
+        item.setAttribute("aria-pressed", String(selected));
+      });
+      renderResources();
+    });
   });
-  renderResources();
-  searchInput.focus();
-});
-document.querySelector("#count-all").textContent = resources.length;
+
+  searchInput.addEventListener("input", renderResources);
+  const resetSearch = document.querySelector("#reset-search");
+  if (resetSearch) {
+    resetSearch.addEventListener("click", () => {
+      searchInput.value = "";
+      activeFilter = "all";
+      filterButtons.forEach((button) => {
+        const selected = button.dataset.filter === "all";
+        button.classList.toggle("is-active", selected);
+        button.setAttribute("aria-pressed", String(selected));
+      });
+      renderResources();
+      searchInput.focus();
+    });
+  }
+  const countAll = document.querySelector("#count-all");
+  if (countAll) countAll.textContent = resources.length;
+}
 
 const menuToggle = document.querySelector("#menu-toggle");
 const siteNav = document.querySelector("#site-nav");
@@ -118,17 +125,19 @@ function menuButtonLabel(isOpen) {
   return isOpen ? "Close navigation" : "Open navigation";
 }
 
-menuToggle.addEventListener("click", () => {
-  const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
-  menuToggle.setAttribute("aria-expanded", String(!isExpanded));
-  menuToggle.setAttribute("aria-label", menuButtonLabel(!isExpanded));
-  siteNav.classList.toggle("is-open", !isExpanded);
-});
-siteNav.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => {
-  menuToggle.setAttribute("aria-expanded", "false");
-  menuToggle.setAttribute("aria-label", menuButtonLabel(false));
-  siteNav.classList.remove("is-open");
-}));
+if (menuToggle && siteNav) {
+  menuToggle.addEventListener("click", () => {
+    const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
+    menuToggle.setAttribute("aria-expanded", String(!isExpanded));
+    menuToggle.setAttribute("aria-label", menuButtonLabel(!isExpanded));
+    siteNav.classList.toggle("is-open", !isExpanded);
+  });
+  siteNav.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => {
+    menuToggle.setAttribute("aria-expanded", "false");
+    menuToggle.setAttribute("aria-label", menuButtonLabel(false));
+    siteNav.classList.remove("is-open");
+  }));
+}
 // Keyboard shortcuts for responsive navigation and the resource search.
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && menuToggle.getAttribute("aria-expanded") === "true") {
@@ -168,10 +177,22 @@ function setLanguage(language) {
   document.documentElement.lang = language;
   document.documentElement.dataset.locale = language;
   savePreference("bobber-language", language);
-  document.title = isSpanish ? "Bobber, el perro de seguridad acuática | Distrito de Tulsa, USACE" : "Bobber the Water Safety Dog | Tulsa District, USACE";
-  document.querySelector('meta[name="description"]').content = isSpanish
-    ? "Conoce a Bobber y encuentra consejos de seguridad acuática en español, dibujos animados y recursos para imprimir del Distrito de Tulsa del Cuerpo de Ingenieros del Ejército de EE. UU."
-    : "Meet Bobber the Water Safety Dog. Explore family-friendly water safety videos, printable activities, posters, coloring sheets, and storybooks from the U.S. Army Corps of Engineers Tulsa District.";
+  const isGrownUpsPage = document.body.dataset.page === "grownups";
+  document.title = isGrownUpsPage
+    ? (isSpanish ? "Para adultos | Bobber, el perro de seguridad acuática" : "For grown-ups | Bobber the Water Safety Dog")
+    : (isSpanish ? "Bobber, el perro de seguridad acuática | Distrito de Tulsa, USACE" : "Bobber the Water Safety Dog | Tulsa District, USACE");
+  const description = document.querySelector('meta[name="description"]');
+  if (description) {
+    if (isGrownUpsPage) {
+      description.content = isSpanish
+        ? "Planificación de visitas al lago, la app del Distrito de Tulsa de USACE y materiales para el aula del perro de seguridad acuática Bobber."
+        : "Lake visit planning, the USACE Tulsa District app, and classroom materials for teachers and grown-ups, from Bobber the Water Safety Dog.";
+    } else {
+      description.content = isSpanish
+        ? "Conoce a Bobber y encuentra consejos de seguridad acuática en español, dibujos animados y recursos para imprimir del Distrito de Tulsa del Cuerpo de Ingenieros del Ejército de EE. UU."
+        : "Meet Bobber the Water Safety Dog. Explore family-friendly water safety videos, printable activities, posters, coloring sheets, and storybooks from the U.S. Army Corps of Engineers Tulsa District.";
+    }
+  }
 
   for (const { node, original } of staticEnglishTextNodes) {
     if (!node.isConnected) continue;
@@ -180,9 +201,12 @@ function setLanguage(language) {
     node.nodeValue = translated ? original.replace(text, translated) : original;
   }
 
-  document.querySelector("#hero-title").innerHTML = isSpanish
-    ? "Disfruta del agua<br><span>con seguridad</span>."
-    : "Big fun.<br><span>Water-safe</span> adventures.";
+  const heroTitle = document.querySelector("#hero-title");
+  if (heroTitle) {
+    heroTitle.innerHTML = isSpanish
+      ? "Disfruta del agua<br><span>con seguridad</span>."
+      : "Big fun.<br><span>Water-safe</span> adventures.";
+  }
 
   const languageCode = headerLanguageToggle.querySelector(".language-code");
   const languageName = headerLanguageToggle.querySelector(".language-name");
@@ -197,12 +221,15 @@ function setLanguage(language) {
   siteNav.setAttribute("aria-label", isSpanish ? "Navegación principal" : "Main navigation");
   document.querySelector(".skip-link").setAttribute("aria-label", isSpanish ? "Saltar al contenido" : "Skip to content");
   document.querySelector(".brand").setAttribute("aria-label", isSpanish ? "Inicio de Bobber, el perro de seguridad acuática" : "Bobber water safety home");
-  document.querySelector(".quick-strip").setAttribute("aria-label", isSpanish ? "Explora el sitio" : "Explore the site");
-  document.querySelector(".filters").setAttribute("aria-label", isSpanish ? "Filtrar recursos" : "Filter resources");
-  document.querySelector("#resource-search").setAttribute("aria-label", isSpanish ? "Buscar recursos de Bobber" : "Search Bobber resources");
-  document.querySelector("#resource-search").placeholder = isSpanish ? "Buscar actividades, afiches y cuentos…" : "Search activities, posters, books…";
-  document.querySelector(".hero-feature").setAttribute("aria-label", isSpanish ? "Consejo de seguridad acuática de Bobber" : "Bobber’s water safety reminder");
-  document.querySelector(".bobber-note img").alt = isSpanish ? "Bobber, el perro de seguridad acuática" : "Bobber the Water Safety Dog";
+  document.querySelector(".quick-strip")?.setAttribute("aria-label", isSpanish ? "Explora el sitio" : "Explore the site");
+  document.querySelector(".filters")?.setAttribute("aria-label", isSpanish ? "Filtrar recursos" : "Filter resources");
+  if (searchInput) {
+    searchInput.setAttribute("aria-label", isSpanish ? "Buscar recursos de Bobber" : "Search Bobber resources");
+    searchInput.placeholder = isSpanish ? "Buscar actividades, afiches y cuentos…" : "Search activities, posters, books…";
+  }
+  document.querySelector(".hero-feature")?.setAttribute("aria-label", isSpanish ? "Consejo de seguridad acuática de Bobber" : "Bobber’s water safety reminder");
+  const noteImage = document.querySelector(".bobber-note img");
+  if (noteImage) noteImage.alt = isSpanish ? "Bobber, el perro de seguridad acuática" : "Bobber the Water Safety Dog";
 
   englishSafetyCopy.forEach((copy) => { copy.hidden = isSpanish; });
   spanishSafetyCopy.forEach((copy) => { copy.hidden = !isSpanish; });
@@ -245,13 +272,15 @@ function updateThemeControl() {
   themeToggle.title = currentLanguage === "es" ? `Cambiar al modo ${nextMode}` : `Switch to ${nextMode} mode`;
   themeIcon.textContent = isDark ? "☼" : "◐";
   themeLabel.textContent = currentLanguage === "es" ? (isDark ? "Claro" : "Oscuro") : (isDark ? "Light" : "Dark");
-  document.querySelector('meta[name="theme-color"]').content = isDark ? "#101c20" : "#123c45";
+  const themeColor = document.querySelector('meta[name="theme-color"]');
+  if (themeColor) themeColor.content = isDark ? "#101c20" : "#123c45";
 }
 
 // Hidden Konami-code easter egg.
 const easterDialog = document.querySelector("#easter-dialog");
 const easterConfetti = document.querySelector("#easter-confetti");
 function updateEasterDialogLanguage() {
+  if (!easterDialog) return;
   const isSpanish = currentLanguage === "es";
   document.querySelector("#easter-kicker").textContent = isSpanish ? "Misión secreta desbloqueada" : "Secret mission unlocked";
   document.querySelector("#easter-title").textContent = isSpanish ? "¡Encontraste a Bobber!" : "You found Bobber!";
@@ -276,11 +305,13 @@ function addEasterEggConfetti() {
   easterConfetti.replaceChildren(...pieces);
 }
 
-document.querySelector("#easter-close").addEventListener("click", () => easterDialog.close());
-document.querySelector("#easter-return").addEventListener("click", () => easterDialog.close());
-easterDialog.addEventListener("click", (event) => {
-  if (event.target === easterDialog) easterDialog.close();
-});
+if (easterDialog) {
+  document.querySelector("#easter-close").addEventListener("click", () => easterDialog.close());
+  document.querySelector("#easter-return").addEventListener("click", () => easterDialog.close());
+  easterDialog.addEventListener("click", (event) => {
+    if (event.target === easterDialog) easterDialog.close();
+  });
+}
 
 const konamiSequence = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
 let konamiProgress = 0;
@@ -293,7 +324,7 @@ function normalizeKonamiKey(event) {
 }
 
 document.addEventListener("keydown", (event) => {
-  if (easterDialog.open || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+  if (!easterDialog || easterDialog.open || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
   const active = document.activeElement;
   if (active?.matches("input, textarea, select, [contenteditable='true'], [role='textbox']")) {
     konamiProgress = 0;
@@ -335,22 +366,51 @@ const dailyTip = dailyTips[Math.floor(Date.now() / 86400000) % dailyTips.length]
 
 function updateSpeechBubble() {
   if (speechBubble) speechBubble.textContent = currentLanguage === "es" ? dailyTip.es : dailyTip.en;
+  if (readySay) readySay.textContent = currentLanguage === "es" ? "¡Marca cada uno!" : "Tick each one!";
 }
 
 const readyBoxes = [...document.querySelectorAll(".lake-check-list input")];
 const readyProgress = document.querySelector("#lake-check-progress");
 const readyDone = document.querySelector("#lake-check-done");
+const readyBobber = document.querySelector(".lake-check-bobber");
+const readySay = document.querySelector("#lake-check-say");
+const reactions = [...document.querySelectorAll(".reaction")];
 
-function updateChecklist() {
+// Each tick makes Bobber react: he hops, and the matching prop pops in beside him.
+const checklistReactions = [
+  { say: { en: "Life jacket on! You look great.", es: "¡Chaleco puesto! Te ves muy bien." } },
+  { say: { en: "Buddy by your side!", es: "¡Tu compañero está contigo!" } },
+  { say: { en: "A grown-up is watching. Nice!", es: "Un adulto está vigilando. ¡Bien!" } },
+  { say: { en: "Reach or throw, not go!", es: "¡Alcanza o lanza, no te metas!" } }
+];
+
+function updateChecklist(reactedBox) {
+  if (!readyProgress) return;
   const done = readyBoxes.filter((box) => box.checked).length;
   readyBoxes.forEach((box) => box.closest("label").classList.toggle("is-checked", box.checked));
+  reactions.forEach((reaction, index) => reaction.classList.toggle("is-on", Boolean(readyBoxes[index]?.checked)));
   readyProgress.textContent = currentLanguage === "es"
     ? `${done} de ${readyBoxes.length} listos`
     : `${done} of ${readyBoxes.length} ready`;
   readyDone.hidden = done !== readyBoxes.length;
+
+  if (readySay) {
+    const index = readyBoxes.indexOf(reactedBox);
+    const reaction = index >= 0 ? checklistReactions[index] : null;
+    if (reaction && reactedBox.checked) {
+      readySay.textContent = currentLanguage === "es" ? reaction.say.es : reaction.say.en;
+    } else if (!reactedBox) {
+      readySay.textContent = currentLanguage === "es" ? "¡Marca cada uno!" : "Tick each one!";
+    }
+  }
+  if (readyBobber && reactedBox && reactedBox.checked) {
+    readyBobber.classList.remove("is-happy");
+    void readyBobber.offsetWidth;
+    readyBobber.classList.add("is-happy");
+  }
 }
 
-readyBoxes.forEach((box) => box.addEventListener("change", updateChecklist));
+readyBoxes.forEach((box) => box.addEventListener("change", () => updateChecklist(box)));
 updateSpeechBubble();
 updateChecklist();
 

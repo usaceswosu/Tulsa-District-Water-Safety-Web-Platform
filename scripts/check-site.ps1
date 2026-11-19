@@ -11,48 +11,69 @@ function Resolve-SiteFile([string]$Url) {
   return Join-Path $siteRoot ($path.Replace("/", [IO.Path]::DirectorySeparatorChar))
 }
 
-$htmlPath = Join-Path $siteRoot "index.html"
 $stylesPath = Join-Path $siteRoot "styles.css"
 $resourceDataPath = Join-Path $siteRoot "data/resources.js"
 $translationsPath = Join-Path $siteRoot "data/translations.js"
 $appPath = Join-Path $siteRoot "scripts/main.js"
-$html = Get-Content -Raw -Encoding UTF8 $htmlPath
 $styles = Get-Content -Raw -Encoding UTF8 $stylesPath
 $resourceData = Get-Content -Raw -Encoding UTF8 $resourceDataPath
 $translations = Get-Content -Raw -Encoding UTF8 $translationsPath
 
-if ($html -notmatch '<html\s+lang="en"') { Add-SiteProblem "index.html must declare its default document language." }
-if ($html -notmatch '<main\b') { Add-SiteProblem "index.html is missing its main landmark." }
-if ($html -notmatch 'class="skip-link"') { Add-SiteProblem "index.html is missing the skip link." }
 if ($styles -notmatch ':focus-visible') { Add-SiteProblem "styles.css is missing visible keyboard focus styles." }
 if ($styles -notmatch 'prefers-reduced-motion') { Add-SiteProblem "styles.css is missing reduced-motion support." }
-if ($html -match '<script\b[^>]*src="https?://|<link\b[^>]*rel="stylesheet"[^>]*href="https?://|<link\b[^>]*href="https?://fonts\.') {
-  Add-SiteProblem "The page should not require remote scripts, stylesheets, or fonts to render."
-}
-
-$ids = [regex]::Matches($html, 'id="([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
-$duplicateIds = $ids | Group-Object | Where-Object Count -gt 1
-foreach ($duplicate in $duplicateIds) { Add-SiteProblem "Duplicate HTML id: $($duplicate.Name)" }
-foreach ($fragment in [regex]::Matches($html, 'href="#([^"]+)"')) {
-  $target = $fragment.Groups[1].Value
-  if ($target -notin $ids) { Add-SiteProblem "Broken in-page link: #$target" }
-}
 
 $localReferences = 0
-foreach ($match in [regex]::Matches($html, '(?:src|href)="([^"]+)"')) {
-  $url = $match.Groups[1].Value
-  if ($url -match '^(?:https?:|mailto:|tel:|#|data:|javascript:)') { continue }
-  $localReferences++
-  $path = Resolve-SiteFile $url
-  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { Add-SiteProblem "Missing local HTML asset: $url" }
-}
+$pages = Get-ChildItem $siteRoot -Filter *.html -File | Sort-Object Name
+foreach ($page in $pages) {
+  $name = $page.Name
+  $html = Get-Content -Raw -Encoding UTF8 $page.FullName
 
-$scriptOrder = @('data/resources.js', 'data/translations.js', 'scripts/main.js')
-$lastIndex = -1
-foreach ($script in $scriptOrder) {
-  $index = $html.IndexOf("<script src=`"$script`"", [StringComparison]::Ordinal)
-  if ($index -lt 0 -or $index -le $lastIndex) { Add-SiteProblem "Missing or out-of-order app script: $script" }
-  $lastIndex = $index
+  if ($html -notmatch '<html\s+lang="en"') { Add-SiteProblem "$name must declare its default document language." }
+  if ($html -notmatch '<main\b') { Add-SiteProblem "$name is missing its main landmark." }
+  if ($html -notmatch 'class="skip-link"') { Add-SiteProblem "$name is missing the skip link." }
+  if ($html -match '<script\b[^>]*src="https?://|<link\b[^>]*rel="stylesheet"[^>]*href="https?://|<link\b[^>]*href="https?://fonts\.') {
+    Add-SiteProblem "$name should not require remote scripts, stylesheets, or fonts to render."
+  }
+
+  $ids = [regex]::Matches($html, 'id="([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+  $duplicateIds = $ids | Group-Object | Where-Object Count -gt 1
+  foreach ($duplicate in $duplicateIds) { Add-SiteProblem "Duplicate HTML id in ${name}: $($duplicate.Name)" }
+  foreach ($fragment in [regex]::Matches($html, 'href="#([^"]+)"')) {
+    $target = $fragment.Groups[1].Value
+    if ($target -notin $ids) { Add-SiteProblem "Broken in-page link in ${name}: #$target" }
+  }
+
+  $fragments = @{}
+  foreach ($fragment in [regex]::Matches($html, 'href="([^"#]+)#([^"]+)"')) {
+    $fragments[$fragment.Groups[1].Value] = $true
+  }
+  foreach ($target in $fragments.Keys) {
+    $targetPath = Resolve-SiteFile $target
+    if (-not (Test-Path -LiteralPath $targetPath -PathType Leaf)) { continue }
+    $targetHtml = Get-Content -Raw -Encoding UTF8 $targetPath
+    $targetIds = [regex]::Matches($targetHtml, 'id="([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+    foreach ($fragment in [regex]::Matches($html, [regex]::Escape("href=`"$target#") + '([^"]+)"')) {
+      if ($fragment.Groups[1].Value -notin $targetIds) {
+        Add-SiteProblem "Broken cross-page link in ${name}: $target#$($fragment.Groups[1].Value)"
+      }
+    }
+  }
+
+  foreach ($match in [regex]::Matches($html, '(?:src|href)="([^"]+)"')) {
+    $url = $match.Groups[1].Value
+    if ($url -match '^(?:https?:|mailto:|tel:|#|data:|javascript:)') { continue }
+    $localReferences++
+    $path = Resolve-SiteFile $url
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { Add-SiteProblem "Missing local asset in ${name}: $url" }
+  }
+
+  $scriptOrder = @('data/resources.js', 'data/translations.js', 'scripts/main.js')
+  $lastIndex = -1
+  foreach ($script in $scriptOrder) {
+    $index = $html.IndexOf("<script src=`"$script`"", [StringComparison]::Ordinal)
+    if ($index -lt 0 -or $index -le $lastIndex) { Add-SiteProblem "Missing or out-of-order app script in ${name}: $script" }
+    $lastIndex = $index
+  }
 }
 
 $resourceMatch = [regex]::Match($resourceData, '(?s)window\.BOBBER_RESOURCES\s*=\s*(\[.*?\]);')

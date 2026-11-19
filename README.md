@@ -23,7 +23,8 @@ The site has no build step. GitHub Pages serves these files and folders directly
 
 ## Project structure
 
-- `index.html` — semantic page structure and script/style loading order.
+- `index.html` — the kid-facing home page: safety reminders, cartoons, AR activity, and the printable library.
+- `grown-ups.html` — lake visit planning, the district app, and educator materials.
 - `styles.css` — design tokens, components, responsive layouts, and light/dark themes.
 - `data/resources.js` — resource metadata and Spanish display titles. Keep the official filenames exactly as stored in `assets/`.
 - `data/translations.js` — Spanish interface copy, separated from page behavior.
