@@ -8,6 +8,8 @@ A responsive, static website that brings together Bobber the Water Safety Dog re
 
 No build tools or server-side code are required. Open `index.html` in a browser, or serve this folder with any static web server. Styles, scripts, fonts (system fonts), artwork, and PDFs load from the repository; there are no CDN or hosted font dependencies.
 
+For local preview without stale browser caches, run `python scripts/serve.py` and open <http://localhost:8000/index.html>.
+
 The links to YouTube, USACE, Recreation.gov, and other official sources are outbound links only. The site itself does not need those services to load; video playback and live lake information do require visiting the respective source.
 
 ## Publish with GitHub Pages
@@ -21,7 +23,9 @@ The site has no build step. GitHub Pages serves these files and folders directly
 
 ## Project structure
 
-- `index.html` — semantic page structure and script/style loading order.
+- `index.html` — the kid-facing home page: safety reminders, cartoons, AR activity, and the printable library.
+- `grown-ups.html` — lake visit planning, the district app, and educator materials.
+- `404.html` — self-contained page for missing addresses.
 - `styles.css` — design tokens, components, responsive layouts, and light/dark themes.
 - `data/resources.js` — resource metadata and Spanish display titles. Keep the official filenames exactly as stored in `assets/`.
 - `data/translations.js` — Spanish interface copy, separated from page behavior.
@@ -31,7 +35,7 @@ The site has no build step. GitHub Pages serves these files and folders directly
 - `assets/bobber-logo.png` — site brand image.
 - `assets/graphics/` — preview images for the printable library.
 - `assets/graphics/videos/` — YouTube preview images for the cartoon episodes.
-- `assets/bobber/` — standalone Bobber clipart from the USACE Water Safety Graphics Library, used on the page.
+- `assets/bobber/` — Bobber artwork used on the page, including the checklist images for Bobber without his life jacket, with it, and with his buddy.
 - `assets/pdfs/` — self-hosted original resource and program PDFs.
 
 ## Updating resources
