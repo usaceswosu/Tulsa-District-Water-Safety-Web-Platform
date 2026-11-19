@@ -10,6 +10,8 @@ No build tools or server-side code are required. Open `index.html` in a browser,
 
 For local preview without stale browser caches, run `python scripts/serve.py` and open <http://localhost:8000/index.html>.
 
+The stylesheet and scripts are linked with a `?v=` value. When you change `styles.css`, `data/resources.js`, `data/translations.js`, `scripts/main.js`, or `scripts/pdf-reader.js`, bump that value in `index.html` and `grown-ups.html` so browsers fetch the new copies.
+
 The links to YouTube, USACE, Recreation.gov, and other official sources are outbound links only. The site itself does not need those services to load; video playback and live lake information do require visiting the respective source.
 
 ## Publish with GitHub Pages

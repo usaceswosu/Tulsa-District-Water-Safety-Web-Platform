@@ -72,7 +72,7 @@ foreach ($page in $pages) {
     $scriptOrder = @('data/resources.js', 'data/translations.js', 'scripts/main.js')
     $lastIndex = -1
     foreach ($script in $scriptOrder) {
-      $index = $html.IndexOf("<script src=`"$script`"", [StringComparison]::Ordinal)
+      $index = $html.IndexOf("<script src=`"$script", [StringComparison]::Ordinal)
       if ($index -lt 0 -or $index -le $lastIndex) { Add-SiteProblem "Missing or out-of-order app script in ${name}: $script" }
       $lastIndex = $index
     }
