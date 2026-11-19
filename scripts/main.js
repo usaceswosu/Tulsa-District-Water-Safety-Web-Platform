@@ -251,6 +251,8 @@ function setLanguage(language) {
   updateThemeControl();
   updateExternalLinkLabels();
   updateEasterDialogLanguage();
+  if (infoClose) infoClose.setAttribute("aria-label", isSpanish ? "Cerrar" : "Close");
+  if (infoDialog?.open) infoDialog.close();
   updateSpeechBubble();
   updateChecklist();
   renderGame();
@@ -456,6 +458,118 @@ function updateChecklist(reactedBox) {
 readyBoxes.forEach((box) => box.addEventListener("change", () => updateChecklist(box)));
 updateSpeechBubble();
 updateChecklist();
+
+// Cards open a detail dialog when clicked, with keyboard support.
+const infoDialog = document.querySelector("#info-dialog");
+const infoArt = document.querySelector("#info-art");
+const infoKicker = document.querySelector("#info-kicker");
+const infoTitle = document.querySelector("#info-title");
+const infoCopy = document.querySelector("#info-copy");
+const infoClose = document.querySelector("#info-close");
+const infoLink = document.querySelector("#info-link");
+
+// Each pal opens their official 1-2-3 Splash trading card.
+const palCards = {
+  "Ranger Buck": {
+    art: "assets/cards/splash/card-2.webp",
+    page: 4,
+    rule: { en: "Learn to swim and float well!", es: "¡Aprende a nadar y flotar bien!" }
+  },
+  "Ranger Jane": {
+    art: "assets/cards/splash/card-3.webp",
+    page: 5,
+    rule: { en: "Get outdoors and play it safe!", es: "¡Disfruta al aire libre con seguridad!" }
+  },
+  "Ranger Toro": {
+    art: "assets/cards/splash/card-4.webp",
+    page: 6,
+    rule: { en: "Learn to swim and float well!", es: "¡Aprenda a nadar y flotar bien!" }
+  },
+  "Corkey": {
+    art: "assets/cards/splash/card-7.webp",
+    page: 9,
+    rule: { en: "Always swim with a buddy!", es: "¡Nada siempre acompañado!" }
+  },
+  "Sinker": {
+    art: "assets/cards/splash/card-8.webp",
+    page: 10,
+    rule: { en: "Don’t trust inflatable toys!", es: "¡No confíes en los juguetes inflables!" }
+  }
+};
+
+function openInfoCard({ art, kicker, title, copy, link }) {
+  if (!infoDialog) return;
+  infoArt.src = art;
+  infoArt.alt = "";
+  infoKicker.textContent = kicker;
+  infoTitle.textContent = title;
+  infoCopy.textContent = copy;
+  if (infoLink) {
+    infoLink.hidden = !link;
+    if (link) {
+      infoLink.href = link.href;
+      infoLink.textContent = link.label;
+      const arrow = document.createElement("span");
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = " ↗";
+      infoLink.append(arrow);
+    }
+  }
+  infoDialog.showModal();
+}
+
+function makeCardOpen(container, getInfo) {
+  if (!container || !infoDialog) return;
+  container.tabIndex = 0;
+  container.setAttribute("role", "button");
+  container.setAttribute("aria-haspopup", "dialog");
+  container.classList.add("is-clickable");
+  const open = () => {
+    const info = getInfo();
+    if (info) openInfoCard(info);
+  };
+  container.addEventListener("click", open);
+  container.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      open();
+    }
+  });
+}
+
+if (infoDialog) {
+  document.querySelectorAll(".safety-card").forEach((card) => {
+    makeCardOpen(card, () => ({
+      art: card.querySelector(".safety-art")?.getAttribute("src") || "",
+      kicker: currentLanguage === "es" ? "Seguridad acuática" : "Water safety",
+      title: card.querySelector("h3")?.textContent || "",
+      copy: card.querySelector(":scope > h3 + p")?.textContent || ""
+    }));
+  });
+
+  document.querySelectorAll(".friends-row li").forEach((pal) => {
+    makeCardOpen(pal, () => {
+      const name = pal.querySelector("strong")?.textContent || "";
+      const card = palCards[name];
+      if (!card) return null;
+      return {
+        art: card.art,
+        kicker: currentLanguage === "es" ? "Tarjeta coleccionable oficial" : "Official trading card",
+        title: name,
+        copy: currentLanguage === "es" ? card.rule.es : card.rule.en,
+        link: {
+          href: `assets/pdfs/Splash_Trading_Card_Game.pdf#page=${card.page}`,
+          label: currentLanguage === "es" ? "Abrir la tarjeta para imprimir" : "Open the printable card"
+        }
+      };
+    });
+  });
+
+  infoClose.addEventListener("click", () => infoDialog.close());
+  infoDialog.addEventListener("click", (event) => {
+    if (event.target === infoDialog) infoDialog.close();
+  });
+}
 
 // Bobber's safety game: four picture questions with instant feedback.
 const gameQuestions = [
