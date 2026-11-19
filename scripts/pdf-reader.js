@@ -9,6 +9,16 @@ const pdfReaderNext = document.querySelector("#pdf-reader-next");
 
 const pdfEngine = new URL("../vendor/pdfjs/", document.currentScript.src);
 let activePdf;
+let pdfjsPromise;
+let workerPrefetch;
+
+// Warm the reader on first hover or focus so the first PDF opens quickly.
+function prefetchPdfEngine() {
+  if (navigator.connection?.saveData) return;
+  pdfjsPromise ||= import(new URL("build/pdf.min.mjs", pdfEngine));
+  workerPrefetch ||= fetch(new URL("build/pdf.worker.min.mjs", pdfEngine), { cache: "force-cache" }).catch(() => {});
+}
+window.prefetchPdfEngine = prefetchPdfEngine;
 
 function readerCopy(english, spanish) {
   return document.documentElement.lang === "es" ? spanish : english;
@@ -108,9 +118,9 @@ async function openPdfReader(url, title, opener) {
   }, 7000);
 
   try {
-    const pdfjs = await import(new URL("build/pdf.mjs", pdfEngine));
+    const pdfjs = await (pdfjsPromise || import(new URL("build/pdf.min.mjs", pdfEngine)));
     if (activePdf !== session) return;
-    pdfjs.GlobalWorkerOptions.workerSrc = new URL("build/pdf.worker.mjs", pdfEngine).href;
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL("build/pdf.worker.min.mjs", pdfEngine).href;
     session.loadingTask = pdfjs.getDocument({
       url,
       standardFontDataUrl: new URL("web/standard_fonts/", pdfEngine).href,

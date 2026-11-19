@@ -94,6 +94,10 @@ function renderResources() {
 }
 
 if (grid && searchInput) {
+  const warmReader = () => window.prefetchPdfEngine?.();
+  grid.addEventListener("pointerover", warmReader, { once: true });
+  grid.addEventListener("focusin", warmReader, { once: true });
+
   filterButtons.forEach((button) => {
     button.addEventListener("click", () => {
       activeFilter = button.dataset.filter;
@@ -411,7 +415,7 @@ const readySay = document.querySelector("#lake-check-say");
 const reactions = [...document.querySelectorAll(".reaction")];
 const bobberLooks = {
   bare: "assets/bobber/bobber-no-jacket.webp",
-  jacket: "assets/bobber/bobber-sitting.png",
+  jacket: "assets/bobber/bobber-sitting.webp",
   buddy: "assets/bobber/bobber-buddy.webp"
 };
 Object.values(bobberLooks).forEach((src) => { const preload = new Image(); preload.src = src; });
