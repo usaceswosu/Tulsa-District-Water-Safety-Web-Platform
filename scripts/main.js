@@ -53,16 +53,20 @@ function makeCard(resource) {
   const link = document.createElement("a");
   link.className = "resource-link";
   link.href = assetPath(resource.file);
-  link.target = "_blank";
-  link.rel = "noopener";
-  link.setAttribute("aria-label", currentLanguage === "es" ? `Abrir el PDF de ${displayTitle} en una pestaña nueva` : `Open ${resource.title} PDF in a new tab`);
+  link.setAttribute("aria-haspopup", "dialog");
+  link.addEventListener("click", (event) => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || !("showModal" in pdfReader)) return;
+    event.preventDefault();
+    openPdfReader(link.href, displayTitle, link);
+  });
   const linkLabel = document.createElement("span");
   linkLabel.textContent = currentLanguage === "es"
     ? (resource.category === "storybook" ? "Leer el cuento" : "Abrir PDF para imprimir")
     : (resource.category === "storybook" ? "Read the story" : "Open printable PDF");
+  link.setAttribute("aria-label", `${linkLabel.textContent}: ${displayTitle}`);
   const arrow = document.createElement("span");
   arrow.setAttribute("aria-hidden", "true");
-  arrow.textContent = "↗";
+  arrow.textContent = "→";
   link.append(linkLabel, arrow);
   body.append(title, link);
   article.append(preview, body);
@@ -131,6 +135,7 @@ siteNav.querySelectorAll("a").forEach((link) => link.addEventListener("click", (
 }));
 // Keyboard shortcuts for responsive navigation and the resource search.
 document.addEventListener("keydown", (event) => {
+  if (pdfReader.open) return;
   if (event.key === "Escape" && menuToggle.getAttribute("aria-expanded") === "true") {
     menuToggle.setAttribute("aria-expanded", "false");
     menuToggle.setAttribute("aria-label", menuButtonLabel(false));
@@ -291,7 +296,7 @@ function normalizeKonamiKey(event) {
 }
 
 document.addEventListener("keydown", (event) => {
-  if (easterDialog.open || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+  if (easterDialog.open || pdfReader.open || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
   const active = document.activeElement;
   if (active?.matches("input, textarea, select, [contenteditable='true'], [role='textbox']")) {
     konamiProgress = 0;
