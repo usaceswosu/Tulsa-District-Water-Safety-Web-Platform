@@ -36,6 +36,7 @@ The site has no build step. GitHub Pages serves these files and folders directly
 - `assets/graphics/` — preview images for the printable library.
 - `assets/graphics/videos/` — YouTube preview images for the cartoon episodes.
 - `assets/bobber/` — Bobber artwork used on the page, including the checklist images for Bobber without his life jacket, with it, and with his buddy.
+- `assets/cards/` — official USACE pals posters and 1-2-3 Splash trading-card images shown in the card collection.
 - `assets/pdfs/` — self-hosted original resource and program PDFs.
 
 ## Updating resources

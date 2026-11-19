@@ -2340,7 +2340,7 @@ html[data-theme="dark"] .page-head {
 }
 
 .library-section {
-  --wave: #e5f1eb;
+  --wave: #fffefa;
 }
 
 .educator-section {
@@ -2355,9 +2355,12 @@ html[data-theme="dark"] .ar-section {
   --wave: #0d191d;
 }
 
-html[data-theme="dark"] .visit-section,
-html[data-theme="dark"] .library-section {
+html[data-theme="dark"] .visit-section {
   --wave: #182a2d;
+}
+
+html[data-theme="dark"] .library-section {
+  --wave: #101c20;
 }
 
 html[data-theme="dark"] .educator-section {
@@ -4290,5 +4293,127 @@ html[data-theme="dark"] .info-close:hover {
 
   .info-art {
     max-height: 180px;
+  }
+}
+
+
+/* Official USACE card collection */
+.cards-section {
+  position: relative;
+  padding: 84px 0 90px;
+  background: #fffefa;
+  --wave: #e5f1eb;
+}
+
+.cards-section::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 22px;
+  pointer-events: none;
+  background: var(--wave);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='22'%3E%3Cpath d='M0 0H60V12C45 22 15 22 0 12Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='22'%3E%3Cpath d='M0 0H60V12C45 22 15 22 0 12Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-size: 60px 22px;
+  mask-size: 60px 22px;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+}
+
+.cards-subtitle {
+  margin: 34px 0 14px;
+  font: 900 24px/1.2 var(--display);
+  letter-spacing: -.02em;
+}
+
+.cards-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.card-tile {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #fff;
+  color: var(--ink);
+  border: 3px solid var(--outline);
+  border-radius: 16px;
+  box-shadow: var(--pop-shadow);
+  font: 800 14px/1.3 var(--display);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+}
+
+.card-tile img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: contain;
+  display: block;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.card-tile:hover {
+  transform: translate(-2px, -3px) rotate(-.5deg);
+  box-shadow: 6px 6px 0 var(--outline);
+}
+
+.card-tile:focus-visible {
+  outline: 3px solid #efa94c;
+  outline-offset: 3px;
+}
+
+.cards-note {
+  margin: 14px 0 0;
+  font-size: 12px;
+}
+
+.cards-note a {
+  color: #11706c;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+html[data-theme="dark"] .cards-section {
+  background: #101c20;
+  --wave: #182a2d;
+}
+
+html[data-theme="dark"] .card-tile {
+  background: #192a2d;
+}
+
+html[data-theme="dark"] .cards-note a {
+  color: #8bd2c2;
+}
+
+.info-link {
+  margin-top: 18px;
+}
+
+@media(max-width:900px) {
+  .cards-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media(max-width:640px) {
+  .cards-section {
+    padding: 62px 0 66px;
+  }
+
+  .cards-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cards-subtitle {
+    font-size: 21px;
   }
 }

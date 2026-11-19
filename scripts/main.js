@@ -466,6 +466,7 @@ const infoKicker = document.querySelector("#info-kicker");
 const infoTitle = document.querySelector("#info-title");
 const infoCopy = document.querySelector("#info-copy");
 const infoClose = document.querySelector("#info-close");
+const infoLink = document.querySelector("#info-link");
 
 const palInfo = {
   "Ranger Buck": {
@@ -490,13 +491,24 @@ const palInfo = {
   }
 };
 
-function openInfoCard({ art, kicker, title, copy }) {
+function openInfoCard({ art, kicker, title, copy, link }) {
   if (!infoDialog) return;
   infoArt.src = art;
   infoArt.alt = "";
   infoKicker.textContent = kicker;
   infoTitle.textContent = title;
   infoCopy.textContent = copy;
+  if (infoLink) {
+    infoLink.hidden = !link;
+    if (link) {
+      infoLink.href = link.href;
+      infoLink.textContent = link.label;
+      const arrow = document.createElement("span");
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = " ↗";
+      infoLink.append(arrow);
+    }
+  }
   infoDialog.showModal();
 }
 
@@ -539,6 +551,34 @@ if (infoDialog) {
         title: name,
         copy: info ? (currentLanguage === "es" ? info.es : info.en) : ""
       };
+    });
+  });
+
+  const officialRules = {
+    "Bobber": { en: "Please wear your life jacket!", es: "¡Usa tu chaleco salvavidas!" },
+    "Ranger Buck": { en: "Learn to swim and float well!", es: "¡Aprende a nadar y flotar bien!" },
+    "Ranger Jane": { en: "Get outdoors and play it safe!", es: "¡Disfruta al aire libre con seguridad!" },
+    "Ranger Toro": { en: "Learn to swim and float well!", es: "¡Aprenda a nadar y flotar bien!" },
+    "Tackle": { en: "“Reel” anglers wear life jackets!", es: "¡Los pescadores usan chaleco salvavidas!" },
+    "Jacques Catsto": { en: "Please keep your lake clean!", es: "¡Mantén limpio tu lago!" },
+    "Corkey": { en: "Always swim with a buddy!", es: "¡Nada siempre acompañado!" },
+    "Sinker": { en: "Don’t trust inflatable toys!", es: "¡No confíes en los juguetes inflables!" }
+  };
+
+  document.querySelectorAll(".card-tile").forEach((tile) => {
+    tile.addEventListener("click", () => {
+      const name = tile.dataset.name || "";
+      const rule = officialRules[name];
+      openInfoCard({
+        art: tile.dataset.art || "",
+        kicker: currentLanguage === "es" ? "Tarjeta oficial de USACE" : "Official USACE card",
+        title: name,
+        copy: rule ? (currentLanguage === "es" ? rule.es : rule.en) : "",
+        link: {
+          href: tile.dataset.pdf || "",
+          label: currentLanguage === "es" ? "Abrir la hoja para imprimir" : "Open the printable sheet"
+        }
+      });
     });
   });
 
