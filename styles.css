@@ -4170,3 +4170,24 @@ html[data-theme="dark"] .game-option.is-wrong {
     animation-delay: 0s !important;
   }
 }
+
+/* Silky bobbing: long sine-like cycle on the GPU layer */
+@keyframes bobber-float-smooth {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -6px, 0); }
+}
+
+.life-jacket-art img,
+.visit-peek {
+  animation: bobber-float-smooth 7s cubic-bezier(.37, 0, .63, 1) infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .life-jacket-art img,
+  .visit-peek {
+    animation: none !important;
+  }
+}
