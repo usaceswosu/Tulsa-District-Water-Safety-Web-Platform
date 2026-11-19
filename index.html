@@ -425,6 +425,22 @@
       <span aria-hidden="true">→</span>
     </button>
   </dialog>
+  <dialog class="pdf-reader" id="pdf-reader" aria-labelledby="pdf-reader-title">
+    <div class="pdf-reader-panel">
+      <header class="pdf-reader-header">
+        <button class="pdf-reader-control" id="pdf-reader-close" type="button" autofocus>Back to the library</button>
+        <a class="pdf-reader-control" id="pdf-reader-download" download>Download PDF</a>
+        <h2 id="pdf-reader-title"></h2>
+      </header>
+      <div class="pdf-reader-stage" id="pdf-reader-stage"></div>
+      <footer class="pdf-reader-footer">
+        <button class="pdf-reader-control" id="pdf-reader-prev" type="button" aria-disabled="true">Previous page</button>
+        <p id="pdf-reader-status" role="status"></p>
+        <button class="pdf-reader-control" id="pdf-reader-next" type="button" aria-disabled="true">Next page</button>
+      </footer>
+    </div>
+  </dialog>
+  <script src="scripts/pdf-reader.js" defer></script>
   <script src="data/resources.js" defer></script>
   <script src="data/translations.js" defer></script>
   <script src="scripts/main.js" defer></script>
