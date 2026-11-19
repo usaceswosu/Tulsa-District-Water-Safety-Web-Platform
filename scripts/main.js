@@ -251,6 +251,8 @@ function setLanguage(language) {
   updateThemeControl();
   updateExternalLinkLabels();
   updateEasterDialogLanguage();
+  if (infoClose) infoClose.setAttribute("aria-label", isSpanish ? "Cerrar" : "Close");
+  if (infoDialog?.open) infoDialog.close();
   updateSpeechBubble();
   updateChecklist();
   renderGame();
@@ -456,6 +458,95 @@ function updateChecklist(reactedBox) {
 readyBoxes.forEach((box) => box.addEventListener("change", () => updateChecklist(box)));
 updateSpeechBubble();
 updateChecklist();
+
+// Cards open a detail dialog when clicked, with keyboard support.
+const infoDialog = document.querySelector("#info-dialog");
+const infoArt = document.querySelector("#info-art");
+const infoKicker = document.querySelector("#info-kicker");
+const infoTitle = document.querySelector("#info-title");
+const infoCopy = document.querySelector("#info-copy");
+const infoClose = document.querySelector("#info-close");
+
+const palInfo = {
+  "Ranger Buck": {
+    en: "A park ranger friend who teams up with Bobber to share water safety tips at the lake.",
+    es: "Un guardabosques que se une a Bobber para compartir consejos de seguridad acuática en el lago."
+  },
+  "Ranger Jane": {
+    en: "A ranger who helps Bobber teach kids how to stay safe around the water.",
+    es: "Una guardabosques que ayuda a Bobber a enseñar a los niños cómo mantenerse seguros cerca del agua."
+  },
+  "Ranger Toro": {
+    en: "A ranger who joins Bobber’s water safety adventures at lakes and rivers.",
+    es: "Un guardabosques que acompaña a Bobber en sus aventuras de seguridad acuática en lagos y ríos."
+  },
+  "Corkey": {
+    en: "One of Bobber’s pals. Corkey wears a life jacket and helps remind everyone to wear theirs too.",
+    es: "Uno de los amigos de Bobber. Corkey usa chaleco salvavidas y ayuda a recordarles a todos que también lo usen."
+  },
+  "Sinker": {
+    en: "Bobber’s blue pal, always around for a water safety reminder.",
+    es: "El amigo azul de Bobber, siempre presente para recordar la seguridad acuática."
+  }
+};
+
+function openInfoCard({ art, kicker, title, copy }) {
+  if (!infoDialog) return;
+  infoArt.src = art;
+  infoArt.alt = "";
+  infoKicker.textContent = kicker;
+  infoTitle.textContent = title;
+  infoCopy.textContent = copy;
+  infoDialog.showModal();
+}
+
+function makeCardOpen(container, getInfo) {
+  if (!container || !infoDialog) return;
+  container.tabIndex = 0;
+  container.setAttribute("role", "button");
+  container.setAttribute("aria-haspopup", "dialog");
+  container.classList.add("is-clickable");
+  const open = () => {
+    const info = getInfo();
+    if (info) openInfoCard(info);
+  };
+  container.addEventListener("click", open);
+  container.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      open();
+    }
+  });
+}
+
+if (infoDialog) {
+  document.querySelectorAll(".safety-card").forEach((card) => {
+    makeCardOpen(card, () => ({
+      art: card.querySelector(".safety-art")?.getAttribute("src") || "",
+      kicker: currentLanguage === "es" ? "Seguridad acuática" : "Water safety",
+      title: card.querySelector("h3")?.textContent || "",
+      copy: card.querySelector(":scope > h3 + p")?.textContent || ""
+    }));
+  });
+
+  document.querySelectorAll(".friends-row li").forEach((pal) => {
+    makeCardOpen(pal, () => {
+      const name = pal.querySelector("strong")?.textContent || "";
+      const info = palInfo[name];
+      return {
+        art: pal.querySelector("img")?.getAttribute("src") || "",
+        kicker: currentLanguage === "es" ? "Los amigos de Bobber" : "Bobber’s pals",
+        title: name,
+        copy: info ? (currentLanguage === "es" ? info.es : info.en) : ""
+      };
+    });
+  });
+
+  infoClose.addEventListener("click", () => infoDialog.close());
+  infoDialog.addEventListener("click", (event) => {
+    if (event.target === infoDialog) infoDialog.close();
+  });
+}
 
 // Bobber's safety game: four picture questions with instant feedback.
 const gameQuestions = [

@@ -91,6 +91,7 @@ window.BOBBER_TRANSLATIONS_ES = {
   "Recreation information and water data for the 38 lakes and MKARNS rivers system.": "Información recreativa y datos del agua de los 38 lagos y del sistema de ríos MKARNS.",
   "Download on the": "Descárgala en la",
   "Get it on": "Disponible en",
+  "Water safety": "Seguridad acuática",
   "Play with Bobber": "Juega con Bobber",
   "Bobber’s safety game.": "El juego de seguridad de Bobber.",
   "Four quick questions. Pick the safe answer and see how you do.": "Cuatro preguntas rápidas. Elige la respuesta segura y mira cómo te va.",
