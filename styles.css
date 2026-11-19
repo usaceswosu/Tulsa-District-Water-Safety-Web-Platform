@@ -4493,3 +4493,11 @@ html:has(.pdf-reader[open]) {
 .pdf-reader-footer {
   justify-content: center;
 }
+
+/* Canvas pages in the scripted reader */
+.pdf-reader-stage canvas {
+  display: block;
+  width: min(100cqw, calc(100cqh * var(--page-ratio)));
+  height: auto;
+  box-shadow: 0 3px 14px #071e2a26;
+}
