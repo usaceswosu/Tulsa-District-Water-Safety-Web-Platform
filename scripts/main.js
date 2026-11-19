@@ -370,7 +370,27 @@ function updateSpeechBubble() {
   if (readySay) readySay.textContent = currentLanguage === "es" ? "¡Marca cada uno!" : "Tick each one!";
 }
 
+// Small confetti burst for finished activities; skipped when motion is reduced.
+function burstConfetti(container) {
+  if (!container || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const layer = document.createElement("div");
+  layer.className = "confetti";
+  layer.setAttribute("aria-hidden", "true");
+  const colors = ["#f17658", "#f7d978", "#167e79", "#73bed0", "#e45b71"];
+  for (let index = 0; index < 18; index += 1) {
+    const piece = document.createElement("i");
+    piece.style.setProperty("--x", `${(index * 37 + 7) % 100}%`);
+    piece.style.setProperty("--delay", `${(index % 6) * 0.05}s`);
+    piece.style.setProperty("--turn", `${index * 47}deg`);
+    piece.style.setProperty("--piece", colors[index % colors.length]);
+    layer.append(piece);
+  }
+  container.append(layer);
+  window.setTimeout(() => layer.remove(), 1800);
+}
+
 const readyBoxes = [...document.querySelectorAll(".lake-check-list input")];
+let checklistDone = false;
 const readyProgress = document.querySelector("#lake-check-progress");
 const readyDone = document.querySelector("#lake-check-done");
 const readyBobber = document.querySelector(".lake-check-bobber");
@@ -412,6 +432,10 @@ function updateChecklist(reactedBox) {
     ? `${done} de ${readyBoxes.length} listos`
     : `${done} of ${readyBoxes.length} ready`;
   readyDone.hidden = done !== readyBoxes.length;
+
+  const nowDone = done === readyBoxes.length;
+  if (nowDone && !checklistDone) burstConfetti(document.querySelector(".lake-check"));
+  checklistDone = nowDone;
 
   if (readySay) {
     const index = readyBoxes.indexOf(reactedBox);
@@ -568,6 +592,7 @@ if (gameNext) {
     if (!gameState.answered) return;
     if (gameState.index === gameQuestions.length - 1) {
       gameState.done = true;
+      burstConfetti(document.querySelector(".game-card"));
     } else {
       gameState.index += 1;
       gameState.answered = false;

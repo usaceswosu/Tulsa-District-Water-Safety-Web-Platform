@@ -4006,3 +4006,149 @@ html[data-theme="dark"] .game-option.is-wrong {
     border: 1pt solid #000;
   }
 }
+
+/* Living details: gentle motion that respects reduced-motion settings */
+@keyframes bobber-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes bubble-pop {
+  from { opacity: 0; transform: scale(.7) rotate(-4deg); }
+  to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes wave-drift {
+  from { -webkit-mask-position: 0 0; mask-position: 0 0; }
+  to { -webkit-mask-position: 60px 0; mask-position: 60px 0; }
+}
+
+@keyframes play-pulse {
+  0%, 100% { box-shadow: 3px 3px 0 var(--outline), 0 0 0 0 #f1765840; }
+  50% { box-shadow: 3px 3px 0 var(--outline), 0 0 0 10px #f1765800; }
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes option-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes correct-pulse {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.03); }
+}
+
+.life-jacket-art img {
+  animation: bobber-float 5s ease-in-out infinite;
+}
+
+.speech-bubble {
+  animation: bubble-pop .5s .25s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+.visit-peek {
+  animation: bobber-float 6s ease-in-out infinite;
+}
+
+.safety-section::before, .visit-section::before, .ar-section::before,
+.library-section::before, .educator-section::before, .game-section::before {
+  animation: wave-drift 22s linear infinite;
+}
+
+.video-play {
+  animation: play-pulse 2.6s ease-out infinite;
+}
+
+.quick-strip>a:hover .quick-icon,
+.quick-strip>a:focus-visible .quick-icon {
+  animation: bobber-wiggle .6s ease;
+}
+
+.site-nav>a:not(.nav-cta) {
+  background-image: linear-gradient(var(--teal), var(--teal));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0 2px;
+  transition: color .2s, background-size .25s ease;
+}
+
+.site-nav>a:not(.nav-cta):hover,
+.site-nav>a:not(.nav-cta):focus-visible {
+  background-size: 100% 2px;
+}
+
+.resource-card {
+  animation: card-in .4s ease both;
+}
+
+.resource-card:nth-child(2n) { animation-delay: .04s; }
+.resource-card:nth-child(3n) { animation-delay: .08s; }
+.resource-card:nth-child(5n) { animation-delay: .12s; }
+
+.game-option {
+  animation: option-in .3s ease both;
+}
+
+.game-option:nth-child(2) { animation-delay: .05s; }
+.game-option:nth-child(3) { animation-delay: .1s; }
+
+.game-option.is-correct {
+  animation: correct-pulse .5s ease;
+}
+
+/* Confetti layer shared by the checklist and the game */
+.confetti {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.confetti i {
+  position: absolute;
+  top: -16px;
+  left: var(--x);
+  width: 8px;
+  height: 13px;
+  border-radius: 2px;
+  background: var(--piece);
+  animation: easter-confetti-fall 1.5s ease-out var(--delay) both;
+  transform: rotate(var(--turn));
+}
+
+.confetti i:nth-child(3n) {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.lake-check, .game-card {
+  position: relative;
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .life-jacket-art img,
+  .visit-peek,
+  .speech-bubble,
+  .video-play,
+  .safety-section::before, .visit-section::before, .ar-section::before,
+  .library-section::before, .educator-section::before, .game-section::before,
+  .quick-strip>a:hover .quick-icon,
+  .quick-strip>a:focus-visible .quick-icon,
+  .resource-card,
+  .game-option,
+  .game-option.is-correct {
+    animation: none !important;
+  }
+
+  .site-nav>a:not(.nav-cta) {
+    transition: color .2s;
+  }
+}
