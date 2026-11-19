@@ -174,6 +174,7 @@ window.BOBBER_TRANSLATIONS_ES = {
   "National Water Safety Program ↗": "Programa Nacional de Seguridad Acuática ↗",
   "Bobber program ↗": "Programa Bobber ↗",
   "Tulsa District ↗": "Distrito de Tulsa ↗",
+  "Built by Joseph McPhearson, Tanner Moore, Moses Michael Angel Garcia, and Austin Wilson at Southwestern Oklahoma State University.": "Creado por Joseph McPhearson, Tanner Moore, Moses Michael Angel Garcia y Austin Wilson en Southwestern Oklahoma State University.",
   "U.S. Army Corps of Engineers · Tulsa District": "Cuerpo de Ingenieros del Ejército de EE. UU. · Distrito de Tulsa",
   "Official U.S. Army website ↗": "Sitio web oficial del Ejército de EE. UU. ↗"
 };
