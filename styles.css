@@ -2277,7 +2277,6 @@ h1, h2 {
   bottom: -6px;
   width: min(30vw, 320px);
   height: auto;
-  pointer-events: none;
 }
 
 @media(max-width:900px) {
@@ -4441,5 +4440,38 @@ html:has(.pdf-reader[open]) {
 
   .footer-credit img {
     height: 28px;
+  }
+}
+
+/* Hover wiggle for the rest of the artwork */
+.friends-row li:hover img,
+.friends-row li:focus-visible img,
+.resource-card:hover .resource-thumb img,
+.video-card:hover .video-thumb img,
+.bobber-note:hover img,
+.game-art:hover,
+.page-head-art:hover,
+.educator-bobber:hover,
+.lake-check-bobber:hover img,
+.closing-logo:hover,
+.brand:hover .brand-logo,
+.ar-visual:hover .ar-shirt {
+  animation: bobber-wiggle .6s ease;
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .friends-row li:hover img,
+  .friends-row li:focus-visible img,
+  .resource-card:hover .resource-thumb img,
+  .video-card:hover .video-thumb img,
+  .bobber-note:hover img,
+  .game-art:hover,
+  .page-head-art:hover,
+  .educator-bobber:hover,
+  .lake-check-bobber:hover img,
+  .closing-logo:hover,
+  .brand:hover .brand-logo,
+  .ar-visual:hover .ar-shirt {
+    animation: none !important;
   }
 }
