@@ -4152,3 +4152,21 @@ html[data-theme="dark"] .game-option.is-wrong {
     transition: color .2s;
   }
 }
+
+/* With reduced motion, keep quiet opacity fades for feedback (no movement) */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resource-card,
+  .game-option {
+    animation: fade-in .3s ease both !important;
+  }
+
+  .game-option:nth-child(2),
+  .game-option:nth-child(3) {
+    animation-delay: 0s !important;
+  }
+}
