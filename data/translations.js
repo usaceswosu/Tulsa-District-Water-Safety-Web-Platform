@@ -94,7 +94,7 @@ window.BOBBER_TRANSLATIONS_ES = {
   "Water safety": "Seguridad acuática",
   "Play with Bobber": "Juega con Bobber",
   "Bobber’s safety game.": "El juego de seguridad de Bobber.",
-  "Four quick questions. Pick the safe answer and see how you do.": "Cuatro preguntas rápidas. Elige la respuesta segura y mira cómo te va.",
+  "Four quick questions, different every time. Pick the safe answer and see how you do.": "Cuatro preguntas rápidas, diferentes cada vez. Elige la respuesta segura y mira cómo te va.",
   "Next question": "Siguiente pregunta",
   "See my score": "Ver mi resultado",
   "Play again": "Jugar otra vez",

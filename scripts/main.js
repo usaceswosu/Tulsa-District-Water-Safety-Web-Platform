@@ -586,7 +586,7 @@ if (infoDialog) {
 }
 
 // Bobber's safety game: four picture questions with instant feedback.
-const gameQuestions = [
+const gamePool = [
   {
     art: "assets/bobber/bobber-jacket-rack.webp",
     alt: { en: "Bobber next to a rack of life jackets", es: "Bobber junto a un perchero de chalecos salvavidas" },
@@ -626,8 +626,89 @@ const gameQuestions = [
       { en: "Only the snack bag", es: "Solo la bolsa de bocadillos" },
       { en: "Nothing at all", es: "Nada" }
     ]
+  },
+  {
+    art: "assets/bobber/bobber-jacket-rack.webp",
+    alt: { en: "Bobber next to a rack of life jackets", es: "Bobber junto a un perchero de chalecos salvavidas" },
+    question: { en: "How should a life jacket fit?", es: "¿Cómo debe quedar el chaleco salvavidas?" },
+    options: [
+      { en: "Snug and buckled", es: "Ajustado y abrochado", correct: true },
+      { en: "Loose and open", es: "Suelto y abierto" },
+      { en: "Two sizes too big", es: "Dos tallas más grande" }
+    ]
+  },
+  {
+    art: "assets/bobber/bobber-swim.webp",
+    alt: { en: "Bobber swimming with a buddy", es: "Bobber nadando con un compañero" },
+    question: { en: "What should you check before you jump into the water?", es: "¿Qué debes revisar antes de saltar al agua?" },
+    options: [
+      { en: "How deep it is", es: "Qué tan profunda es", correct: true },
+      { en: "Whether your friends dare you", es: "Si tus amigos te animan" },
+      { en: "Nothing—just jump", es: "Nada, solo saltar" }
+    ]
+  },
+  {
+    art: "assets/bobber/bobber-cold-water.webp",
+    alt: { en: "Bobber beside cold water with a danger sign", es: "Bobber junto a agua fría con un letrero de peligro" },
+    question: { en: "What should you do if you feel cold in the water?", es: "¿Qué debes hacer si sientes frío en el agua?" },
+    options: [
+      { en: "Get out and warm up", es: "Salir y calentarte", correct: true },
+      { en: "Stay in longer", es: "Quedarte más tiempo" },
+      { en: "Swim farther out", es: "Nadar más lejos" }
+    ]
+  },
+  {
+    art: "assets/bobber/bobber-swim.webp",
+    alt: { en: "Bobber swimming with a buddy", es: "Bobber nadando con un compañero" },
+    question: { en: "Can an inflatable toy replace a life jacket?", es: "¿Puede un juguete inflable sustituir un chaleco salvavidas?" },
+    options: [
+      { en: "No, never", es: "No, nunca", correct: true },
+      { en: "Yes, always", es: "Sí, siempre" },
+      { en: "Only in deep water", es: "Solo en agua profunda" }
+    ]
+  },
+  {
+    art: "assets/bobber/bobber-boat.webp",
+    alt: { en: "Bobber rowing a boat", es: "Bobber remando en un bote" },
+    question: { en: "What should you do when you hear thunder?", es: "¿Qué debes hacer cuando oyes truenos?" },
+    options: [
+      { en: "Leave the water right away", es: "Salir del agua de inmediato", correct: true },
+      { en: "Keep swimming", es: "Seguir nadando" },
+      { en: "Wait for the rain to stop", es: "Esperar a que pare la lluvia" }
+    ]
+  },
+  {
+    art: "assets/bobber/bobber-swim.webp",
+    alt: { en: "Bobber swimming with a buddy", es: "Bobber nadando con un compañero" },
+    question: { en: "Where should you swim?", es: "¿Dónde debes nadar?" },
+    options: [
+      { en: "In a designated swimming area", es: "En una zona designada para nadar", correct: true },
+      { en: "Near a boat ramp", es: "Cerca de una rampa de botes" },
+      { en: "Anywhere you like", es: "Donde quieras" }
+    ]
+  },
+  {
+    art: "assets/bobber/bobber-swim.webp",
+    alt: { en: "Bobber swimming with a buddy", es: "Bobber nadando con un compañero" },
+    question: { en: "What should you do before you swim?", es: "¿Qué debes hacer antes de nadar?" },
+    options: [
+      { en: "Ask a grown-up to watch", es: "Pedirle a un adulto que te vigile", correct: true },
+      { en: "Swim first, tell later", es: "Nadar primero y avisar después" },
+      { en: "Turn off the lights", es: "Apagar las luces" }
+    ]
+  },
+  {
+    art: "assets/bobber/bobber-boat.webp",
+    alt: { en: "Bobber rowing a boat", es: "Bobber remando en un bote" },
+    question: { en: "What should you wear when fishing from a boat?", es: "¿Qué debes llevar puesto cuando pescas desde un bote?" },
+    options: [
+      { en: "A life jacket", es: "Un chaleco salvavidas", correct: true },
+      { en: "Heavy boots", es: "Botas pesadas" },
+      { en: "A backpack", es: "Una mochila" }
+    ]
   }
 ];
+const GAME_ROUNDS = 4;
 
 const gameArt = document.querySelector("#game-art");
 const gameQuestion = document.querySelector("#game-question");
@@ -638,7 +719,7 @@ const gameNext = document.querySelector("#game-next");
 const gameNextLabel = document.querySelector("#game-next-label");
 const gameResult = document.querySelector("#game-result");
 const gameRestart = document.querySelector("#game-restart");
-const gameState = { index: 0, score: 0, answered: false, chosen: -1, done: false, orders: [] };
+const gameState = { index: 0, score: 0, answered: false, chosen: -1, done: false, rounds: [], orders: [] };
 
 function gameText(pair) {
   return currentLanguage === "es" ? pair.es : pair.en;
@@ -653,13 +734,21 @@ function shuffle(values) {
   return out;
 }
 
-function shuffleGameAnswers() {
-  gameState.orders = gameQuestions.map((round) => shuffle(round.options.map((_, index) => index)));
+function startGame() {
+  const picks = shuffle(gamePool.map((_, index) => index)).slice(0, GAME_ROUNDS);
+  gameState.rounds = picks.map((index) => gamePool[index]);
+  gameState.orders = gameState.rounds.map((round) => shuffle(round.options.map((_, index) => index)));
+  gameState.index = 0;
+  gameState.score = 0;
+  gameState.answered = false;
+  gameState.chosen = -1;
+  gameState.done = false;
 }
 
 function renderGame() {
   if (!gameOptions) return;
-  const total = gameQuestions.length;
+  if (!gameState.rounds.length) startGame();
+  const total = gameState.rounds.length;
 
   if (gameState.done) {
     gameProgress.textContent = "";
@@ -674,8 +763,7 @@ function renderGame() {
     return;
   }
 
-  const round = gameQuestions[gameState.index];
-  if (!gameState.orders.length) shuffleGameAnswers();
+  const round = gameState.rounds[gameState.index];
   const order = gameState.orders[gameState.index];
   gameResult.hidden = true;
   gameRestart.hidden = true;
@@ -716,13 +804,13 @@ function renderGame() {
 
 function gameNextHidden() {
   gameNext.hidden = false;
-  gameNextLabel.textContent = gameState.index === gameQuestions.length - 1
+  gameNextLabel.textContent = gameState.index === gameState.rounds.length - 1
     ? gameText({ en: "See my score", es: "Ver mi resultado" })
     : gameText({ en: "Next question", es: "Siguiente pregunta" });
 }
 
 function chooseGameOption(index) {
-  const round = gameQuestions[gameState.index];
+  const round = gameState.rounds[gameState.index];
   const order = gameState.orders[gameState.index];
   const correctIndex = order.findIndex((sourceIndex) => round.options[sourceIndex].correct);
   gameState.answered = true;
@@ -735,7 +823,7 @@ function chooseGameOption(index) {
 if (gameNext) {
   gameNext.addEventListener("click", () => {
     if (!gameState.answered) return;
-    if (gameState.index === gameQuestions.length - 1) {
+    if (gameState.index === gameState.rounds.length - 1) {
       gameState.done = true;
       burstConfetti(document.querySelector(".game-card"));
     } else {
@@ -748,17 +836,12 @@ if (gameNext) {
   });
 
   gameRestart.addEventListener("click", () => {
-    gameState.index = 0;
-    gameState.score = 0;
-    gameState.answered = false;
-    gameState.chosen = -1;
-    gameState.done = false;
-    shuffleGameAnswers();
+    startGame();
     renderGame();
     gameQuestion.focus();
   });
 
-  shuffleGameAnswers();
+  startGame();
   renderGame();
 }
 
