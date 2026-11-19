@@ -848,6 +848,260 @@ html[data-theme="dark"] .library-note a {
   color: #8bd2c2;
 }
 
+/* Readability pass: larger type and artwork so words and pictures are easier to see. */
+body {
+  font-size: 17px;
+}
+
+.site-nav {
+  font-size: 14px;
+}
+
+.brand-copy strong {
+  font-size: 23px;
+}
+
+.brand-copy small {
+  font-size: 11px;
+}
+
+.hero h1 {
+  font-size: clamp(52px, 6.2vw, 86px);
+}
+
+.hero-description {
+  font-size: 19px;
+}
+
+.hero-note {
+  font-size: 12.5px;
+}
+
+.eyebrow, .section-kicker {
+  font-size: 12px;
+}
+
+.button {
+  min-height: 52px;
+  padding: 14px 22px;
+  font-size: 14px;
+}
+
+.quick-strip strong {
+  font-size: 17.5px;
+}
+
+.quick-strip small {
+  font-size: 12px;
+}
+
+.intro h2, .section-heading h2, .safety-heading h2 {
+  font-size: clamp(42px, 5.2vw, 64px);
+}
+
+.section-heading>p {
+  font-size: 15px;
+}
+
+.intro-text p {
+  font-size: 15.5px;
+}
+
+.safety-card {
+  min-height: 258px;
+}
+
+.safety-card h3 {
+  font-size: 19px;
+}
+
+.safety-card p {
+  font-size: 13.5px;
+}
+
+.safety-art {
+  width: 118px;
+  height: 80px;
+}
+
+.safety-footnote, .visit-note, .educator-note, .source-note, .library-note, .results-message {
+  font-size: 11.5px;
+}
+
+.video-card h3 {
+  font-size: 19px;
+}
+
+.episode {
+  font-size: 10px;
+}
+
+.video-links a {
+  font-size: 11.5px;
+}
+
+.visit-card {
+  min-height: 292px;
+}
+
+.visit-card h3 {
+  font-size: 19px;
+}
+
+.visit-card p {
+  font-size: 12.5px;
+}
+
+.visit-card>a, .educator-card>a {
+  font-size: 11px;
+}
+
+.educator-card {
+  min-height: 242px;
+}
+
+.educator-card h3 {
+  font-size: 21px;
+}
+
+.educator-card p {
+  font-size: 12.5px;
+}
+
+.page-head h1 {
+  font-size: clamp(44px, 5.4vw, 64px);
+}
+
+.page-head-copy {
+  font-size: 18px;
+}
+
+.educator-bobber {
+  width: 250px;
+}
+
+.page-head-art {
+  width: min(32vw, 360px);
+}
+
+.resource-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.resource-body h3 {
+  font-size: 15.5px;
+}
+
+.resource-link {
+  font-size: 11.5px;
+}
+
+.resource-type {
+  font-size: 9px;
+}
+
+.filter-button {
+  font-size: 12.5px;
+}
+
+.lake-check-copy h3 {
+  font-size: 24px;
+}
+
+.lake-check-copy p {
+  font-size: 14px;
+}
+
+.lake-check-list label {
+  font-size: 14.5px;
+}
+
+.lake-check-list input {
+  width: 24px;
+  height: 24px;
+}
+
+.lake-check-progress {
+  font-size: 17px;
+}
+
+.lake-check-say {
+  font-size: 13px;
+}
+
+.lake-check-bobber {
+  width: 112px;
+}
+
+.lake-check-bobber.is-buddy {
+  width: 190px;
+}
+
+.life-jacket-art img {
+  height: 208px;
+}
+
+.feature-title {
+  font-size: 25px;
+}
+
+.feature-description {
+  font-size: 13.5px;
+}
+
+.feature-link {
+  font-size: 12px;
+}
+
+.closing h2 {
+  font-size: 26px;
+}
+
+.footer-brand p, .footer-links {
+  font-size: 12.5px;
+}
+
+.footer-label, .footer-bottom {
+  font-size: 10px;
+}
+
+@media(max-width:900px) {
+  .resource-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media(max-width:640px) {
+  .hero h1 {
+    font-size: clamp(46px, 12vw, 64px);
+  }
+
+  .intro h2, .section-heading h2, .safety-heading h2 {
+    font-size: 40px;
+  }
+
+  .safety-card h3 {
+    font-size: 16px;
+  }
+
+  .safety-card p {
+    font-size: 12.5px;
+  }
+
+  .video-card h3, .visit-card h3 {
+    font-size: 16px;
+  }
+
+  .safety-art {
+    width: 96px;
+    height: 66px;
+  }
+
+  .resource-body h3 {
+    font-size: 13px;
+  }
+}
+
 .library-note a {
   color: #11706c;
   text-decoration: underline;
