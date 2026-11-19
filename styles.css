@@ -2373,8 +2373,16 @@ html[data-theme="dark"] .lake-check-list label.is-checked span {
     grid-template-columns: 1fr;
   }
 
+  .lake-check-copy {
+    order: 0;
+  }
+
+  .lake-check-list {
+    order: 1;
+  }
+
   .lake-check-side {
-    order: -1;
+    order: 2;
   }
 }
 
