@@ -468,26 +468,32 @@ const infoCopy = document.querySelector("#info-copy");
 const infoClose = document.querySelector("#info-close");
 const infoLink = document.querySelector("#info-link");
 
-const palInfo = {
+// Each pal opens their official 1-2-3 Splash trading card.
+const palCards = {
   "Ranger Buck": {
-    en: "A park ranger friend who teams up with Bobber to share water safety tips at the lake.",
-    es: "Un guardabosques que se une a Bobber para compartir consejos de seguridad acuática en el lago."
+    art: "assets/cards/splash/card-2.webp",
+    page: 4,
+    rule: { en: "Learn to swim and float well!", es: "¡Aprende a nadar y flotar bien!" }
   },
   "Ranger Jane": {
-    en: "A ranger who helps Bobber teach kids how to stay safe around the water.",
-    es: "Una guardabosques que ayuda a Bobber a enseñar a los niños cómo mantenerse seguros cerca del agua."
+    art: "assets/cards/splash/card-3.webp",
+    page: 5,
+    rule: { en: "Get outdoors and play it safe!", es: "¡Disfruta al aire libre con seguridad!" }
   },
   "Ranger Toro": {
-    en: "A ranger who joins Bobber’s water safety adventures at lakes and rivers.",
-    es: "Un guardabosques que acompaña a Bobber en sus aventuras de seguridad acuática en lagos y ríos."
+    art: "assets/cards/splash/card-4.webp",
+    page: 6,
+    rule: { en: "Learn to swim and float well!", es: "¡Aprenda a nadar y flotar bien!" }
   },
   "Corkey": {
-    en: "One of Bobber’s pals. Corkey wears a life jacket and helps remind everyone to wear theirs too.",
-    es: "Uno de los amigos de Bobber. Corkey usa chaleco salvavidas y ayuda a recordarles a todos que también lo usen."
+    art: "assets/cards/splash/card-7.webp",
+    page: 9,
+    rule: { en: "Always swim with a buddy!", es: "¡Nada siempre acompañado!" }
   },
   "Sinker": {
-    en: "Bobber’s blue pal, always around for a water safety reminder.",
-    es: "El amigo azul de Bobber, siempre presente para recordar la seguridad acuática."
+    art: "assets/cards/splash/card-8.webp",
+    page: 10,
+    rule: { en: "Don’t trust inflatable toys!", es: "¡No confíes en los juguetes inflables!" }
   }
 };
 
@@ -544,41 +550,18 @@ if (infoDialog) {
   document.querySelectorAll(".friends-row li").forEach((pal) => {
     makeCardOpen(pal, () => {
       const name = pal.querySelector("strong")?.textContent || "";
-      const info = palInfo[name];
+      const card = palCards[name];
+      if (!card) return null;
       return {
-        art: pal.querySelector("img")?.getAttribute("src") || "",
-        kicker: currentLanguage === "es" ? "Los amigos de Bobber" : "Bobber’s pals",
+        art: card.art,
+        kicker: currentLanguage === "es" ? "Tarjeta coleccionable oficial" : "Official trading card",
         title: name,
-        copy: info ? (currentLanguage === "es" ? info.es : info.en) : ""
-      };
-    });
-  });
-
-  const officialRules = {
-    "Bobber": { en: "Please wear your life jacket!", es: "¡Usa tu chaleco salvavidas!" },
-    "Ranger Buck": { en: "Learn to swim and float well!", es: "¡Aprende a nadar y flotar bien!" },
-    "Ranger Jane": { en: "Get outdoors and play it safe!", es: "¡Disfruta al aire libre con seguridad!" },
-    "Ranger Toro": { en: "Learn to swim and float well!", es: "¡Aprenda a nadar y flotar bien!" },
-    "Tackle": { en: "“Reel” anglers wear life jackets!", es: "¡Los pescadores usan chaleco salvavidas!" },
-    "Jacques Catsto": { en: "Please keep your lake clean!", es: "¡Mantén limpio tu lago!" },
-    "Corkey": { en: "Always swim with a buddy!", es: "¡Nada siempre acompañado!" },
-    "Sinker": { en: "Don’t trust inflatable toys!", es: "¡No confíes en los juguetes inflables!" }
-  };
-
-  document.querySelectorAll(".card-tile").forEach((tile) => {
-    tile.addEventListener("click", () => {
-      const name = tile.dataset.name || "";
-      const rule = officialRules[name];
-      openInfoCard({
-        art: tile.dataset.art || "",
-        kicker: currentLanguage === "es" ? "Tarjeta oficial de USACE" : "Official USACE card",
-        title: name,
-        copy: rule ? (currentLanguage === "es" ? rule.es : rule.en) : "",
+        copy: currentLanguage === "es" ? card.rule.es : card.rule.en,
         link: {
-          href: tile.dataset.pdf || "",
-          label: currentLanguage === "es" ? "Abrir la hoja para imprimir" : "Open the printable sheet"
+          href: `assets/pdfs/Splash_Trading_Card_Game.pdf#page=${card.page}`,
+          label: currentLanguage === "es" ? "Abrir la tarjeta para imprimir" : "Open the printable card"
         }
-      });
+      };
     });
   });
 
