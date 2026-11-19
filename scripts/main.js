@@ -638,10 +638,23 @@ const gameNext = document.querySelector("#game-next");
 const gameNextLabel = document.querySelector("#game-next-label");
 const gameResult = document.querySelector("#game-result");
 const gameRestart = document.querySelector("#game-restart");
-const gameState = { index: 0, score: 0, answered: false, chosen: -1, done: false };
+const gameState = { index: 0, score: 0, answered: false, chosen: -1, done: false, orders: [] };
 
 function gameText(pair) {
   return currentLanguage === "es" ? pair.es : pair.en;
+}
+
+function shuffle(values) {
+  const out = values.slice();
+  for (let index = out.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(Math.random() * (index + 1));
+    [out[index], out[swap]] = [out[swap], out[index]];
+  }
+  return out;
+}
+
+function shuffleGameAnswers() {
+  gameState.orders = gameQuestions.map((round) => shuffle(round.options.map((_, index) => index)));
 }
 
 function renderGame() {
@@ -662,6 +675,8 @@ function renderGame() {
   }
 
   const round = gameQuestions[gameState.index];
+  if (!gameState.orders.length) shuffleGameAnswers();
+  const order = gameState.orders[gameState.index];
   gameResult.hidden = true;
   gameRestart.hidden = true;
   gameQuestion.hidden = false;
@@ -671,12 +686,12 @@ function renderGame() {
   gameArt.src = round.art;
   gameArt.alt = gameText(round.alt);
 
-  const correctIndex = round.options.findIndex((option) => option.correct);
-  gameOptions.replaceChildren(...round.options.map((option, index) => {
+  const correctIndex = order.findIndex((sourceIndex) => round.options[sourceIndex].correct);
+  gameOptions.replaceChildren(...order.map((sourceIndex, index) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "game-option";
-    button.textContent = gameText(option);
+    button.textContent = gameText(round.options[sourceIndex]);
     if (gameState.answered) {
       button.disabled = true;
       if (index === correctIndex) button.classList.add("is-correct");
@@ -691,7 +706,7 @@ function renderGame() {
     const isRight = gameState.chosen === correctIndex;
     gameFeedback.textContent = isRight
       ? gameText({ en: "That’s right!", es: "¡Correcto!" })
-      : gameText({ en: "Not quite. The safe answer is: ", es: "Casi. La respuesta segura es: " }) + gameText(round.options[correctIndex]);
+      : gameText({ en: "Not quite. The safe answer is: ", es: "Casi. La respuesta segura es: " }) + gameText(round.options[order[correctIndex]]);
     gameNextHidden();
   } else {
     gameFeedback.textContent = "";
@@ -707,7 +722,9 @@ function gameNextHidden() {
 }
 
 function chooseGameOption(index) {
-  const correctIndex = gameQuestions[gameState.index].options.findIndex((option) => option.correct);
+  const round = gameQuestions[gameState.index];
+  const order = gameState.orders[gameState.index];
+  const correctIndex = order.findIndex((sourceIndex) => round.options[sourceIndex].correct);
   gameState.answered = true;
   gameState.chosen = index;
   if (index === correctIndex) gameState.score += 1;
@@ -736,10 +753,12 @@ if (gameNext) {
     gameState.answered = false;
     gameState.chosen = -1;
     gameState.done = false;
+    shuffleGameAnswers();
     renderGame();
     gameQuestion.focus();
   });
 
+  shuffleGameAnswers();
   renderGame();
 }
 
