@@ -253,6 +253,7 @@ function setLanguage(language) {
   updateEasterDialogLanguage();
   updateSpeechBubble();
   updateChecklist();
+  renderGame();
 }
 
 headerLanguageToggle.addEventListener("click", () => {
@@ -431,6 +432,163 @@ function updateChecklist(reactedBox) {
 readyBoxes.forEach((box) => box.addEventListener("change", () => updateChecklist(box)));
 updateSpeechBubble();
 updateChecklist();
+
+// Bobber's safety game: four picture questions with instant feedback.
+const gameQuestions = [
+  {
+    art: "assets/bobber/bobber-jacket-rack.webp",
+    alt: { en: "Bobber next to a rack of life jackets", es: "Bobber junto a un perchero de chalecos salvavidas" },
+    question: { en: "What should you put on before you get in a boat?", es: "¿Qué debes ponerte antes de subir a un bote?" },
+    options: [
+      { en: "A life jacket", es: "Un chaleco salvavidas", correct: true },
+      { en: "A raincoat", es: "Un impermeable" },
+      { en: "Sunglasses", es: "Gafas de sol" }
+    ]
+  },
+  {
+    art: "assets/bobber/bobber-lifebuoy.webp",
+    alt: { en: "Bobber throwing a lifebuoy from a dock", es: "Bobber lanzando un salvavidas desde un muelle" },
+    question: { en: "What should you do if someone is in trouble in the water?", es: "¿Qué debes hacer si alguien está en peligro en el agua?" },
+    options: [
+      { en: "Reach or throw something that floats", es: "Alcanzar o lanzar algo que flote", correct: true },
+      { en: "Jump in to help", es: "Saltar al agua para ayudar" },
+      { en: "Wait and do nothing", es: "Esperar sin hacer nada" }
+    ]
+  },
+  {
+    art: "assets/bobber/bobber-swim.webp",
+    alt: { en: "Bobber swimming with a buddy", es: "Bobber nadando con un compañero" },
+    question: { en: "Who should you swim with?", es: "¿Con quién debes nadar?" },
+    options: [
+      { en: "A buddy", es: "Con un compañero", correct: true },
+      { en: "Nobody", es: "Con nadie" },
+      { en: "A beach toy", es: "Con un juguete de playa" }
+    ]
+  },
+  {
+    art: "assets/bobber/bobber-boat.webp",
+    alt: { en: "Bobber rowing a boat", es: "Bobber remando en un bote" },
+    question: { en: "What should you check before a lake day?", es: "¿Qué debes revisar antes de un día en el lago?" },
+    options: [
+      { en: "The weather and water conditions", es: "El clima y las condiciones del agua", correct: true },
+      { en: "Only the snack bag", es: "Solo la bolsa de bocadillos" },
+      { en: "Nothing at all", es: "Nada" }
+    ]
+  }
+];
+
+const gameArt = document.querySelector("#game-art");
+const gameQuestion = document.querySelector("#game-question");
+const gameOptions = document.querySelector("#game-options");
+const gameProgress = document.querySelector("#game-progress");
+const gameFeedback = document.querySelector("#game-feedback");
+const gameNext = document.querySelector("#game-next");
+const gameNextLabel = document.querySelector("#game-next-label");
+const gameResult = document.querySelector("#game-result");
+const gameRestart = document.querySelector("#game-restart");
+const gameState = { index: 0, score: 0, answered: false, chosen: -1, done: false };
+
+function gameText(pair) {
+  return currentLanguage === "es" ? pair.es : pair.en;
+}
+
+function renderGame() {
+  if (!gameOptions) return;
+  const total = gameQuestions.length;
+
+  if (gameState.done) {
+    gameProgress.textContent = "";
+    gameQuestion.hidden = true;
+    gameArt.hidden = true;
+    gameOptions.replaceChildren();
+    gameFeedback.textContent = "";
+    gameNext.hidden = true;
+    gameResult.hidden = false;
+    gameResult.textContent = gameText({ en: `You got ${gameState.score} of ${total} right!`, es: `¡Acertaste ${gameState.score} de ${total}!` });
+    gameRestart.hidden = false;
+    return;
+  }
+
+  const round = gameQuestions[gameState.index];
+  gameResult.hidden = true;
+  gameRestart.hidden = true;
+  gameQuestion.hidden = false;
+  gameArt.hidden = false;
+  gameProgress.textContent = gameText({ en: `Question ${gameState.index + 1} of ${total}`, es: `Pregunta ${gameState.index + 1} de ${total}` });
+  gameQuestion.textContent = gameText(round.question);
+  gameArt.src = round.art;
+  gameArt.alt = gameText(round.alt);
+
+  const correctIndex = round.options.findIndex((option) => option.correct);
+  gameOptions.replaceChildren(...round.options.map((option, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "game-option";
+    button.textContent = gameText(option);
+    if (gameState.answered) {
+      button.disabled = true;
+      if (index === correctIndex) button.classList.add("is-correct");
+      if (index === gameState.chosen && index !== correctIndex) button.classList.add("is-wrong");
+    } else {
+      button.addEventListener("click", () => chooseGameOption(index));
+    }
+    return button;
+  }));
+
+  if (gameState.answered) {
+    const isRight = gameState.chosen === correctIndex;
+    gameFeedback.textContent = isRight
+      ? gameText({ en: "That’s right!", es: "¡Correcto!" })
+      : gameText({ en: "Not quite. The safe answer is: ", es: "Casi. La respuesta segura es: " }) + gameText(round.options[correctIndex]);
+    gameNextHidden();
+  } else {
+    gameFeedback.textContent = "";
+    gameNext.hidden = true;
+  }
+}
+
+function gameNextHidden() {
+  gameNext.hidden = false;
+  gameNextLabel.textContent = gameState.index === gameQuestions.length - 1
+    ? gameText({ en: "See my score", es: "Ver mi resultado" })
+    : gameText({ en: "Next question", es: "Siguiente pregunta" });
+}
+
+function chooseGameOption(index) {
+  const correctIndex = gameQuestions[gameState.index].options.findIndex((option) => option.correct);
+  gameState.answered = true;
+  gameState.chosen = index;
+  if (index === correctIndex) gameState.score += 1;
+  renderGame();
+  gameNext.focus();
+}
+
+if (gameNext) {
+  gameNext.addEventListener("click", () => {
+    if (!gameState.answered) return;
+    if (gameState.index === gameQuestions.length - 1) {
+      gameState.done = true;
+    } else {
+      gameState.index += 1;
+      gameState.answered = false;
+      gameState.chosen = -1;
+    }
+    renderGame();
+    gameQuestion.focus();
+  });
+
+  gameRestart.addEventListener("click", () => {
+    gameState.index = 0;
+    gameState.score = 0;
+    gameState.answered = false;
+    gameState.chosen = -1;
+    gameState.done = false;
+    renderGame();
+    gameQuestion.focus();
+  });
+
+  renderGame();
+}
 
 // Cards and headings bounce in as they scroll into view. Skipped for reduced motion, and content stays visible without scripts.
 const revealTargets = document.querySelectorAll(".section-heading, .safety-card, .visit-card, .educator-card, .video-card, .app-download, .ar-card");
