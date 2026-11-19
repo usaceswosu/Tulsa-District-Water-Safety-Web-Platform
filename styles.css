@@ -498,14 +498,14 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 }
 
 .safety-symbol {
-  width: 43px;
-  height: 43px;
+  width: 66px;
+  height: 66px;
   display: grid;
   place-items: center;
   background: #e5f1eb;
   border-radius: 50%;
   color: var(--teal);
-  font-size: 23px;
+  font-size: 30px;
 }
 
 .safety-card:nth-child(2) .safety-symbol {
@@ -2060,8 +2060,25 @@ h1, h2 {
 
 /* Grown-ups page header */
 .page-head {
+  position: relative;
+  overflow: hidden;
   padding: 66px 0 56px;
   background: #e5f1eb;
+}
+
+.page-head-art {
+  position: absolute;
+  right: 4%;
+  bottom: -6px;
+  width: min(30vw, 320px);
+  height: auto;
+  pointer-events: none;
+}
+
+@media(max-width:900px) {
+  .page-head-art {
+    display: none;
+  }
 }
 
 .page-head h1 {
@@ -3312,7 +3329,7 @@ html[data-theme="dark"] {
 
 .life-jacket-art img {
   width: auto;
-  height: 165px;
+  height: 182px;
   max-width: 100%;
   object-fit: contain;
   filter: drop-shadow(0 9px 6px #123c451c);
@@ -3330,16 +3347,19 @@ html[data-theme="dark"] {
   }
 }
 
-.safety-symbol-img {
-  object-fit: contain;
-  padding: 5px;
-}
-
 .educator-bobber {
-  width: 150px;
+  width: 210px;
   height: auto;
   display: block;
   margin-top: 18px;
+}
+
+.safety-art {
+  width: 100px;
+  height: 66px;
+  display: block;
+  object-fit: contain;
+  object-position: left center;
 }
 
 .empty-bobber {
