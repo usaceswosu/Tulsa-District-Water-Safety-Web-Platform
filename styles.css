@@ -1,5 +1,6 @@
 /* Design tokens and global defaults */
 :root {
+  color-scheme: light;
   --ink: #16383d;
   --deep: #123c45;
   --deep2: #0d3039;
