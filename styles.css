@@ -2012,6 +2012,14 @@ html[data-theme="dark"] .hero-feature {
     padding: 20px 22px;
   }
 
+  /* Keep the card steady while Bobber's longer reminders wrap on smaller screens. */
+  .speech-bubble {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+  }
+
   .life-jacket-art {
     width: 164px;
     height: 152px;

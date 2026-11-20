@@ -372,21 +372,61 @@ themeToggle.addEventListener("click", () => {
   savePreference("bobber-theme", nextTheme);
   updateThemeControl();
 });
-// Bobber shares a different tip each day, and the lake-ready checklist celebrates a full set of ticks.
-const dailyTips = [
+// Bobber starts with the tip of the day, then keeps sharing more reminders while the page is open.
+const bobberTips = [
   { en: "Wear your life jacket every time!", es: "¡Usa tu chaleco salvavidas siempre!" },
   { en: "Swim with a buddy!", es: "¡Nada acompañado!" },
   { en: "Reach or throw. Don’t go!", es: "¡Alcanza o lanza; no te metas!" },
-  { en: "Cold water is sneaky—stay alert!", es: "El agua fría es traicionera: ¡mantente alerta!" },
+  { en: "Cold water is sneaky—stay alert!", es: "Agua fría: ¡mantente alerta!" },
   { en: "Ask a grown-up before you go!", es: "¡Pregunta a un adulto antes de ir!" },
-  { en: "Look out for each other!", es: "¡Cuídense entre todos!" }
+  { en: "Look out for each other!", es: "¡Cuídense entre todos!" },
+  { en: "Check the weather before you go!", es: "¡Revisa el clima antes de salir!" },
+  { en: "Jump in feet first!", es: "¡Salta con los pies primero!" },
+  { en: "Stay in a grown-up’s sight!", es: "¡Quédate a la vista de un adulto!" },
+  { en: "Take breaks and drink water!", es: "¡Toma descansos y bebe agua!" },
+  { en: "Leave the water if you feel cold!", es: "¡Sal del agua si tienes frío!" },
+  { en: "Look before you leap!", es: "¡Mira antes de saltar!" }
 ];
 const speechBubble = document.querySelector(".speech-bubble");
-const dailyTip = dailyTips[Math.floor(Date.now() / 86400000) % dailyTips.length];
+let tipIndex = Math.floor(Date.now() / 86400000) % bobberTips.length;
+
+function renderSpeechBubble() {
+  if (speechBubble) speechBubble.textContent = bobberTips[tipIndex][currentLanguage];
+}
 
 function updateSpeechBubble() {
-  if (speechBubble) speechBubble.textContent = currentLanguage === "es" ? dailyTip.es : dailyTip.en;
+  renderSpeechBubble();
   if (readySay) readySay.textContent = currentLanguage === "es" ? "¡Marca cada uno!" : "Tick each one!";
+}
+
+function advanceSpeechBubble() {
+  tipIndex = (tipIndex + 1) % bobberTips.length;
+  renderSpeechBubble();
+  if (speechBubble && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    speechBubble.animate(
+      [{ opacity: 0, translate: "0 3px" }, { opacity: 1, translate: "0 0" }],
+      { duration: 320, easing: "ease-out" }
+    );
+  }
+}
+
+let speechTimer = null;
+function startSpeechRotation() {
+  if (!speechBubble || speechTimer) return;
+  speechTimer = window.setInterval(advanceSpeechBubble, 8000);
+}
+
+function stopSpeechRotation() {
+  if (speechTimer) window.clearInterval(speechTimer);
+  speechTimer = null;
+}
+
+if (speechBubble) {
+  if (!document.hidden) startSpeechRotation();
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopSpeechRotation();
+    else startSpeechRotation();
+  });
 }
 
 // Small confetti burst for finished activities; skipped when motion is reduced.
