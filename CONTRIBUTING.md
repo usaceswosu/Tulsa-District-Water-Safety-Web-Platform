@@ -21,13 +21,13 @@ npm run check
 npm test
 ```
 
-`npm run check` runs version, global-name, content, translation, metadata coverage, site-integrity, public-URL, sitemap, QR, classroom-pack, HTML, CSS, partial, precache, PDF metadata, and PDF budget checks. The site-integrity check (`scripts/check-site.mjs`) is the cross-platform source of truth for catalog/assets/page links.
+`npm run check` runs version, global-name, content, translation, metadata coverage, site-integrity, public-URL, resource-schema, sitemap, QR, classroom-pack, HTML, CSS, asset-budget, partial, precache, PDF metadata, and PDF budget checks. The site-integrity check (`scripts/check-site.mjs`) is the cross-platform source of truth for catalog/assets/page links.
 
 CI additionally runs:
 
 - `pwsh -NoProfile -File scripts/check-site.ps1` as a second opinion
 - Lighthouse on the home and grown-ups pages
-- the full Playwright suite in Chromium, Firefox, WebKit, Pixel 7, and iPhone 13
+- the full Playwright suite in a separate, browser-cached job covering Chromium, Firefox, WebKit, Pixel 7, and iPhone 13
 - `npm run check:live` after static checks, verifying the live version, critical URLs, reader, offline shell, and JSON-LD, plus a daily schedule
 
 The live smoke test can also target a local server:
@@ -50,8 +50,9 @@ npm run check:live -- http://127.0.0.1:4173
 2. Add an entry to `window.BOBBER_RESOURCES` in `data/resources.js` (keep filenames exact).
 3. Add the Spanish title to `BOBBER_RESOURCE_TITLES_ES`.
 4. Run `npm run update:pdf-meta`.
-5. If the PDF is large, create a preview (below).
-6. Bump the version and test.
+5. Run `npm run update:resource-schema`.
+6. If the PDF is large, create a preview (below).
+7. Bump the version and test.
 
 ### Generate a lightweight reader preview
 
@@ -99,7 +100,7 @@ After review, add the approved fields to the matching `data/resources.js` entry:
 }
 ```
 
-Run `npm run check:metadata`. Once every resource is filled, switch CI to `npm run check:metadata -- --require` so future resources cannot ship without review metadata. The UI automatically shows badges and language/grade filters when values exist.
+Run `npm run check:metadata`, then `npm run update:resource-schema` so the public JSON-LD reflects the reviewed fields. Once every resource is filled, switch CI to `npm run check:metadata -- --require` so future resources cannot ship without review metadata. The UI automatically shows badges and language/grade filters when values exist.
 
 ### Change tips, quiz questions, or pal cards
 

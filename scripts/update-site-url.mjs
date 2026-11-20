@@ -44,7 +44,7 @@ walk(siteRoot);
 
 writeFileSync(join(siteRoot, "site.config.json"), `${JSON.stringify({ url: next }, null, 2)}\n`);
 console.log(`Updated ${changed} file(s). Regenerating QR codes, sitemap, and classroom pack…`);
-for (const script of ["make-qr.mjs", "update-sitemap.mjs", "make-teacher-pack.mjs", "check-site-url.mjs"]) {
+for (const script of ["update-resource-schema.mjs", "make-qr.mjs", "update-sitemap.mjs", "make-teacher-pack.mjs", "check-site-url.mjs"]) {
   execFileSync(process.execPath, [join(siteRoot, "scripts", script)], { stdio: "inherit" });
 }
 console.log("Next: run npm run bump:version -- YYYYMMDDx so the service worker and QR/classroom-pack caches refresh.");

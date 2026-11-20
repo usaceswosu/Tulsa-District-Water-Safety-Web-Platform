@@ -23,7 +23,7 @@ The links to YouTube, USACE, Recreation.gov, and other official sources are outb
 ## Quality checks
 
 ```bash
-npm run check       # versions, globals, content, translations, metadata, URL/sitemap, QR/pack, HTML, CSS, partials, precache, PDFs
+npm run check       # versions, globals, content, translations, metadata, URL/schema/sitemap, QR/pack, HTML, CSS/budgets, partials, precache, PDFs
 npm test            # Chromium, Firefox, WebKit + Pixel/iPhone mobile smoke tests
 npm run check:live  # post-deploy smoke test against the public URL
 ```
@@ -76,7 +76,7 @@ GitHub Pages serves the files directly. Internal links are relative to the proje
 - `scripts/pdf-reader.js` — in-page reader, fallback viewer, TOC, zoom, and print.
 - `sw.js` + `precache.json` — versioned offline shell and runtime caching.
 - `site.config.json` — single source of truth for the public site URL.
-- `scripts/` — maintenance, validation, versioning, URL/sitemap, QR/pack, preview, and live-smoke tools.
+- `scripts/` — maintenance, validation, versioning, URL/schema/sitemap, QR/pack, preview, and live-smoke tools.
 - `tests/` — Playwright suites by feature, run in Chromium, Firefox, and WebKit.
 - `.github/workflows/` — static checks, Lighthouse, live deployment smoke test, and scheduled link check.
 - `assets/` — artwork, thumbnails, self-hosted PDFs, previews, QR codes, and the classroom ZIP.

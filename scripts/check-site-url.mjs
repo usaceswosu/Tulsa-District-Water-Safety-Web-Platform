@@ -35,22 +35,50 @@ for (const [file, path] of [
 expectIncludes("404.html", `href="${siteUrl}/assets/bobber-logo.png"`, "absolute 404 logo URL");
 expectIncludes("robots.txt", `Sitemap: ${siteUrl}/sitemap.xml`, "robots sitemap URL");
 
-const jsonLdMatch = read("index.html").match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
-if (!jsonLdMatch) {
+const jsonLdBlocks = [...read("index.html").matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)];
+if (!jsonLdBlocks.length) {
   problems.push("index.html is missing JSON-LD structured data.");
 } else {
-  try {
-    const graph = JSON.parse(jsonLdMatch[1])["@graph"] || [];
-    const site = graph.find((node) => node["@type"] === "WebSite");
-    const organization = graph.find((node) => node["@type"] === "GovernmentOrganization");
-    if (!site || site.url !== `${siteUrl}/` || site["@id"] !== `${siteUrl}/#website`) {
-      problems.push("JSON-LD WebSite URL does not match site.config.json.");
+  const nodes = [];
+  for (const match of jsonLdBlocks) {
+    try {
+      const document = JSON.parse(match[1]);
+      nodes.push(...(Array.isArray(document["@graph"]) ? document["@graph"] : [document]));
+    } catch (error) {
+      problems.push(`index.html JSON-LD is invalid: ${error.message}`);
     }
-    if (!organization || organization["@id"] !== `${siteUrl}/#organization`) {
-      problems.push("JSON-LD organization graph is missing or uses a stale URL.");
+  }
+  const site = nodes.find((node) => node["@type"] === "WebSite");
+  const organization = nodes.find((node) => node["@type"] === "GovernmentOrganization");
+  if (!site || site.url !== `${siteUrl}/` || site["@id"] !== `${siteUrl}/#website`) {
+    problems.push("JSON-LD WebSite URL does not match site.config.json.");
+  }
+  if (!organization || organization["@id"] !== `${siteUrl}/#organization`) {
+    problems.push("JSON-LD organization graph is missing or uses a stale URL.");
+  }
+
+  const library = nodes.find((node) => node["@type"] === "ItemList");
+  const items = library?.itemListElement;
+  if (!library || !Array.isArray(items) || !items.length) {
+    problems.push("JSON-LD resource ItemList is missing.");
+  } else {
+    if (library.numberOfItems !== items.length) {
+      problems.push(`JSON-LD ItemList says ${library.numberOfItems} items but lists ${items.length}.`);
     }
-  } catch (error) {
-    problems.push(`index.html JSON-LD is invalid: ${error.message}`);
+    const urls = new Set();
+    items.forEach((entry, index) => {
+      const item = entry?.item;
+      if (entry?.position !== index + 1) problems.push(`JSON-LD ItemList position ${index + 1} is incorrect.`);
+      if (item?.["@type"] !== "LearningResource") problems.push(`JSON-LD ItemList entry ${index + 1} is not a LearningResource.`);
+      if (!item?.name) problems.push(`JSON-LD ItemList entry ${index + 1} is missing a name.`);
+      if (!item?.url?.startsWith(`${siteUrl}/assets/`)) {
+        problems.push(`JSON-LD ItemList entry ${index + 1} has a stale URL.`);
+      } else if (urls.has(item.url)) {
+        problems.push(`JSON-LD ItemList repeats ${item.url}.`);
+      } else {
+        urls.add(item.url);
+      }
+    });
   }
 }
 expectIncludes("sitemap.xml", `<loc>${siteUrl}/</loc>`, "sitemap home URL");

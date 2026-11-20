@@ -44,13 +44,13 @@ try {
         frozen: Object.isFrozen(window.BOBBER_CONTENT),
         firstMeta: document.querySelector(".resource-meta")?.textContent || "",
         canonical: document.querySelector('link[rel="canonical"]')?.href || "",
-        jsonLd: (() => {
+        jsonLd: [...document.querySelectorAll('script[type="application/ld+json"]')].map((script) => {
           try {
-            return JSON.parse(document.querySelector('script[type="application/ld+json"]')?.textContent || "null");
+            return JSON.parse(script.textContent);
           } catch {
             return null;
           }
-        })()
+        })
       };
     });
     if (state.version === expectedVersion && state.firstMeta.includes("preview") && state.firstMeta.includes("print")) break;
@@ -62,11 +62,19 @@ try {
   assert(state.frozen, "Home-page content is not frozen.");
   assert(state.firstMeta.includes("preview") && state.firstMeta.includes("print"), `Unexpected card metadata: ${state.firstMeta}`);
   assert(state.canonical.startsWith(siteUrl), `Unexpected canonical URL: ${state.canonical}`);
-  const graph = state.jsonLd?.["@graph"] || [];
+  const jsonLdDocuments = state.jsonLd || [];
+  assert(jsonLdDocuments.every(Boolean), "A live JSON-LD block is invalid.");
+  const graph = jsonLdDocuments.flatMap((document) =>
+    Array.isArray(document?.["@graph"]) ? document["@graph"] : [document]
+  );
   const websiteNode = graph.find((node) => node["@type"] === "WebSite");
   const organizationNode = graph.find((node) => node["@type"] === "GovernmentOrganization");
+  const libraryNode = graph.find((node) => node["@type"] === "ItemList");
   assert(websiteNode?.url === `${siteUrl}/`, "JSON-LD WebSite URL is missing or stale.");
   assert(organizationNode?.["@id"]?.endsWith("#organization"), "JSON-LD organization node is missing.");
+  assert(libraryNode?.numberOfItems === 42, "JSON-LD library ItemList is missing items.");
+  assert(libraryNode?.itemListElement?.length === 42, "JSON-LD library ItemList has the wrong item count.");
+  assert(libraryNode.itemListElement.every((entry) => entry.item?.url?.startsWith(`${siteUrl}/assets/`)), "JSON-LD library item URL is stale.");
 
   const versionDate = `${expectedVersion.slice(0, 4)}-${expectedVersion.slice(4, 6)}-${expectedVersion.slice(6, 8)}`;
   for (const path of ["/accessibility.html", "/poster.html", "/manifest.webmanifest", "/assets/qr/bobber-site.svg", "/assets/qr/bobber-site-es.svg", "/assets/downloads/Bobber_Classroom_Pack_2026.zip"]) {

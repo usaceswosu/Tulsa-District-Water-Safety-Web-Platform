@@ -77,7 +77,7 @@ A flat `Record<EnglishText, SpanishText>` used by the language toggle. Static te
 
 ### Structured data
 
-`index.html` contains JSON-LD for the `WebSite` and the publishing `GovernmentOrganization`. `check-site-url.mjs` validates the URLs against `site.config.json`, and `check-live.mjs` verifies the deployed graph. Keep claims conservative and Public Affairs-reviewed.
+`index.html` contains JSON-LD for the `WebSite` and the publishing `GovernmentOrganization`, plus a generated `ItemList` of the 42 library resources. Run `npm run update:resource-schema` after changing the catalog or reviewed metadata; `npm run check:resource-schema` verifies the block is current. `check-site-url.mjs` validates every JSON-LD block against `site.config.json`, and `check-live.mjs` verifies the deployed graph and item count. Keep claims conservative and Public Affairs-reviewed; unreviewed language, grade, and description fields are omitted automatically.
 
 ## Language and theme
 
@@ -181,11 +181,12 @@ The public base URL lives in `site.config.json`. `npm run update:site-url -- <ur
 | `precache.json` | Generated shell URL list |
 | `site.config.json` | Single source of truth for the public base URL |
 | `sitemap.xml` | Generated from site config + version date |
-| `scripts/check-*.mjs` | Structural, URL, sitemap, version, content, CSS, PDF, and global checks |
+| `scripts/check-*.mjs` | Structural, URL, schema, sitemap, version, content, CSS, budget, PDF, and global checks |
 | `scripts/check-site.mjs` | Cross-platform catalog/assets/page-link check |
 | `scripts/check-site.ps1` | PowerShell second-opinion copy of the site-integrity check |
 | `scripts/check-live.mjs` | Post-deploy reader/offline/version smoke test |
 | `scripts/bump-version.mjs` | Version bump + sitemap/precache regeneration |
+| `scripts/update-resource-schema.mjs` | Generated `ItemList` JSON-LD for the printable library |
 | `scripts/update-site-url.mjs` | One-command domain/path migration |
 | `scripts/generate-preview-pdf.py` | Optional raster preview generator |
 | `tests/` | Playwright suites for Chromium, Firefox, and WebKit |
