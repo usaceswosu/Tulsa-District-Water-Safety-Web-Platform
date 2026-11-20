@@ -43,7 +43,23 @@ function walk(directory) {
 }
 walk(join(root, "assets"));
 
-const list = [...urls].map((url) => encodeURI(url)).sort((a, b) => a.localeCompare(b));
+// Encode each path segment exactly as assetPath() does in the browser. encodeURI
+// leaves "&" alone, which produces a cache key the page never requests.
+function encodeUrl(url) {
+  const queryIndex = url.indexOf("?");
+  const path = queryIndex === -1 ? url : url.slice(0, queryIndex);
+  const query = queryIndex === -1 ? "" : url.slice(queryIndex);
+  const encodedPath = path.split("/").map((segment) => {
+    try {
+      return encodeURIComponent(decodeURIComponent(segment));
+    } catch {
+      return encodeURIComponent(segment);
+    }
+  }).join("/");
+  return `${encodedPath}${query}`;
+}
+
+const list = [...urls].map(encodeUrl).sort((a, b) => a.localeCompare(b));
 const content = `${JSON.stringify(list, null, 2)}\n`;
 const current = existsSync(output) ? readFileSync(output, "utf8") : "";
 if (checkOnly) {

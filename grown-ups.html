@@ -31,24 +31,32 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Bobber">
   <script>
-    try {
-      const params = new URLSearchParams(location.search);
-      const requested = params.get("lang");
-      const stored = localStorage.getItem("bobber-language");
-      const language = requested === "es" || requested === "en" ? requested : (stored === "es" ? "es" : "en");
-      document.documentElement.dataset.theme = localStorage.getItem("bobber-theme") ||
-        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    (function () {
+      let storedLanguage = null;
+      let storedTheme = null;
+      try {
+        storedLanguage = localStorage.getItem("bobber-language");
+        storedTheme = localStorage.getItem("bobber-theme");
+      } catch {
+        // Storage can be blocked. Keep the URL language and system theme.
+      }
+      const requested = new URLSearchParams(location.search).get("lang");
+      const language = requested === "es" || requested === "en" ? requested : (storedLanguage === "es" ? "es" : "en");
+      const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
+      const theme = storedTheme === "dark" || storedTheme === "light" ? storedTheme : (prefersDark ? "dark" : "light");
+      document.documentElement.dataset.theme = theme;
       document.documentElement.dataset.locale = language;
       document.documentElement.lang = language;
-      if (requested === "es" || requested === "en") localStorage.setItem("bobber-language", language);
+      try {
+        if (requested === "es" || requested === "en") localStorage.setItem("bobber-language", language);
+      } catch {
+        // The language still works for this page view.
+      }
       const themeColor = document.querySelector('meta[name="theme-color"]');
-      if (themeColor) themeColor.content = document.documentElement.dataset.theme === "dark" ? "#101c20" : "#fffefa";
-    } catch {
-      document.documentElement.dataset.theme = "light";
-      document.documentElement.dataset.locale = "en";
-    }
+      if (themeColor) themeColor.content = theme === "dark" ? "#101c20" : "#fffefa";
+    })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261120e">
+  <link rel="stylesheet" href="styles.css?v=20261120g">
 </head>
 <body data-page="grownups">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -176,7 +184,7 @@
             <p class="teacher-tools-meta">ZIP · 13 MB · Print-quality PDFs</p>
           </div>
           <div class="teacher-tools-actions">
-            <a class="button button-coral" href="assets/downloads/Bobber_Classroom_Pack_2026.zip?v=20261120e" download>Download the classroom pack <span aria-hidden="true">↓</span></a>
+            <a class="button button-coral" href="assets/downloads/Bobber_Classroom_Pack_2026.zip?v=20261120g" download>Download the classroom pack <span aria-hidden="true">↓</span></a>
             <a class="button button-dark" href="poster.html">Print the QR poster <span aria-hidden="true">↗</span></a>
           </div>
         </div>
@@ -286,9 +294,9 @@
       <span aria-hidden="true">→</span>
     </button>
   </dialog>
-  <script src="scripts/pdf-reader.js?v=20261120e" defer></script>
-  <script src="data/resources.js?v=20261120e" defer></script>
-  <script src="data/translations.js?v=20261120e" defer></script>
-  <script src="scripts/main.js?v=20261120e" defer></script>
+  <script src="scripts/pdf-reader.js?v=20261120g" defer></script>
+  <script src="data/resources.js?v=20261120g" defer></script>
+  <script src="data/translations.js?v=20261120g" defer></script>
+  <script src="scripts/main.js?v=20261120g" defer></script>
 </body>
 </html>

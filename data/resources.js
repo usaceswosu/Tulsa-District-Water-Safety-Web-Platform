@@ -52,6 +52,12 @@ window.BOBBER_CATEGORY_LABELS = {
   es: { all: "Todos", activity: "Actividad", poster: "Afiches y dibujos", storybook: "Cuento" }
 };
 
+// Filter buttons use plural labels; category badges use the singular labels above.
+window.BOBBER_FILTER_LABELS = {
+  en: { all: "All", activity: "Activities", poster: "Posters & coloring", storybook: "Storybooks" },
+  es: { all: "Todos", activity: "Actividades", poster: "Afiches y dibujos", storybook: "Cuentos" }
+};
+
 window.BOBBER_RESOURCE_TITLES_ES = {
   "Bobber Boating Items": "Elementos para navegar con Bobber",
   "Bobber Bookmarks": "Marcapáginas de Bobber",

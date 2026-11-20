@@ -3994,18 +3994,67 @@ html[data-theme="dark"] .game-option.is-wrong {
 
 /* Print styles: clean paper output for the printable-friendly content */
 @media print {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
   .site-header, .skip-link, .quick-strip, .game-section, .ar-section,
   .library-tools, .results-message, .visit-peek, .page-head-art,
   .easter-dialog, .video-thumb, .video-links, .hero-actions, .hero-note,
   .hero-ripple, .hero-watermark, .closing .button, .reset-search,
-  .store-badge, .filters, .search-box {
+  .store-badge, .filters, .search-box, .pwa-stack, .teacher-tools-actions {
     display: none !important;
+  }
+
+  html {
+    color-scheme: light;
   }
 
   body {
     background: #fff;
     color: #000;
     font-size: 11pt;
+  }
+
+  /* Cards revealed on scroll must not print blank. */
+  .reveal {
+    opacity: 1 !important;
+    translate: 0 !important;
+    transition: none !important;
+  }
+
+  /* Printing from dark mode should still use ink on paper. */
+  .safety-card, .visit-card, .educator-card, .video-card, .resource-card,
+  .app-download, .lake-check, .ar-card, .bobber-note, .teacher-tools,
+  .closing, .hero-feature, .speech-bubble, .friends-row li, .empty-state {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  body:not(.printing-certificate):not(.printing-reader-page) main :is(
+    h1, h2, h3, h4, p, li, strong, small, em, span, a, label, code
+  ),
+  body:not(.printing-certificate):not(.printing-reader-page) .site-footer :is(
+    h1, h2, h3, h4, p, li, strong, small, em, span, a, label, code
+  ) {
+    color: #000 !important;
+  }
+
+  .resource-type {
+    background: #fff !important;
+    color: #000 !important;
+    border: 1pt solid #000;
+  }
+
+  .resource-thumb, .lake-check-list label, .lake-check-say, .visit-icon,
+  .safety-number, .visit-number {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .page-head .button {
+    display: none !important;
   }
 
   .hero, .safety-section, .visit-section, .library-section, .educator-section,
@@ -5122,7 +5171,7 @@ html[data-theme="dark"] .pwa-banner {
   }
 
   body.printing-reader-page #pdf-reader {
-    position: static;
+    position: static !important;
     inset: auto;
     width: 100%;
     max-width: none;
@@ -5160,10 +5209,12 @@ html[data-theme="dark"] .pwa-banner {
   }
 
   body.printing-reader-page .pdf-print-page canvas {
-    width: 100%;
+    width: auto;
     max-width: 100%;
+    max-height: 10.2in;
     height: auto;
     display: block;
+    margin: 0 auto;
   }
 }
 

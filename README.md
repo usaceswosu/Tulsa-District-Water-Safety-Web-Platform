@@ -8,9 +8,9 @@ A responsive, static website that brings together Bobber the Water Safety Dog re
 
 No build tools or server-side code are required. Open `index.html` in a browser, or serve this folder with any static web server. Styles, scripts, fonts (system fonts), artwork, and PDFs load from the repository; there are no CDN or hosted font dependencies.
 
-For local preview without stale browser caches, run `python scripts/serve.py` and open <http://localhost:8000/index.html>.
+For local preview, run `npm run serve` (or `node scripts/serve.mjs`) and open <http://127.0.0.1:4173/index.html>.
 
-The stylesheet and scripts are linked with a `?v=` value. When you change `styles.css`, `data/resources.js`, `data/translations.js`, `scripts/main.js`, or `scripts/pdf-reader.js`, bump that value in `index.html` and `grown-ups.html` so browsers fetch the new copies.
+The stylesheet and scripts are linked with a `?v=` value. When you change `styles.css`, `data/resources.js`, `data/pdf-meta.js`, `data/translations.js`, `scripts/main.js`, or `scripts/pdf-reader.js`, bump that value in `index.html` and `grown-ups.html` (including the classroom-pack link), then run `npm run update:precache` so the offline shell uses the same version. The reader also uses the `main.js` version for cache-busted preview PDFs and vendor modules.
 
 The links to YouTube, USACE, Recreation.gov, and other official sources are outbound links only. The site itself does not need those services to load; video playback and live lake information do require visiting the respective source.
 

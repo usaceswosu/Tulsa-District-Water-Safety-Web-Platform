@@ -27,23 +27,39 @@ const pdfReaderTocTitle = document.querySelector("#pdf-reader-toc-title");
 const pdfReaderTocList = document.querySelector("#pdf-reader-toc-list");
 const PDF_ZOOM_LEVELS = [0.75, 1, 1.25, 1.5, 2];
 
-const pdfEngine = new URL("../vendor/pdfjs/", document.currentScript.src);
+const readerScript = document.currentScript;
+const pdfEngine = new URL("../vendor/pdfjs/", readerScript.src);
+const readerAssetVersion = new URL(readerScript.src).searchParams.get("v") || "";
+const vendorQuery = readerAssetVersion ? `?v=${encodeURIComponent(readerAssetVersion)}` : "";
+const pdfModuleUrl = new URL(`build/pdf.min.mjs${vendorQuery}`, pdfEngine);
+const pdfWorkerUrl = new URL(`build/pdf.worker.min.mjs${vendorQuery}`, pdfEngine);
 let activePdf;
 let pdfjsPromise;
+let printInProgress = false;
+let printCleanupTimer;
+
+function loadPdfEngine() {
+  if (!pdfjsPromise) {
+    pdfjsPromise = import(pdfModuleUrl).then((module) => {
+      try {
+        fetch(pdfWorkerUrl, { cache: "force-cache" }).catch(() => {});
+      } catch {
+        // The worker will still load on first use.
+      }
+      return module;
+    });
+    // A failed import must not poison later attempts to open a PDF.
+    pdfjsPromise.catch(() => { pdfjsPromise = undefined; });
+  }
+  return pdfjsPromise;
+}
 
 // Warm the reader on first hover or focus so the first PDF opens quickly.
 function prefetchPdfEngine() {
   const connection = navigator.connection;
   const effectiveType = connection?.effectiveType || "";
   if (connection?.saveData || /(^|-)2g$|^3g$/.test(effectiveType)) return;
-  pdfjsPromise ||= import(new URL("build/pdf.min.mjs", pdfEngine)).then((module) => {
-    try {
-      fetch(new URL("build/pdf.worker.min.mjs", pdfEngine), { cache: "force-cache" }).catch(() => {});
-    } catch {
-      // The worker will still load on first use.
-    }
-    return module;
-  });
+  loadPdfEngine().catch(() => {});
 }
 window.prefetchPdfEngine = prefetchPdfEngine;
 
@@ -56,14 +72,21 @@ function setPdfControls(documentProxy, page) {
   pdfReaderNext.setAttribute("aria-disabled", String(!documentProxy || page >= documentProxy.numPages));
 }
 
+function updateTocVisibility(session) {
+  const available = Boolean(session?.document && !session.fallback && session.toc?.length >= 3);
+  pdfReaderTocToggle.hidden = !available;
+  if (!available) {
+    pdfReaderToc.hidden = true;
+    pdfReaderTocToggle.setAttribute("aria-expanded", "false");
+  }
+}
+
 function updateReaderTools(session, page = 1) {
   if (!pdfReaderToolbar) return;
   const ready = Boolean(session?.document && !session.fallback);
   pdfReaderToolbar.hidden = !ready;
   if (!ready) {
-    pdfReaderToc.hidden = true;
-    pdfReaderTocToggle.hidden = true;
-    pdfReaderTocToggle.setAttribute("aria-expanded", "false");
+    updateTocVisibility(session);
     return;
   }
   const zoom = session.zoom || 1;
@@ -79,11 +102,7 @@ function updateReaderTools(session, page = 1) {
   pdfReaderPageInput.max = String(session.document.numPages);
   pdfReaderPageInput.value = String(Math.min(Math.max(1, page || session.page || 1), session.document.numPages));
   pdfReaderPageTotal.textContent = String(session.document.numPages);
-  pdfReaderTocToggle.hidden = !(session.toc && session.toc.length >= 3);
-  if (pdfReaderTocToggle.hidden) {
-    pdfReaderToc.hidden = true;
-    pdfReaderTocToggle.setAttribute("aria-expanded", "false");
-  }
+  updateTocVisibility(session);
 }
 
 function showReaderToolsLoading() {
@@ -93,6 +112,7 @@ function showReaderToolsLoading() {
   pdfReaderZoomReset.disabled = true;
   pdfReaderPageInput.disabled = true;
   pdfReaderGo.disabled = true;
+  pdfReaderPrintPage.disabled = true;
   pdfReaderPageInput.value = "1";
   pdfReaderPageInput.max = "1";
   pdfReaderPageTotal.textContent = "1";
@@ -124,14 +144,14 @@ function resetPdfZoom() {
 
 // If the scripted reader cannot start, fall back to the browser's own PDF viewer.
 function showPdfFallback(session) {
-  if (!session || activePdf !== session) return;
+  if (!session || activePdf !== session || session.fallback) return;
   window.clearTimeout(session.watchdog);
   session.fallback = true;
-  try { session.loadingTask?.destroy(); } catch { /* already gone */ }
+  try { session.loadingTask?.destroy()?.catch?.(() => {}); } catch { /* already gone */ }
   setPdfControls(null);
   pdfReaderToolbar.hidden = true;
-  pdfReaderToc.hidden = true;
-  pdfReaderTocToggle.setAttribute("aria-expanded", "false");
+  updateTocVisibility(session);
+  pdfReaderPrintPage.disabled = true;
   pdfReaderPrevious.hidden = true;
   pdfReaderNext.hidden = true;
   const frame = document.createElement("iframe");
@@ -146,14 +166,14 @@ function showPdfFallback(session) {
 }
 
 async function showPdfPage(session, pageNumber) {
-  if (activePdf !== session || session.rendering) return;
+  if (activePdf !== session || session.fallback || session.rendering) return;
   session.rendering = true;
   setPdfControls(null);
   updateReaderTools(session, pageNumber);
   pdfReaderStatus.textContent = readerCopy("Loading page…", "Cargando página…");
   try {
     const page = await session.document.getPage(pageNumber);
-    if (activePdf !== session) return;
+    if (activePdf !== session || session.fallback) return;
     const natural = page.getViewport({ scale: 1 });
     const stage = pdfReaderStage.getBoundingClientRect();
     const availableWidth = Math.max(120, stage.width - 16);
@@ -178,7 +198,7 @@ async function showPdfPage(session, pageNumber) {
     canvas.setAttribute("aria-label", `${session.title} — ${label}`);
     session.renderTask = page.render({ canvas, viewport });
     await session.renderTask.promise;
-    if (activePdf !== session) return;
+    if (activePdf !== session || session.fallback) return;
     session.page = pageNumber;
     window.clearTimeout(session.watchdog);
     pdfReaderStage.replaceChildren(canvas);
@@ -189,7 +209,7 @@ async function showPdfPage(session, pageNumber) {
   } finally {
     session.renderTask = null;
     session.rendering = false;
-    if (activePdf === session && session.page) {
+    if (activePdf === session && session.page && !session.fallback) {
       setPdfControls(session.document, session.page);
       updateReaderTools(session, session.page);
     }
@@ -219,6 +239,16 @@ function updateReaderChrome() {
       `Vista previa de la primera página: ${activePdf?.title || ""}`
     );
   }
+  const stageCanvas = pdfReaderStage.querySelector("canvas");
+  if (stageCanvas && activePdf?.page) {
+    const pageLabel = readerCopy(
+      `Page ${activePdf.page} of ${activePdf.document.numPages}`,
+      `Página ${activePdf.page} de ${activePdf.document.numPages}`
+    );
+    stageCanvas.setAttribute("aria-label", `${activePdf.title} — ${pageLabel}`);
+  }
+  const fallbackFrame = pdfReaderStage.querySelector("iframe");
+  if (fallbackFrame) fallbackFrame.title = `${activePdf?.title || ""} PDF`;
   pdfReaderPrevious.textContent = readerCopy("Previous page", "Página anterior");
   pdfReaderNext.textContent = readerCopy("Next page", "Página siguiente");
   pdfReaderZoomLabel.textContent = readerCopy("Zoom", "Zoom");
@@ -249,6 +279,9 @@ function updateReaderChrome() {
 window.updatePdfReaderLanguage = updateReaderChrome;
 
 function cleanupPrintPage() {
+  window.clearTimeout(printCleanupTimer);
+  printCleanupTimer = undefined;
+  printInProgress = false;
   document.body.classList.remove("printing-reader-page");
   pdfPrintPage?.setAttribute("aria-hidden", "true");
   pdfPrintPage?.replaceChildren();
@@ -258,15 +291,24 @@ function cleanupPrintPage() {
       `Página ${activePdf.page} de ${activePdf.document.numPages}`
     );
     updateReaderTools(activePdf, activePdf.page);
+  } else if (activePdf) {
+    pdfReaderPrintPage.disabled = true;
   }
 }
 
 async function printCurrentPage() {
-  if (!activePdf?.document || !activePdf.page || activePdf.rendering || activePdf.fallback) return;
+  const session = activePdf;
+  if (!session?.document || !session.page || session.rendering || session.fallback || printInProgress) return;
+  printInProgress = true;
   pdfReaderPrintPage.disabled = true;
   pdfReaderStatus.textContent = readerCopy("Preparing the print view…", "Preparando la vista de impresión…");
   try {
-    const page = await activePdf.document.getPage(activePdf.page);
+    const page = await session.document.getPage(session.page);
+    if (activePdf !== session || !pdfReader.open || session.fallback) {
+      printInProgress = false;
+      if (activePdf === session && !session.fallback) pdfReaderPrintPage.disabled = false;
+      return;
+    }
     const natural = page.getViewport({ scale: 1 });
     const scale = Math.min(4, 2550 / Math.max(natural.width, natural.height));
     const viewport = page.getViewport({ scale });
@@ -274,14 +316,21 @@ async function printCurrentPage() {
     canvas.width = Math.ceil(viewport.width);
     canvas.height = Math.ceil(viewport.height);
     await page.render({ canvas, viewport }).promise;
+    if (activePdf !== session || !pdfReader.open || session.fallback) {
+      printInProgress = false;
+      if (activePdf === session && !session.fallback) pdfReaderPrintPage.disabled = false;
+      return;
+    }
     pdfPrintPage.replaceChildren(canvas);
     pdfPrintPage.setAttribute("aria-hidden", "false");
     document.body.classList.add("printing-reader-page");
+    window.addEventListener("afterprint", () => cleanupPrintPage(), { once: true });
+    printCleanupTimer = window.setTimeout(cleanupPrintPage, 300_000);
     window.print();
-    cleanupPrintPage();
   } catch {
-    pdfReaderStatus.textContent = readerCopy("Could not prepare the print view. Use Print full PDF.", "No se pudo preparar la vista de impresión. Usa Imprimir PDF completo.");
+    cleanupPrintPage();
     pdfReaderPrintPage.disabled = false;
+    pdfReaderStatus.textContent = readerCopy("Could not prepare the print view. Use Print full PDF.", "No se pudo preparar la vista de impresión. Usa Imprimir PDF completo.");
   }
 }
 
@@ -322,6 +371,8 @@ async function buildToc(session) {
     if (outline?.length) await collectToc(session, outline, 0, items);
     if (activePdf !== session) return;
     session.toc = items.filter((item) => item.title);
+    // TOC entries are built in the background after the first page is shown.
+    // Keep the page input and zoom controls untouched while the user reads.
     pdfReaderTocList.replaceChildren(...session.toc.map((item) => {
       const entry = document.createElement("li");
       if (item.page) {
@@ -349,18 +400,27 @@ async function buildToc(session) {
       }
       return entry;
     }));
-    updateReaderTools(session, session.page || 1);
+    updateTocVisibility(session);
   } catch {
     if (activePdf === session) {
       session.toc = [];
-      updateReaderTools(session, session.page || 1);
+      updateTocVisibility(session);
     }
   }
+}
+
+function destroyPdfSession(session) {
+  if (!session) return;
+  window.clearTimeout(session.watchdog);
+  try { session.renderTask?.cancel(); } catch { /* already gone */ }
+  try { session.loadingTask?.destroy()?.catch?.(() => {}); } catch { /* already gone */ }
 }
 
 async function openPdfReader(url, title, opener, downloadUrl = url, preview = false, placeholder = "") {
   // `url` is the fast preview used by the canvas reader; `downloadUrl` stays the
   // full print-quality PDF, including its accessibility tags.
+  if (printInProgress || document.body.classList.contains("printing-reader-page")) cleanupPrintPage();
+  if (activePdf) destroyPdfSession(activePdf);
   const session = { title, url, downloadUrl, preview, placeholder, opener, page: 0, fallback: false, zoom: 1, toc: [] };
   activePdf = session;
   pdfReaderTitle.textContent = title;
@@ -384,15 +444,15 @@ async function openPdfReader(url, title, opener, downloadUrl = url, preview = fa
   setPdfControls(null);
   pdfReaderPrevious.hidden = false;
   pdfReaderNext.hidden = false;
-  pdfReader.showModal();
+  if (!pdfReader.open) pdfReader.showModal();
   session.watchdog = window.setTimeout(() => {
     if (activePdf === session && !session.page) showPdfFallback(session);
   }, 7000);
 
   try {
-    const pdfjs = await (pdfjsPromise || import(new URL("build/pdf.min.mjs", pdfEngine)));
+    const pdfjs = await loadPdfEngine();
     if (activePdf !== session) return;
-    pdfjs.GlobalWorkerOptions.workerSrc = new URL("build/pdf.worker.min.mjs", pdfEngine).href;
+    pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl.href;
     session.loadingTask = pdfjs.getDocument({
       url,
       standardFontDataUrl: new URL("web/standard_fonts/", pdfEngine).href,
@@ -401,8 +461,9 @@ async function openPdfReader(url, title, opener, downloadUrl = url, preview = fa
       isEvalSupported: false,
     });
     session.document = await session.loadingTask.promise;
-    await buildToc(session);
+    // Show the first page before extracting the outline so long guides are readable immediately.
     await showPdfPage(session, 1);
+    if (activePdf === session && !session.fallback) buildToc(session);
   } catch {
     if (activePdf === session) showPdfFallback(session);
   }
@@ -454,17 +515,21 @@ window.addEventListener("resize", () => {
 pdfReaderClose.addEventListener("click", () => pdfReader.close());
 pdfReader.addEventListener("keydown", (event) => {
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  const target = event.target;
+  if (target instanceof Element && target.closest("input, textarea, select, [contenteditable='true']")) return;
   if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
     event.preventDefault();
     stepPdfPage(event.key === "ArrowLeft" ? -1 : 1);
   }
 });
 pdfReader.addEventListener("close", () => {
+  // A close event can arrive after a rapid close-and-reopen. Leave the new
+  // session alone; the old one was already destroyed when the new one opened.
+  if (pdfReader.open) return;
   const session = activePdf;
   activePdf = null;
-  window.clearTimeout(session?.watchdog);
-  try { session?.renderTask?.cancel(); } catch { /* already gone */ }
-  try { session?.loadingTask?.destroy(); } catch { /* already gone */ }
+  cleanupPrintPage();
+  destroyPdfSession(session);
   pdfReaderStage.replaceChildren();
-  session?.opener.focus({ preventScroll: true });
+  session?.opener?.focus?.({ preventScroll: true });
 });

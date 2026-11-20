@@ -5,6 +5,8 @@ const educatorPdfLinks = [...document.querySelectorAll(".educator-card a[href$='
 if (educatorPdfLinks.length && typeof pdfReader !== "undefined" && pdfReader && typeof openPdfReader === "function") {
   educatorPdfLinks.forEach((link) => {
     link.setAttribute("aria-haspopup", "dialog");
+    // These links open the in-page reader, so do not label them as new-tab links.
+    link.dataset.readerLink = "true";
     link.addEventListener("click", (event) => {
       if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
@@ -14,6 +16,7 @@ if (educatorPdfLinks.length && typeof pdfReader !== "undefined" && pdfReader && 
   });
 }
 const resourceTitlesEs = window.BOBBER_RESOURCE_TITLES_ES;
+const filterLabels = window.BOBBER_FILTER_LABELS || categoryLabels;
 const pdfMeta = window.BOBBER_PDF_META || {};
 const spanishText = window.BOBBER_TRANSLATIONS_ES;
 const appScript = [...document.scripts].find((script) => script.src.includes("main.js"));
@@ -222,14 +225,16 @@ if (menuToggle && siteNav) {
 }
 // Keyboard shortcuts for responsive navigation and the resource search.
 document.addEventListener("keydown", (event) => {
-  if (typeof pdfReader !== "undefined" && pdfReader && pdfReader.open) return;
+  if (document.querySelector("dialog[open]")) return;
   if (event.key === "Escape" && menuToggle.getAttribute("aria-expanded") === "true") {
     menuToggle.setAttribute("aria-expanded", "false");
     menuToggle.setAttribute("aria-label", menuButtonLabel(false));
     siteNav.classList.remove("is-open");
     menuToggle.focus();
   }
-  if (event.key === "/" && !["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) {
+  const active = document.activeElement;
+  const isTyping = active?.matches("input, textarea, select, [contenteditable='true'], [role='textbox']");
+  if (event.key === "/" && searchInput && !isTyping) {
     event.preventDefault();
     searchInput.focus();
   }
@@ -240,7 +245,8 @@ const spanishSafetyCopy = [...document.querySelectorAll(".spanish-copy")];
 const englishSafetyCopy = [...document.querySelectorAll(".safety-card > p")];
 function updateExternalLinkLabels() {
   document.querySelectorAll('a[target="_blank"]').forEach((link) => {
-    if (link.hasAttribute("aria-label") && link.dataset.autoExternalLabel !== "true") return;
+    const isReaderLink = link.dataset.readerLink === "true";
+    if (!isReaderLink && link.hasAttribute("aria-label") && link.dataset.autoExternalLabel !== "true") return;
     const label = [...link.childNodes]
       .map((node) => node.nodeType === Node.ELEMENT_NODE && node.hasAttribute("aria-hidden") ? "" : node.textContent)
       .join(" ")
@@ -249,7 +255,11 @@ function updateExternalLinkLabels() {
       .trim();
     if (!label) return;
     link.dataset.autoExternalLabel = "true";
-    link.setAttribute("aria-label", currentLanguage === "es" ? `${label} (se abre en una pestaña nueva)` : `${label} (opens in a new tab)`);
+    if (isReaderLink) {
+      link.setAttribute("aria-label", label);
+    } else {
+      link.setAttribute("aria-label", currentLanguage === "es" ? `${label} (se abre en una pestaña nueva)` : `${label} (opens in a new tab)`);
+    }
   });
 }
 
@@ -336,23 +346,26 @@ function setLanguage(language) {
   filterButtons.forEach((button) => {
     const key = button.dataset.filter;
     const label = button.querySelector("span");
+    const text = filterLabels[language][key];
     if (label) {
-      button.firstChild.textContent = `${categoryLabels[language][key]} `;
+      button.firstChild.textContent = `${text} `;
     } else {
-      button.textContent = categoryLabels[language][key];
+      button.textContent = text;
     }
   });
   if (resourcesRendered) renderResources();
   else scheduleResources();
   updateThemeControl();
+  if (typeof window.updatePdfReaderLanguage === "function") window.updatePdfReaderLanguage();
   updateExternalLinkLabels();
   updateEasterDialogLanguage();
   if (infoClose) infoClose.setAttribute("aria-label", isSpanish ? "Cerrar" : "Close");
   document.querySelectorAll(".card-open").forEach((button) => {
-    button.setAttribute("aria-label", `${isSpanish ? "Abrir detalles" : "Open details"}: ${button.dataset.title}`);
+    const title = button.closest(".safety-card, .friends-row li")?.querySelector("h3, strong")?.textContent.trim() || button.dataset.title;
+    if (title) button.dataset.title = title;
+    button.setAttribute("aria-label", `${isSpanish ? "Abrir detalles" : "Open details"}: ${title}`);
   });
   if (infoDialog?.open) infoDialog.close();
-  if (typeof window.updatePdfReaderLanguage === "function") window.updatePdfReaderLanguage();
   updateSpeechBubble();
   updateChecklist();
   renderGame();
@@ -402,7 +415,13 @@ function setupPwa() {
   refresh.className = "pwa-action";
   refresh.addEventListener("click", () => {
     pwaReloadRequested = true;
-    swRegistration?.waiting?.postMessage({ type: "SKIP_WAITING" });
+    const waiting = swRegistration?.waiting;
+    if (waiting) {
+      waiting.postMessage({ type: "SKIP_WAITING" });
+      window.setTimeout(() => { if (pwaReloadRequested) location.reload(); }, 4000);
+    } else {
+      location.reload();
+    }
   });
   updateBanner.append(message, refresh);
   stack.append(offlineBanner, updateBanner);
@@ -506,8 +525,7 @@ function normalizeKonamiKey(event) {
 }
 
 document.addEventListener("keydown", (event) => {
-  const readerOpen = typeof pdfReader !== "undefined" && pdfReader && pdfReader.open;
-  if (!easterDialog || easterDialog.open || readerOpen || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+  if (!easterDialog || document.querySelector("dialog[open]") || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
   const active = document.activeElement;
   if (active?.matches("input, textarea, select, [contenteditable='true'], [role='textbox']")) {
     konamiProgress = 0;
@@ -733,6 +751,7 @@ function openInfoCard({ art, kicker, title, copy, link }) {
       arrow.setAttribute("aria-hidden", "true");
       arrow.textContent = " ↗";
       infoLink.append(arrow);
+      updateExternalLinkLabels();
     }
   }
   infoDialog.showModal();
@@ -1125,7 +1144,7 @@ function updateCertificatePrintSheet() {
   const isSpanish = currentLanguage === "es";
   certificatePrintName.textContent = certificateNameValue();
   certificatePrintDate.textContent = `${isSpanish ? "Fecha" : "Date"}: ${certificateDateValue()}`;
-  document.querySelector("#certificate-sheet-kicker").textContent = isSpanish ? "Bobber, el perro de seguridad acuática" : "Bobber’s Water Safety Dog";
+  document.querySelector("#certificate-sheet-kicker").textContent = isSpanish ? "Bobber, el perro de seguridad acuática" : "Bobber the Water Safety Dog";
   document.querySelector("#certificate-sheet-eyebrow").textContent = isSpanish ? "Certificado de valentía" : "Certificate of awesomeness";
   document.querySelector("#certificate-sheet-title").textContent = isSpanish ? "Héroe de seguridad" : "Safety Hero";
   document.querySelector("#certificate-sheet-copy").textContent = isSpanish ? "Esto certifica que" : "This certifies that";
@@ -1170,7 +1189,8 @@ if (certificateDialog && gameCertificate) {
 if (gameNext) {
   gameNext.addEventListener("click", () => {
     if (!gameState.answered) return;
-    if (gameState.index === gameState.rounds.length - 1) {
+    const finished = gameState.index === gameState.rounds.length - 1;
+    if (finished) {
       gameState.done = true;
       burstConfetti(document.querySelector(".game-card"));
     } else {
@@ -1179,7 +1199,8 @@ if (gameNext) {
       gameState.chosen = -1;
     }
     renderGame();
-    gameQuestion.focus();
+    if (finished) gameResult.focus();
+    else gameQuestion.focus();
   });
 
   gameRestart.addEventListener("click", () => {

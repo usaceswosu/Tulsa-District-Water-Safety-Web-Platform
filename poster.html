@@ -16,15 +16,19 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Bobber">
   <script>
-    try {
-      const theme = localStorage.getItem("bobber-theme") ||
-        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    (function () {
+      let storedTheme = null;
+      try {
+        storedTheme = localStorage.getItem("bobber-theme");
+      } catch {
+        // Fall back to the system preference when storage is blocked.
+      }
+      const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
+      const theme = storedTheme === "dark" || storedTheme === "light" ? storedTheme : (prefersDark ? "dark" : "light");
       document.documentElement.dataset.theme = theme;
       const themeColor = document.querySelector('meta[name="theme-color"]');
       if (themeColor) themeColor.content = theme === "dark" ? "#101c20" : "#fffefa";
-    } catch {
-      document.documentElement.dataset.theme = "light";
-    }
+    })();
   </script>
   <style>
     :root {
@@ -250,7 +254,7 @@
     @media print {
       @page { size: letter portrait; margin: .3in; }
 
-      body { padding: 0; background: #fff; }
+      body { padding: 0; background: #fff; color: #16383d; }
       .skip-link, .topbar, .intro { display: none !important; }
       .poster-list { display: block; width: 100%; margin: 0; }
       .poster-sheet {

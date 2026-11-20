@@ -31,25 +31,33 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Bobber">
   <script>
-    try {
-      const params = new URLSearchParams(location.search);
-      const requested = params.get("lang");
-      const stored = localStorage.getItem("bobber-language");
-      const language = requested === "es" || requested === "en" ? requested : (stored === "es" ? "es" : "en");
-      document.documentElement.dataset.theme = localStorage.getItem("bobber-theme") ||
-        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    (function () {
+      let storedLanguage = null;
+      let storedTheme = null;
+      try {
+        storedLanguage = localStorage.getItem("bobber-language");
+        storedTheme = localStorage.getItem("bobber-theme");
+      } catch {
+        // Storage can be blocked. Keep the URL language and system theme.
+      }
+      const requested = new URLSearchParams(location.search).get("lang");
+      const language = requested === "es" || requested === "en" ? requested : (storedLanguage === "es" ? "es" : "en");
+      const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
+      const theme = storedTheme === "dark" || storedTheme === "light" ? storedTheme : (prefersDark ? "dark" : "light");
+      document.documentElement.dataset.theme = theme;
       document.documentElement.dataset.locale = language;
       document.documentElement.lang = language;
-      if (requested === "es" || requested === "en") localStorage.setItem("bobber-language", language);
+      try {
+        if (requested === "es" || requested === "en") localStorage.setItem("bobber-language", language);
+      } catch {
+        // The language still works for this page view.
+      }
       const themeColor = document.querySelector('meta[name="theme-color"]');
-      if (themeColor) themeColor.content = document.documentElement.dataset.theme === "dark" ? "#101c20" : "#fffefa";
-    } catch {
-      document.documentElement.dataset.theme = "light";
-      document.documentElement.dataset.locale = "en";
-    }
+      if (themeColor) themeColor.content = theme === "dark" ? "#101c20" : "#fffefa";
+    })();
   </script>
   <link rel="preload" as="image" href="assets/bobber/bobber-thumbs-up.webp" imagesrcset="assets/bobber/bobber-thumbs-up-300.webp 300w, assets/bobber/bobber-thumbs-up.webp 480w" imagesizes="(max-width: 900px) 120px, 150px" fetchpriority="high">
-  <link rel="stylesheet" href="styles.css?v=20261120e">
+  <link rel="stylesheet" href="styles.css?v=20261120g">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -330,7 +338,7 @@
           <div class="game-options" id="game-options"></div>
           <p class="game-feedback" id="game-feedback" aria-live="polite"></p>
           <button class="button button-dark" id="game-next" type="button" hidden><span id="game-next-label">Next question</span> <span aria-hidden="true">→</span></button>
-          <div class="game-result" id="game-result" aria-live="polite" hidden></div>
+          <div class="game-result" id="game-result" aria-live="polite" tabindex="-1" hidden></div>
           <div class="game-finish-actions" id="game-finish-actions" hidden>
             <button class="button button-coral" id="game-certificate" type="button"><span id="game-certificate-label">Print my Safety Hero certificate</span> <span aria-hidden="true">🖨</span></button>
             <button class="button button-dark" id="game-restart" type="button"><span id="game-restart-label">Play again</span> <span aria-hidden="true">↻</span></button>
@@ -482,7 +490,7 @@
     <div class="certificate-sheet">
       <div class="certificate-sheet-top">
         <div>
-          <p class="certificate-sheet-kicker" id="certificate-sheet-kicker">Bobber’s Water Safety Dog</p>
+          <p class="certificate-sheet-kicker" id="certificate-sheet-kicker">Bobber the Water Safety Dog</p>
           <p class="certificate-sheet-eyebrow" id="certificate-sheet-eyebrow">Certificate of awesomeness</p>
         </div>
         <img src="assets/bobber/bobber-thumbs-up.webp" alt="" width="240" height="300">
@@ -540,10 +548,10 @@
       </div>
     </dialog>
   <!-- partial:pdf-reader:end -->
-  <script src="scripts/pdf-reader.js?v=20261120e" defer></script>
-  <script src="data/resources.js?v=20261120e" defer></script>
-  <script src="data/pdf-meta.js?v=20261120e" defer></script>
-  <script src="data/translations.js?v=20261120e" defer></script>
-  <script src="scripts/main.js?v=20261120e" defer></script>
+  <script src="scripts/pdf-reader.js?v=20261120g" defer></script>
+  <script src="data/resources.js?v=20261120g" defer></script>
+  <script src="data/pdf-meta.js?v=20261120g" defer></script>
+  <script src="data/translations.js?v=20261120g" defer></script>
+  <script src="scripts/main.js?v=20261120g" defer></script>
 </body>
 </html>
