@@ -2884,7 +2884,7 @@ html[data-theme="dark"] .library-note, html[data-theme="dark"] .results-message,
   color: #a4b5b0;
 }
 
-html[data-theme="dark"] /* Header language and theme controls */
+/* Header language and theme controls */
 .header-language-toggle {
   min-height: 38px;
   padding: 7px 10px;
