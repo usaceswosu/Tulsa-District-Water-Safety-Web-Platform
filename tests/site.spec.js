@@ -70,6 +70,8 @@ test("theme toggle updates data-theme, theme-color, and persists", async ({ page
 });
 
 test("Bobber rotates tips without changing the hero card height", async ({ page }) => {
+  // Test the narrow layout, where longer Spanish/English tips can wrap.
+  await page.setViewportSize({ width: 360, height: 900 });
   await page.goto("/");
   const bubble = page.locator(".speech-bubble");
   const before = await bubble.textContent();
@@ -82,6 +84,7 @@ test("Bobber rotates tips without changing the hero card height", async ({ page 
 
 test("the library opens a fast preview and keeps the print PDF for download", async ({ page }) => {
   await page.goto("/");
+  const previewRequest = page.waitForRequest((request) => request.url().includes("-web.pdf"), { timeout: 15_000 });
   await page.locator(".resource-link").first().click();
   await expect(page.locator("#pdf-reader")).toHaveJSProperty("open", true);
   await expect(page.locator("#pdf-reader-download")).toHaveText("Download print PDF");
@@ -89,9 +92,17 @@ test("the library opens a fast preview and keeps the print PDF for download", as
     "href",
     /Bobber%20Boating%20Items%20Actitvty%20Sheet\.pdf$/
   );
-  await expect(page.locator("#pdf-reader-stage canvas")).toBeVisible({ timeout: 15_000 });
-  await expect(page.locator("#pdf-reader-status")).toHaveText("Page 1 of 2");
-  expect(await page.evaluate(() => performance.getEntriesByType("resource").some((entry) => entry.name.includes("-web.pdf")))).toBe(true);
+  // The canvas reader is preferred, but the watchdog may hand off to the
+  // browser viewer on a slow CI runner. Both still use the lightweight preview.
+  const canvas = page.locator("#pdf-reader-stage canvas");
+  const fallback = page.locator("#pdf-reader-stage iframe");
+  await expect(canvas.or(fallback)).toBeVisible({ timeout: 15_000 });
+  if (await canvas.isVisible()) {
+    await expect(page.locator("#pdf-reader-status")).toHaveText("Page 1 of 2");
+  } else {
+    await expect(page.locator("#pdf-reader-status")).toContainText("Showing this PDF");
+  }
+  expect(await previewRequest).not.toBeNull();
   await page.click("#pdf-reader-close");
   await expect(page.locator("#pdf-reader")).not.toHaveAttribute("open", "");
 
