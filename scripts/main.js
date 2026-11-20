@@ -195,14 +195,36 @@ function refreshMetadataFilters() {
 }
 
 // Resource library: cards use local PDFs and previews from the repository.
-function makeCard(resource) {
-  const displayTitle = currentLanguage === "es" ? (resourceTitlesEs[resource.title] || resource.title) : resource.title;
+function cardReaderTargets(resource) {
   const meta = pdfMeta[resource.file] || {};
   const printFile = assetPath(resource.file);
   const previewFile = meta.webFile
     ? `${assetPath(meta.webFile)}${assetVersion ? `?v=${encodeURIComponent(assetVersion)}` : ""}`
     : printFile;
-  const placeholderFile = assetPath(`graphics/${resource.image}`);
+  return { meta, printFile, previewFile, placeholderFile: assetPath(`graphics/${resource.image}`) };
+}
+
+function wireResourceCard(resource, article) {
+  const link = article.querySelector(".resource-link");
+  if (!link || link.dataset.readerWired === "true") return;
+  const displayTitle = currentLanguage === "es" ? (resourceTitlesEs[resource.title] || resource.title) : resource.title;
+  const { meta, printFile, previewFile, placeholderFile } = cardReaderTargets(resource);
+  link.href = printFile;
+  link.target = "_blank";
+  link.rel = "noopener";
+  link.setAttribute("aria-haspopup", "dialog");
+  link.dataset.readerWired = "true";
+  link.addEventListener("click", (event) => {
+    const readerReady = typeof pdfReader !== "undefined" && pdfReader && "showModal" in pdfReader && typeof openPdfReader === "function";
+    if (!readerReady || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    openPdfReader(previewFile, displayTitle, link, printFile, Boolean(meta.webFile), placeholderFile);
+  });
+}
+
+function makeCard(resource) {
+  const displayTitle = currentLanguage === "es" ? (resourceTitlesEs[resource.title] || resource.title) : resource.title;
+  const { meta, placeholderFile } = cardReaderTargets(resource);
   const article = document.createElement("article");
   article.className = "resource-card";
 
@@ -245,16 +267,6 @@ function makeCard(resource) {
   metaLine.textContent = [formatPageCount(meta.pages), formatResourceSize(meta)].filter(Boolean).join(" · ");
   const link = document.createElement("a");
   link.className = "resource-link";
-  link.href = printFile;
-  link.target = "_blank";
-  link.rel = "noopener";
-  link.setAttribute("aria-haspopup", "dialog");
-  link.addEventListener("click", (event) => {
-    const readerReady = typeof pdfReader !== "undefined" && pdfReader && "showModal" in pdfReader && typeof openPdfReader === "function";
-    if (!readerReady || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-    event.preventDefault();
-    openPdfReader(previewFile, displayTitle, link, printFile, Boolean(meta.webFile), placeholderFile);
-  });
   const linkLabel = document.createElement("span");
   linkLabel.textContent = currentLanguage === "es"
     ? (resource.category === "storybook" ? "Leer el cuento" : "Abrir PDF para imprimir")
@@ -270,6 +282,7 @@ function makeCard(resource) {
   if (metaLine.textContent) body.append(metaLine);
   body.append(link);
   article.append(preview, body);
+  wireResourceCard(resource, article);
   return article;
 }
 
@@ -324,6 +337,27 @@ function resourceMatches(resource, searchText, query) {
   if (activeLanguageFilter !== "all" && !(resource.languages || []).includes(activeLanguageFilter)) return false;
   if (activeGradeFilter !== "all" && resource.gradeRange !== activeGradeFilter) return false;
   return !query || searchText.includes(query);
+}
+
+function adoptStaticCards() {
+  if (!grid) return [];
+  const cards = [...grid.querySelectorAll(".resource-card")];
+  if (cards.length !== resources.length) return [];
+  const byFile = new Map(resources.map((resource) => [resource.file, resource]));
+  const seen = new Set();
+  const adopted = [];
+  for (const card of cards) {
+    const resource = byFile.get(card.dataset.resourceFile);
+    if (!resource || seen.has(resource.file)) return [];
+    seen.add(resource.file);
+    wireResourceCard(resource, card);
+    adopted.push({
+      resource,
+      card,
+      searchText: buildResourceSearchText(resource)
+    });
+  }
+  return adopted;
 }
 
 function renderResources() {
@@ -426,6 +460,12 @@ if (grid && searchInput) {
   }
   const countAll = document.querySelector("#count-all");
   if (countAll) countAll.textContent = resources.length;
+
+  resourceCards = adoptStaticCards();
+  if (resourceCards.length) {
+    renderedLanguage = "en";
+    renderResources();
+  }
   renderEmptySuggestions();
 }
 

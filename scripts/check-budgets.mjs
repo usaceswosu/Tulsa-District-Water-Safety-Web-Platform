@@ -12,7 +12,7 @@ const budgets = [
   { label: "scripts/pdf-reader.js", file: "scripts/pdf-reader.js", limit: 8 * KB },
   { label: "data/translations.js", file: "data/translations.js", limit: 8 * KB },
   { label: "data/content.js", file: "data/content.js", limit: 4 * KB },
-  { label: "index.html", file: "index.html", limit: 14 * KB }
+  { label: "index.html", file: "index.html", limit: 18 * KB }
 ];
 const problems = [];
 const results = [];

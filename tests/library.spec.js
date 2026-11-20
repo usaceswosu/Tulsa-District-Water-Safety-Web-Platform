@@ -242,6 +242,20 @@ test("the whole library card opens the reader", async ({ page }) => {
   await page.click("#pdf-reader-close");
 });
 
+test("the library is usable without JavaScript", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto("/");
+  await expect(page.locator(".resource-card")).toHaveCount(42);
+  await expect(page.locator(".resource-card h3").first()).toHaveText("Bobber Boating Items");
+  await expect(page.locator(".resource-card .resource-link").first()).toHaveAttribute(
+    "href",
+    /assets\/pdfs\/.+\.pdf$/
+  );
+  await expect(page.locator("noscript p")).toHaveText("Search and filters need JavaScript. All resources are listed below.");
+  await context.close();
+});
+
 test("reviewed resource metadata renders badges and filters", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("#metadata-filters")).toBeHidden();

@@ -89,7 +89,9 @@ A flat `Record<EnglishText, SpanishText>` used by the language toggle. Static te
 
 ## Library
 
-Cards are created once per language. Search and category filters only toggle `hidden` on the existing cards, so typing does not rebuild the DOM or reload images. `renderResources()` rebuilds cards when the language changes or the catalog length changes. Search matches both title languages, descriptions, grades, language names, category labels, and familiar aliases such as “life vest” or “PFD”; it ignores diacritics and punctuation, so “accion” finds “Acción”. A zero-result search offers category shortcuts.
+English cards are generated into `index.html` by `scripts/render-library.mjs`, so the library works without JavaScript and is present in the initial HTML. On boot `main.js` adopts those cards by `data-resource-file`, attaches the reader handlers, and computes search text; it does not rebuild them. Search and category filters only toggle `hidden` on the existing cards, so typing does not reload images. `renderResources()` rebuilds cards when the language changes or the catalog length changes; Spanish is still rendered at runtime. Search matches both title languages, descriptions, grades, language names, category labels, and familiar aliases such as “life vest” or “PFD”; it ignores diacritics and punctuation, so “accion” finds “Acción”. A zero-result search offers category shortcuts.
+
+Run `npm run update:library` after changing the catalog or `data/pdf-meta.js`; `npm run check:library` catches stale generated markup.
 
 ## In-page PDF reader
 
@@ -187,6 +189,7 @@ The public base URL lives in `site.config.json`. `npm run update:site-url -- <ur
 | `scripts/check-live.mjs` | Post-deploy reader/offline/version smoke test |
 | `scripts/bump-version.mjs` | Version bump + sitemap/precache regeneration |
 | `scripts/update-resource-schema.mjs` | Generated `ItemList` JSON-LD for the printable library |
+| `scripts/render-library.mjs` | Generated English library cards in `index.html` |
 | `scripts/update-site-url.mjs` | One-command domain/path migration |
 | `scripts/generate-preview-pdf.py` | Optional raster preview generator |
 | `tests/` | Playwright suites for Chromium, Firefox, and WebKit |

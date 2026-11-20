@@ -23,7 +23,7 @@ The links to YouTube, USACE, Recreation.gov, and other official sources are outb
 ## Quality checks
 
 ```bash
-npm run check       # versions, globals, content, translations, metadata, URL/schema/sitemap, QR/pack, HTML, CSS/budgets, partials, precache, PDFs
+npm run check       # versions, globals, content, translations, metadata, URL/schema/library/sitemap, QR/pack, HTML, CSS/budgets, partials, precache, PDFs
 npm test            # Chromium, Firefox, WebKit + Pixel/iPhone mobile smoke tests
 npm run check:live  # post-deploy smoke test against the public URL
 ```
@@ -62,7 +62,7 @@ GitHub Pages serves the files directly. Internal links are relative to the proje
 
 ## Project structure
 
-- `index.html` — kid-facing home: safety reminders, cartoons, AR, game, printable library, reader.
+- `index.html` — kid-facing home: safety reminders, cartoons, AR, game, static printable library, reader.
 - `grown-ups.html` — lake planning, the district app, classroom materials, reader.
 - `accessibility.html` / `poster.html` / `404.html` — self-contained statement, QR poster, and not-found pages.
 - `partials/` — shared header, footer, and reader markup copied into both main pages.

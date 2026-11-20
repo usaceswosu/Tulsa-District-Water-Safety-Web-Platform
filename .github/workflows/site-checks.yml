@@ -62,6 +62,9 @@ jobs:
       - name: Check resource structured data
         run: npm run check:resource-schema
 
+      - name: Check static library cards
+        run: npm run check:library
+
       - name: Check sitemap
         run: npm run check:sitemap
 

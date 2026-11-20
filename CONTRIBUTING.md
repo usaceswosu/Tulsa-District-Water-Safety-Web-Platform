@@ -21,7 +21,7 @@ npm run check
 npm test
 ```
 
-`npm run check` runs version, global-name, content, translation, metadata coverage, site-integrity, public-URL, resource-schema, sitemap, QR, classroom-pack, HTML, CSS, asset-budget, partial, precache, PDF metadata, and PDF budget checks. The site-integrity check (`scripts/check-site.mjs`) is the cross-platform source of truth for catalog/assets/page links.
+`npm run check` runs version, global-name, content, translation, metadata coverage, site-integrity, public-URL, resource-schema, static-library, sitemap, QR, classroom-pack, HTML, CSS, asset-budget, partial, precache, PDF metadata, and PDF budget checks. The site-integrity check (`scripts/check-site.mjs`) is the cross-platform source of truth for catalog/assets/page links.
 
 CI additionally runs:
 
@@ -51,8 +51,9 @@ npm run check:live -- http://127.0.0.1:4173
 3. Add the Spanish title to `BOBBER_RESOURCE_TITLES_ES`.
 4. Run `npm run update:pdf-meta`.
 5. Run `npm run update:resource-schema`.
-6. If the PDF is large, create a preview (below).
-7. Bump the version and test.
+6. Run `npm run update:library`.
+7. If the PDF is large, create a preview (below), then repeat steps 4–6.
+8. Bump the version and test.
 
 ### Generate a lightweight reader preview
 
@@ -100,7 +101,7 @@ After review, add the approved fields to the matching `data/resources.js` entry:
 }
 ```
 
-Run `npm run check:metadata`, then `npm run update:resource-schema` so the public JSON-LD reflects the reviewed fields. Once every resource is filled, switch CI to `npm run check:metadata -- --require` so future resources cannot ship without review metadata. The UI automatically shows badges and language/grade filters when values exist.
+Run `npm run check:metadata`, then `npm run update:resource-schema` and `npm run update:library` so the public JSON-LD and static cards reflect the reviewed fields. Once every resource is filled, switch CI to `npm run check:metadata -- --require` so future resources cannot ship without review metadata. The UI automatically shows badges and language/grade filters when values exist.
 
 ### Change tips, quiz questions, or pal cards
 

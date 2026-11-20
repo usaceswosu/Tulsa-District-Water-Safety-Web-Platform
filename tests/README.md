@@ -5,7 +5,7 @@ Playwright runs against the local server configured in `playwright.config.js` in
 | File | Covers |
 | --- | --- |
 | `home.spec.js` | Metadata, language/title updates, theme, tips, filters, keyboard shortcuts, responsive layout, navigation |
-| `library.spec.js` | Card rendering/filtering, preview reader, print actions, lifecycle recovery, TOC, catalog metadata |
+| `library.spec.js` | Static/no-JS cards, filtering, preview reader, print actions, lifecycle recovery, TOC, catalog metadata |
 | `game.spec.js` | Quiz flow, focus management, certificate print lifecycle |
 | `accessibility.spec.js` | Axe scans, 320px reflow, dark-mode print, forced colors, poster print |
 | `offline.spec.js` | Service-worker install, offline root, query-tolerant navigation, encoded thumbnails |
