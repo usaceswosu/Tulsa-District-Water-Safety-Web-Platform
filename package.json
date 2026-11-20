@@ -1,0 +1,23 @@
+{
+  "name": "tulsa-district-water-safety-web-platform",
+  "private": true,
+  "type": "module",
+  "description": "Static Bobber water-safety site for USACE Tulsa District",
+  "scripts": {
+    "serve": "node scripts/serve.mjs",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "update:pdf-meta": "node scripts/update-pdf-meta.mjs",
+    "check:pdf-meta": "node scripts/update-pdf-meta.mjs --check",
+    "update:image-dimensions": "node scripts/update-image-dimensions.mjs",
+    "check:pdf-budget": "node scripts/check-pdf-budget.mjs",
+    "check:html": "html-validate index.html grown-ups.html 404.html accessibility.html"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.55.0",
+    "html-validate": "^9.7.1",
+    "image-size": "^2.0.2",
+    "pdfjs-dist": "^6.5.438"
+  }
+}

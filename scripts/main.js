@@ -2,6 +2,7 @@
 const resources = window.BOBBER_RESOURCES;
 const categoryLabels = window.BOBBER_CATEGORY_LABELS;
 const resourceTitlesEs = window.BOBBER_RESOURCE_TITLES_ES;
+const pdfMeta = window.BOBBER_PDF_META || {};
 const spanishText = window.BOBBER_TRANSLATIONS_ES;
 // Capture authored English text once so the language toggle can switch both ways.
 const staticEnglishTextNodes = [];
@@ -28,9 +29,29 @@ function assetPath(filename) {
   return `assets/${filename.split("/").map(encodeURIComponent).join("/")}`;
 }
 
+function formatFileSize(bytes) {
+  if (!Number.isFinite(bytes) || bytes <= 0) return "";
+  const locale = currentLanguage === "es" ? "es" : "en";
+  if (bytes >= 1048576) {
+    const value = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(bytes / 1048576);
+    return `${value} MB`;
+  }
+  return `${new Intl.NumberFormat(locale).format(Math.round(bytes / 1024))} KB`;
+}
+
+function formatPageCount(pages) {
+  if (!Number.isFinite(pages) || pages <= 0) return "";
+  return currentLanguage === "es"
+    ? `${pages} ${pages === 1 ? "página" : "páginas"}`
+    : `${pages} ${pages === 1 ? "page" : "pages"}`;
+}
+
 // Resource library: cards use local PDFs and previews from the repository.
 function makeCard(resource) {
   const displayTitle = currentLanguage === "es" ? (resourceTitlesEs[resource.title] || resource.title) : resource.title;
+  const meta = pdfMeta[resource.file] || {};
+  const printFile = assetPath(resource.file);
+  const previewFile = meta.webFile ? assetPath(meta.webFile) : printFile;
   const article = document.createElement("article");
   article.className = "resource-card";
 
@@ -50,9 +71,12 @@ function makeCard(resource) {
   body.className = "resource-body";
   const title = document.createElement("h3");
   title.textContent = displayTitle;
+  const metaLine = document.createElement("p");
+  metaLine.className = "resource-meta";
+  metaLine.textContent = [formatPageCount(meta.pages), formatFileSize(meta.bytes)].filter(Boolean).join(" · ");
   const link = document.createElement("a");
   link.className = "resource-link";
-  link.href = assetPath(resource.file);
+  link.href = printFile;
   link.target = "_blank";
   link.rel = "noopener";
   link.setAttribute("aria-haspopup", "dialog");
@@ -60,7 +84,7 @@ function makeCard(resource) {
     const readerReady = typeof pdfReader !== "undefined" && pdfReader && "showModal" in pdfReader && typeof openPdfReader === "function";
     if (!readerReady || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
-    openPdfReader(link.href, displayTitle, link);
+    openPdfReader(previewFile, displayTitle, link, printFile, Boolean(meta.webFile));
   });
   const linkLabel = document.createElement("span");
   linkLabel.textContent = currentLanguage === "es"
@@ -71,7 +95,9 @@ function makeCard(resource) {
   arrow.setAttribute("aria-hidden", "true");
   arrow.textContent = "→";
   link.append(linkLabel, arrow);
-  body.append(title, link);
+  body.append(title);
+  if (metaLine.textContent) body.append(metaLine);
+  body.append(link);
   article.append(preview, body);
   return article;
 }
@@ -189,6 +215,14 @@ function setLanguage(language) {
   document.documentElement.lang = language;
   document.documentElement.dataset.locale = language;
   savePreference("bobber-language", language);
+  try {
+    const url = new URL(window.location.href);
+    if (isSpanish) url.searchParams.set("lang", "es");
+    else url.searchParams.delete("lang");
+    window.history.replaceState(null, "", url.href);
+  } catch {
+    // History is unavailable in some embedded previews; the language still changes.
+  }
   const isGrownUpsPage = document.body.dataset.page === "grownups";
   document.title = isGrownUpsPage
     ? (isSpanish ? "Para adultos | Bobber, el perro de seguridad acuática" : "For grown-ups | Bobber the Water Safety Dog")
@@ -226,14 +260,16 @@ function setLanguage(language) {
   languageName.textContent = isSpanish ? "Inglés" : "Español";
   languageName.lang = "es";
   headerLanguageToggle.setAttribute("aria-pressed", String(isSpanish));
-  headerLanguageToggle.setAttribute("aria-label", isSpanish ? "Cambiar el sitio a inglés / Switch to English" : "Switch the entire page to Spanish / Cambiar a español");
-  headerLanguageToggle.title = isSpanish ? "Cambiar el sitio a inglés / Switch to English" : "Switch the entire page to Spanish / Cambiar a español";
+  headerLanguageToggle.setAttribute("aria-label", isSpanish ? "EN Inglés" : "ES Español");
+  headerLanguageToggle.title = isSpanish ? "Inglés — cambiar toda la página a inglés" : "Español — switch the entire page to Spanish";
 
   menuToggle.setAttribute("aria-label", menuButtonLabel(menuToggle.getAttribute("aria-expanded") === "true"));
   siteNav.setAttribute("aria-label", isSpanish ? "Navegación principal" : "Main navigation");
   document.querySelector(".skip-link").setAttribute("aria-label", isSpanish ? "Saltar al contenido" : "Skip to content");
-  document.querySelector(".brand").setAttribute("aria-label", isSpanish ? "Inicio de Bobber, el perro de seguridad acuática" : "Bobber water safety home");
   document.querySelector(".quick-strip")?.setAttribute("aria-label", isSpanish ? "Explora el sitio" : "Explore the site");
+  document.querySelectorAll('a[href="accessibility.html"], a[href="accessibility.html#espanol"]').forEach((link) => {
+    link.href = isSpanish ? "accessibility.html#espanol" : "accessibility.html";
+  });
   document.querySelector(".filters")?.setAttribute("aria-label", isSpanish ? "Filtrar recursos" : "Filter resources");
   if (searchInput) {
     searchInput.setAttribute("aria-label", isSpanish ? "Buscar recursos de Bobber" : "Search Bobber resources");
@@ -292,7 +328,7 @@ function updateThemeControl() {
   themeIcon.textContent = isDark ? "☼" : "◐";
   themeLabel.textContent = currentLanguage === "es" ? (isDark ? "Claro" : "Oscuro") : (isDark ? "Light" : "Dark");
   const themeColor = document.querySelector('meta[name="theme-color"]');
-  if (themeColor) themeColor.content = isDark ? "#101c20" : "#123c45";
+  if (themeColor) themeColor.content = isDark ? "#101c20" : "#fffefa";
 }
 
 // Hidden Konami-code easter egg.

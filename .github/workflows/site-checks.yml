@@ -18,3 +18,46 @@ jobs:
       - name: Validate local assets, resource data, and page links
         shell: pwsh
         run: ./scripts/check-site.ps1
+
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate HTML
+        run: npm run check:html
+
+      - name: Check PDF metadata
+        run: npm run check:pdf-meta
+
+      - name: Check PDF budget
+        run: npm run check:pdf-budget
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run accessibility and smoke tests
+        run: npm test
+
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run Lighthouse budgets
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true

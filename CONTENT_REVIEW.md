@@ -24,6 +24,9 @@ This checklist is for district staff reviewing the Bobber water-safety site befo
 - [ ] Check focus visibility, color contrast in both themes, 200% zoom, narrow mobile widths, and Spanish text pronunciation/language changes.
 - [ ] Verify that each cartoon has accurate English and Spanish captions; add transcripts or accessible alternatives where available.
 - [ ] Confirm printable PDFs are accessible or provide an accessible alternative when one is available.
+- [ ] Review `accessibility.html` with Public Affairs: official-status wording, contact routes, and the privacy statement.
+- [ ] Confirm the rasterized in-page PDF previews and print-quality downloads are acceptable for the library. The previews are for on-screen reading; tagged print originals are preserved for download.
+- [ ] Confirm the Spanish `?lang=es` URL and hreflang metadata match the district's bilingual publishing plan.
 
 ## Review record
 

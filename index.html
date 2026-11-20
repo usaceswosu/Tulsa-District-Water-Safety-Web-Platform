@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <meta name="darkreader-lock">
-  <meta name="theme-color" content="#123c45">
+  <meta name="theme-color" content="#fffefa">
   <meta name="description" content="Meet Bobber the Water Safety Dog. Explore family-friendly water safety videos, printable activities, posters, coloring sheets, and storybooks from the U.S. Army Corps of Engineers Tulsa District.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bobber the Water Safety Dog">
@@ -17,27 +17,41 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Bobber the Water Safety Dog giving a thumbs up">
   <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="es_US">
+  <link rel="canonical" href="https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/">
+  <link rel="alternate" hreflang="en" href="https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/">
+  <link rel="alternate" hreflang="es" href="https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/?lang=es">
+  <link rel="alternate" hreflang="x-default" href="https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/">
   <title>Bobber the Water Safety Dog | Tulsa District, USACE</title>
   <link rel="icon" type="image/png" href="assets/bobber-logo.png">
   <script>
     try {
+      const params = new URLSearchParams(location.search);
+      const requested = params.get("lang");
+      const stored = localStorage.getItem("bobber-language");
+      const language = requested === "es" || requested === "en" ? requested : (stored === "es" ? "es" : "en");
       document.documentElement.dataset.theme = localStorage.getItem("bobber-theme") ||
         (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-      document.documentElement.dataset.locale = localStorage.getItem("bobber-language") || "en";
+      document.documentElement.dataset.locale = language;
+      document.documentElement.lang = language;
+      if (requested === "es" || requested === "en") localStorage.setItem("bobber-language", language);
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = document.documentElement.dataset.theme === "dark" ? "#101c20" : "#fffefa";
     } catch {
       document.documentElement.dataset.theme = "light";
       document.documentElement.dataset.locale = "en";
     }
   </script>
-  <link rel="preload" as="image" href="assets/bobber/bobber-thumbs-up.webp">
-  <link rel="stylesheet" href="styles.css?v=20261119s">
+  <link rel="preload" as="image" href="assets/bobber/bobber-thumbs-up.webp" fetchpriority="high">
+  <link rel="stylesheet" href="styles.css?v=20261119v">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="#top" aria-label="Bobber water safety home">
-        <img class="brand-logo" src="assets/bobber-logo.webp" alt="">
+      <a class="brand" href="#top">
+        <img class="brand-logo" src="assets/bobber-logo.webp" alt="" width="160" height="159">
         <span class="brand-copy"><strong>Bobber</strong><small>Water Safety Dog</small></span>
       </a>
       <nav class="site-nav" id="site-nav" aria-label="Main navigation">
@@ -49,7 +63,7 @@
         <a class="nav-cta" href="#resources">Explore the library <span aria-hidden="true">↗</span></a>
       </nav>
       <div class="header-tools">
-        <button class="header-language-toggle" id="header-language-toggle" type="button" aria-label="Switch to Spanish / Cambiar a español" aria-pressed="false" aria-controls="main"><span class="language-code" aria-hidden="true">ES</span><span class="language-name" lang="es">Español</span></button>
+        <button class="header-language-toggle" id="header-language-toggle" type="button" aria-label="ES Español" aria-pressed="false" aria-controls="main"><span class="language-code" aria-hidden="true">ES</span> <span class="language-name" lang="es">Español</span></button>
         <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode"><span class="theme-icon" aria-hidden="true">◐</span><span class="theme-label">Dark</span></button>
         <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open navigation"><span></span><span></span><span></span></button>
       </div>
@@ -74,7 +88,7 @@
           <div class="feature-topline"><span>Bobber’s lake-day reminder</span><span aria-hidden="true">✦</span></div>
           <p class="speech-bubble">Hi, I’m Bobber!</p>
           <div class="life-jacket-art" aria-hidden="true">
-            <img src="assets/bobber/bobber-thumbs-up.webp" alt="">
+            <img src="assets/bobber/bobber-thumbs-up.webp" alt="" width="480" height="601">
 
           </div>
           <p class="feature-title">Wear your life jacket.</p>
@@ -114,7 +128,7 @@
           <p>Bobber helps young people learn how to enjoy lakes, rivers, pools, and beaches more safely. His advice is easy to remember, and even easier to share with your family.</p>
           <a class="text-link" href="#resources">Find something fun to print <span aria-hidden="true">→</span></a>
           <div class="bobber-note">
-            <img src="assets/bobber/bobber-standing.webp" loading="lazy" decoding="async" alt="Bobber the Water Safety Dog">
+            <img src="assets/bobber/bobber-standing.webp" loading="lazy" decoding="async" alt="Bobber the Water Safety Dog" width="480" height="415">
             <span><small>Meet your lake-day buddy</small><strong>Bobber’s got your back.</strong></span>
           </div>
         </div>
@@ -122,11 +136,11 @@
       <div class="friends">
         <h3 class="friends-title">Bobber’s pals</h3>
         <ul class="friends-row">
-          <li><img src="assets/bobber/friends/buck.webp" loading="lazy" decoding="async" alt=""><strong>Ranger Buck</strong><small>Ranger</small></li>
-          <li><img src="assets/bobber/friends/jane.webp" loading="lazy" decoding="async" alt=""><strong>Ranger Jane</strong><small>Ranger</small></li>
-          <li><img src="assets/bobber/friends/toro.webp" loading="lazy" decoding="async" alt=""><strong>Ranger Toro</strong><small>Ranger</small></li>
-          <li><img src="assets/bobber/friends/corkey.webp" loading="lazy" decoding="async" alt=""><strong>Corkey</strong><small>Bobber’s pal</small></li>
-          <li><img src="assets/bobber/friends/sinker.webp" loading="lazy" decoding="async" alt=""><strong>Sinker</strong><small>Bobber’s pal</small></li>
+          <li><img src="assets/bobber/friends/buck.webp" loading="lazy" decoding="async" alt="" width="300" height="560"><strong>Ranger Buck</strong><small>Ranger</small></li>
+          <li><img src="assets/bobber/friends/jane.webp" loading="lazy" decoding="async" alt="" width="290" height="560"><strong>Ranger Jane</strong><small>Ranger</small></li>
+          <li><img src="assets/bobber/friends/toro.webp" loading="lazy" decoding="async" alt="" width="263" height="560"><strong>Ranger Toro</strong><small>Ranger</small></li>
+          <li><img src="assets/bobber/friends/corkey.webp" loading="lazy" decoding="async" alt="" width="363" height="560"><strong>Corkey</strong><small>Bobber’s pal</small></li>
+          <li><img src="assets/bobber/friends/sinker.webp" loading="lazy" decoding="async" alt="" width="380" height="560"><strong>Sinker</strong><small>Bobber’s pal</small></li>
         </ul>
       </div>
     </section>
@@ -146,7 +160,7 @@
         <div class="safety-grid">
           <article class="safety-card">
             <span class="safety-number" aria-hidden="true">01</span>
-            <img class="safety-art" src="assets/bobber/bobber-jacket-rack.webp" loading="lazy" decoding="async" alt="">
+            <img class="safety-art" src="assets/bobber/bobber-jacket-rack.webp" loading="lazy" decoding="async" alt="" width="725" height="533">
 
             <h3>Wear your life jacket</h3>
             <p>Wear a properly fitted, U.S. Coast Guard-approved life jacket when you’re in, on, or around open water.</p>
@@ -157,7 +171,7 @@
           </article>
           <article class="safety-card">
             <span class="safety-number" aria-hidden="true">02</span>
-            <img class="safety-art" src="assets/bobber/bobber-swim.webp" loading="lazy" decoding="async" alt="">
+            <img class="safety-art" src="assets/bobber/bobber-swim.webp" loading="lazy" decoding="async" alt="" width="729" height="446">
             <h3>Swim with a buddy</h3>
             <p>Choose a designated swimming area, follow posted rules, and make sure a responsible adult is watching.</p>
             <div class="spanish-copy" id="safety-es-buddy" lang="es" hidden>
@@ -167,7 +181,7 @@
           </article>
           <article class="safety-card">
             <span class="safety-number" aria-hidden="true">03</span>
-            <img class="safety-art" src="assets/bobber/bobber-lifebuoy.webp" loading="lazy" decoding="async" alt="">
+            <img class="safety-art" src="assets/bobber/bobber-lifebuoy.webp" loading="lazy" decoding="async" alt="" width="728" height="598">
             <h3>Reach or throw. Don’t go.</h3>
             <p>If someone is in trouble, get an adult and call 911. Reach with something long or throw something that floats—don’t enter the water.</p>
             <div class="spanish-copy" id="safety-es-rescue" lang="es" hidden>
@@ -177,7 +191,7 @@
           </article>
           <article class="safety-card">
             <span class="safety-number" aria-hidden="true">04</span>
-            <img class="safety-art" src="assets/bobber/bobber-cold-water.webp" loading="lazy" decoding="async" alt="">
+            <img class="safety-art" src="assets/bobber/bobber-cold-water.webp" loading="lazy" decoding="async" alt="" width="911" height="689">
             <h3>Respect cold water</h3>
             <p>Cold water can be dangerous even on a warm day. Dress for the water, stay alert, and don’t take chances.</p>
             <div class="spanish-copy" id="safety-es-cold" lang="es" hidden>
@@ -200,7 +214,7 @@
           </div>
           <div class="lake-check-side">
             <div class="lake-check-bobber">
-              <img id="lake-check-bobber-img" src="assets/bobber/bobber-no-jacket.webp" alt="">
+              <img id="lake-check-bobber-img" src="assets/bobber/bobber-no-jacket.webp" alt="" width="806" height="1024">
               <svg class="reaction reaction-jacket" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
                 <path d="M18 6h5c0 3 2 5 5 5s5-2 5-5h5l6 8-6 5v22H18V19l-6-5 6-8Z" fill="#f17658" stroke="#123c45" stroke-width="3" stroke-linejoin="round"/>
                 <path d="M18 20h24M18 32h24" stroke="#f7d978" stroke-width="4"/>
@@ -240,7 +254,7 @@
         <article class="video-card">
           <span class="episode">Episode 01</span>
           <div class="video-thumb">
-            <img src="assets/graphics/videos/episode-01.webp" alt="" loading="lazy" decoding="async">
+            <img src="assets/graphics/videos/episode-01.webp" alt="" loading="lazy" decoding="async" width="640" height="360">
             <div class="video-play" aria-hidden="true">▶</div>
           </div>
           <h3>Dog Paddling Puppies</h3>
@@ -253,7 +267,7 @@
         <article class="video-card">
           <span class="episode">Episode 02</span>
           <div class="video-thumb">
-            <img src="assets/graphics/videos/episode-02.webp" alt="" loading="lazy" decoding="async">
+            <img src="assets/graphics/videos/episode-02.webp" alt="" loading="lazy" decoding="async" width="640" height="360">
             <div class="video-play" aria-hidden="true">▶</div>
           </div>
           <h3>Don’t Blow a Day at the Beach</h3>
@@ -266,7 +280,7 @@
         <article class="video-card">
           <span class="episode">Episode 03</span>
           <div class="video-thumb">
-            <img src="assets/graphics/videos/episode-03.webp" alt="" loading="lazy" decoding="async">
+            <img src="assets/graphics/videos/episode-03.webp" alt="" loading="lazy" decoding="async" width="640" height="360">
             <div class="video-play" aria-hidden="true">▶</div>
           </div>
           <h3>Sinker Has a Fit</h3>
@@ -279,7 +293,7 @@
         <article class="video-card">
           <span class="episode">Episode 04</span>
           <div class="video-thumb">
-            <img src="assets/graphics/videos/episode-04.webp" alt="" loading="lazy" decoding="async">
+            <img src="assets/graphics/videos/episode-04.webp" alt="" loading="lazy" decoding="async" width="640" height="360">
             <div class="video-play" aria-hidden="true">▶</div>
           </div>
           <h3>Who’s Your Buddy?</h3>
@@ -305,7 +319,7 @@
         <div class="game-card">
           <p class="game-progress" id="game-progress">Question 1 of 4</p>
           <h3 class="game-question" id="game-question" tabindex="-1">What should you put on before you get in a boat?</h3>
-          <img class="game-art" id="game-art" src="assets/bobber/bobber-jacket-rack.webp" alt="">
+          <img class="game-art" id="game-art" src="assets/bobber/bobber-jacket-rack.webp" alt="" width="725" height="533">
           <div class="game-options" id="game-options"></div>
           <p class="game-feedback" id="game-feedback" aria-live="polite"></p>
           <button class="button button-dark" id="game-next" type="button" hidden><span id="game-next-label">Next question</span> <span aria-hidden="true">→</span></button>
@@ -357,7 +371,7 @@
         <p class="results-message" id="results-message" aria-live="polite"></p>
         <div class="resource-grid" id="resource-grid"></div>
         <div class="empty-state" id="empty-state" hidden>
-          <img class="empty-bobber" src="assets/bobber/bobber-sitting.webp" loading="lazy" decoding="async" alt="">
+          <img class="empty-bobber" src="assets/bobber/bobber-sitting.webp" loading="lazy" decoding="async" alt="" width="480" height="611">
           <h3>No matching resources</h3>
           <p>Try another search or choose a different category.</p>
           <button class="reset-search" id="reset-search" type="button">Show everything</button>
@@ -370,7 +384,7 @@
     </section>
 
     <section class="closing section-wrap">
-      <img class="closing-logo" src="assets/bobber/bobber-sitting.webp" loading="lazy" decoding="async" alt="Bobber the Water Safety Dog">
+      <img class="closing-logo" src="assets/bobber/bobber-sitting.webp" loading="lazy" decoding="async" alt="Bobber the Water Safety Dog" width="480" height="611">
       <div>
         <span class="section-kicker">Before you head out</span>
         <h2>Have a plan. Wear a life jacket. Look out for each other.</h2>
@@ -383,7 +397,7 @@
     <div class="footer-inner">
       <div class="footer-brand">
         <a class="brand brand-light" href="#top">
-          <img class="brand-logo" src="assets/bobber-logo.webp" alt="">
+          <img class="brand-logo" src="assets/bobber-logo.webp" alt="" width="160" height="159">
           <span class="brand-copy"><strong>Bobber</strong><small>Water Safety Dog</small></span>
         </a>
         <p>A water safety education resource from the U.S. Army Corps of Engineers, Tulsa District.</p>
@@ -404,11 +418,12 @@
       </div>
     </div>
     <div class="footer-credit">
-      <a href="https://www.swosu.edu/" target="_blank" rel="noopener noreferrer"><img src="assets/images/swosu-logo.png" alt="Southwestern Oklahoma State University"></a>
+      <a href="https://www.swosu.edu/" target="_blank" rel="noopener noreferrer"><img src="assets/images/swosu-logo.png" alt="Southwestern Oklahoma State University" width="125" height="50"></a>
       <p>Built by Joseph McPhearson, Tanner Moore, Moses Michael Angel Garcia, and Austin Wilson at Southwestern Oklahoma State University.</p>
     </div>
     <div class="footer-bottom">
       <span>U.S. Army Corps of Engineers · Tulsa District</span>
+      <a href="accessibility.html">Accessibility &amp; privacy</a>
       <a href="https://www.usace.army.mil/" target="_blank" rel="noopener noreferrer">Official U.S. Army website ↗</a>
     </div>
   </footer>
@@ -423,7 +438,7 @@
   <dialog class="easter-dialog" id="easter-dialog" aria-labelledby="easter-title" aria-describedby="easter-copy">
     <div class="easter-confetti" id="easter-confetti" aria-hidden="true"></div>
     <button class="easter-close" id="easter-close" type="button" aria-label="Close secret mission">×</button>
-    <img class="easter-logo" src="assets/bobber-logo.webp" alt="Bobber the Water Safety Dog">
+    <img class="easter-logo" src="assets/bobber-logo.webp" alt="Bobber the Water Safety Dog" width="160" height="159">
     <p class="easter-kicker" id="easter-kicker">Secret mission unlocked</p>
     <h2 id="easter-title">You found Bobber!</h2>
     <p id="easter-copy">Your secret mission: bring a buddy, wear a life jacket, and share one water-safety tip.</p>
@@ -447,9 +462,10 @@
       </div>
     </div>
   </dialog>
-  <script src="scripts/pdf-reader.js?v=20261119s" defer></script>
-  <script src="data/resources.js?v=20261119s" defer></script>
-  <script src="data/translations.js?v=20261119s" defer></script>
-  <script src="scripts/main.js?v=20261119s" defer></script>
+  <script src="scripts/pdf-reader.js?v=20261119v" defer></script>
+  <script src="data/resources.js?v=20261119v" defer></script>
+  <script src="data/pdf-meta.js?v=20261119v" defer></script>
+  <script src="data/translations.js?v=20261119v" defer></script>
+  <script src="scripts/main.js?v=20261119v" defer></script>
 </body>
 </html>

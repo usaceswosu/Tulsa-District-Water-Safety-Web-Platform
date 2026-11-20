@@ -85,7 +85,12 @@ async function showPdfPage(session, pageNumber) {
 
 function updateReaderChrome() {
   pdfReaderClose.textContent = readerCopy("Back to the library", "Volver a la biblioteca");
-  pdfReaderDownload.textContent = readerCopy("Download PDF", "Descargar PDF");
+  pdfReaderDownload.textContent = activePdf?.preview
+    ? readerCopy("Download print PDF", "Descargar PDF para imprimir")
+    : readerCopy("Download PDF", "Descargar PDF");
+  pdfReaderDownload.title = activePdf?.preview
+    ? readerCopy("Full print-quality PDF", "PDF de calidad para imprimir")
+    : "";
   pdfReaderPrevious.textContent = readerCopy("Previous page", "Página anterior");
   pdfReaderNext.textContent = readerCopy("Next page", "Página siguiente");
   if (activePdf?.fallback) {
@@ -104,12 +109,14 @@ function updateReaderChrome() {
 // The page language can change while the reader is open.
 window.updatePdfReaderLanguage = updateReaderChrome;
 
-async function openPdfReader(url, title, opener) {
-  const session = { title, url, opener, page: 0, fallback: false };
+async function openPdfReader(url, title, opener, downloadUrl = url, preview = false) {
+  // `url` is the fast preview used by the canvas reader; `downloadUrl` stays the
+  // full print-quality PDF, including its accessibility tags.
+  const session = { title, url, downloadUrl, preview, opener, page: 0, fallback: false };
   activePdf = session;
   pdfReaderTitle.textContent = title;
   updateReaderChrome();
-  pdfReaderDownload.href = url;
+  pdfReaderDownload.href = session.downloadUrl;
   pdfReaderDownload.setAttribute("download", "");
   pdfReaderStage.replaceChildren();
   pdfReaderStatus.textContent = readerCopy("Loading PDF…", "Cargando PDF…");

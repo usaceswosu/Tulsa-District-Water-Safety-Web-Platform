@@ -1,0 +1,29 @@
+name: Link check
+
+on:
+  schedule:
+    - cron: "0 14 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Check links in the published pages
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --max-retries 2
+            --accept 200,206,301,302,403,429
+            --exclude-path node_modules
+            --exclude-path vendor
+            --exclude-path test-results
+            './**/*.html'
+          fail: true
