@@ -16,6 +16,8 @@ if (educatorPdfLinks.length && typeof pdfReader !== "undefined" && pdfReader && 
 const resourceTitlesEs = window.BOBBER_RESOURCE_TITLES_ES;
 const pdfMeta = window.BOBBER_PDF_META || {};
 const spanishText = window.BOBBER_TRANSLATIONS_ES;
+const appScript = [...document.scripts].find((script) => script.src.includes("main.js"));
+const assetVersion = appScript ? new URL(appScript.src).searchParams.get("v") || "" : "";
 // Capture authored English text once so the language toggle can switch both ways.
 const staticEnglishTextNodes = [];
 const textWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -65,7 +67,10 @@ function makeCard(resource) {
   const displayTitle = currentLanguage === "es" ? (resourceTitlesEs[resource.title] || resource.title) : resource.title;
   const meta = pdfMeta[resource.file] || {};
   const printFile = assetPath(resource.file);
-  const previewFile = meta.webFile ? assetPath(meta.webFile) : printFile;
+  const previewFile = meta.webFile
+    ? `${assetPath(meta.webFile)}${assetVersion ? `?v=${encodeURIComponent(assetVersion)}` : ""}`
+    : printFile;
+  const placeholderFile = assetPath(`graphics/${resource.image}`);
   const article = document.createElement("article");
   article.className = "resource-card";
 
@@ -98,7 +103,7 @@ function makeCard(resource) {
     const readerReady = typeof pdfReader !== "undefined" && pdfReader && "showModal" in pdfReader && typeof openPdfReader === "function";
     if (!readerReady || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
-    openPdfReader(previewFile, displayTitle, link, printFile, Boolean(meta.webFile));
+    openPdfReader(previewFile, displayTitle, link, printFile, Boolean(meta.webFile), placeholderFile);
   });
   const linkLabel = document.createElement("span");
   linkLabel.textContent = currentLanguage === "es"
@@ -145,10 +150,13 @@ function scheduleResources() {
   else window.setTimeout(run, 120);
 }
 
+function warmPdfEngine() {
+  window.prefetchPdfEngine?.();
+}
+
 if (grid && searchInput) {
-  const warmReader = () => window.prefetchPdfEngine?.();
-  grid.addEventListener("pointerover", warmReader, { once: true });
-  grid.addEventListener("focusin", warmReader, { once: true });
+  grid.addEventListener("pointerover", warmPdfEngine, { once: true });
+  grid.addEventListener("focusin", warmPdfEngine, { once: true });
 
   filterButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -179,6 +187,17 @@ if (grid && searchInput) {
   }
   const countAll = document.querySelector("#count-all");
   if (countAll) countAll.textContent = resources.length;
+}
+
+const readerWarmTarget = grid?.closest(".library-section") || document.querySelector(".educator-section");
+if (readerWarmTarget && "IntersectionObserver" in window) {
+  const readerWarmObserver = new IntersectionObserver((entries) => {
+    if (entries.some((entry) => entry.isIntersecting)) {
+      warmPdfEngine();
+      readerWarmObserver.disconnect();
+    }
+  }, { rootMargin: "500px" });
+  readerWarmObserver.observe(readerWarmTarget);
 }
 
 const menuToggle = document.querySelector("#menu-toggle");

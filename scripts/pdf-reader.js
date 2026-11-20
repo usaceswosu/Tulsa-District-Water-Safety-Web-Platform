@@ -33,8 +33,17 @@ let pdfjsPromise;
 
 // Warm the reader on first hover or focus so the first PDF opens quickly.
 function prefetchPdfEngine() {
-  if (navigator.connection?.saveData) return;
-  pdfjsPromise ||= import(new URL("build/pdf.min.mjs", pdfEngine));
+  const connection = navigator.connection;
+  const effectiveType = connection?.effectiveType || "";
+  if (connection?.saveData || /(^|-)2g$|^3g$/.test(effectiveType)) return;
+  pdfjsPromise ||= import(new URL("build/pdf.min.mjs", pdfEngine)).then((module) => {
+    try {
+      fetch(new URL("build/pdf.worker.min.mjs", pdfEngine), { cache: "force-cache" }).catch(() => {});
+    } catch {
+      // The worker will still load on first use.
+    }
+    return module;
+  });
 }
 window.prefetchPdfEngine = prefetchPdfEngine;
 
@@ -203,6 +212,13 @@ function updateReaderChrome() {
   pdfReaderPrintFull.href = activePdf?.downloadUrl || activePdf?.url || "#";
   pdfReaderPrintPage.textContent = readerCopy("Print this page", "Imprimir esta página");
   pdfReaderPrintPage.title = readerCopy("Print the page you are viewing", "Imprime la página que estás viendo");
+  const placeholderImage = pdfReaderStage.querySelector(".pdf-reader-placeholder");
+  if (placeholderImage) {
+    placeholderImage.alt = readerCopy(
+      `First page preview: ${activePdf?.title || ""}`,
+      `Vista previa de la primera página: ${activePdf?.title || ""}`
+    );
+  }
   pdfReaderPrevious.textContent = readerCopy("Previous page", "Página anterior");
   pdfReaderNext.textContent = readerCopy("Next page", "Página siguiente");
   pdfReaderZoomLabel.textContent = readerCopy("Zoom", "Zoom");
@@ -342,16 +358,23 @@ async function buildToc(session) {
   }
 }
 
-async function openPdfReader(url, title, opener, downloadUrl = url, preview = false) {
+async function openPdfReader(url, title, opener, downloadUrl = url, preview = false, placeholder = "") {
   // `url` is the fast preview used by the canvas reader; `downloadUrl` stays the
   // full print-quality PDF, including its accessibility tags.
-  const session = { title, url, downloadUrl, preview, opener, page: 0, fallback: false, zoom: 1, toc: [] };
+  const session = { title, url, downloadUrl, preview, placeholder, opener, page: 0, fallback: false, zoom: 1, toc: [] };
   activePdf = session;
   pdfReaderTitle.textContent = title;
   updateReaderChrome();
   pdfReaderDownload.href = session.downloadUrl;
   pdfReaderDownload.setAttribute("download", "");
   pdfReaderStage.replaceChildren();
+  if (placeholder) {
+    const image = document.createElement("img");
+    image.className = "pdf-reader-placeholder";
+    image.src = placeholder;
+    image.alt = readerCopy(`First page preview: ${title}`, `Vista previa de la primera página: ${title}`);
+    pdfReaderStage.append(image);
+  }
   pdfReaderTocList.replaceChildren();
   pdfReaderToc.hidden = true;
   pdfReaderTocToggle.setAttribute("aria-expanded", "false");

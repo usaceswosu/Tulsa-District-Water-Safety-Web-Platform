@@ -84,9 +84,14 @@ test("Bobber rotates tips without changing the hero card height", async ({ page 
 
 test("the library opens a fast preview and keeps the print PDF for download", async ({ page }) => {
   await page.goto("/");
+  await page.route("**/*-web.pdf*", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await route.continue();
+  });
   const previewRequest = page.waitForRequest((request) => request.url().includes("-web.pdf"), { timeout: 15_000 });
   await page.locator(".resource-link").first().click();
   await expect(page.locator("#pdf-reader")).toHaveJSProperty("open", true);
+  await expect(page.locator(".pdf-reader-placeholder")).toBeVisible();
   await expect(page.locator("#pdf-reader-download")).toHaveText("Download print PDF");
   await expect(page.locator("#pdf-reader-download")).toHaveAttribute(
     "href",
@@ -97,6 +102,7 @@ test("the library opens a fast preview and keeps the print PDF for download", as
   const canvas = page.locator("#pdf-reader-stage canvas");
   const fallback = page.locator("#pdf-reader-stage iframe");
   await expect(canvas.or(fallback)).toBeVisible({ timeout: 15_000 });
+  await page.unroute("**/*-web.pdf*");
   if (await canvas.isVisible()) {
     await expect(page.locator("#pdf-reader-status")).toHaveText("Page 1 of 2");
     await expect(page.locator("#pdf-reader-zoom-value")).toHaveText("100%");
@@ -262,6 +268,15 @@ test("key pages remain usable with forced colors", async ({ page }) => {
     await expect(page.locator("h1")).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   }
+});
+
+test("the reader engine warms when the library approaches", async ({ page }) => {
+  const moduleRequest = page.waitForRequest(/pdf\.min\.mjs/, { timeout: 15_000 });
+  const workerRequest = page.waitForRequest(/pdf\.worker\.min\.mjs/, { timeout: 15_000 });
+  await page.goto("/");
+  await page.locator(".library-section").scrollIntoViewIfNeeded();
+  await moduleRequest;
+  await workerRequest;
 });
 
 test("the offline shell loads after installation", async ({ page, context }) => {
