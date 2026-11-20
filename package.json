@@ -46,7 +46,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
     "@playwright/test": "^1.55.0",
-    "html-validate": "^9.7.1",
+    "html-validate": "^11.21.1",
     "image-size": "^2.0.2",
     "jszip": "^3.10.2",
     "pdfjs-dist": "^6.5.438",
