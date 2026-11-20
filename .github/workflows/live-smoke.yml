@@ -2,16 +2,20 @@ name: Live smoke
 
 on:
   workflow_run:
-    workflows: ["pages build and deployment"]
+    workflows: ["Static site checks"]
     types: [completed]
   workflow_dispatch:
+  schedule:
+    - cron: "0 15 * * *"
 
 permissions:
   contents: read
 
 jobs:
   smoke:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request')
     runs-on: ubuntu-latest
     steps:
       - name: Check out the deployed revision

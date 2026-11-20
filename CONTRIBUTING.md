@@ -28,7 +28,7 @@ CI additionally runs:
 - `pwsh -NoProfile -File scripts/check-site.ps1` as a second opinion
 - Lighthouse on the home and grown-ups pages
 - the full Playwright suite in Chromium, Firefox, and WebKit
-- `npm run check:live` after a successful GitHub Pages deployment
+- `npm run check:live` after static checks, verifying the live version matches the commit, plus a daily schedule
 
 The live smoke test can also target a local server:
 

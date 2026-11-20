@@ -1,12 +1,20 @@
 // Post-deploy smoke test against the public GitHub Pages URL.
 // Usage: npm run check:live
 import { chromium } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { siteRoot } from "./lib/site-root.mjs";
 import { siteUrl } from "./lib/site-config.mjs";
 
 // Optional first argument lets maintainers smoke-test a local/staging origin.
 // Canonical metadata is still checked against site.config.json.
 const target = (process.argv[2] || siteUrl).replace(/\/+$/, "");
 const home = `${target}/index.html`;
+const expectedVersion = readFileSync(join(siteRoot, "index.html"), "utf8").match(/main\.js\?v=([0-9a-z]+)/)?.[1];
+if (!expectedVersion) {
+  console.error("Live smoke failed: could not read the expected asset version from index.html.");
+  process.exit(1);
+}
 const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: "reduce" });
 const page = await context.newPage();
@@ -24,8 +32,8 @@ function assert(condition, message) {
 
 try {
   let state;
-  // Pages can take a few seconds to propagate after the deployment workflow.
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
+  // Pages can take a little time to propagate after the deployment workflow.
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
     await page.goto(`${home}?live-smoke=${Date.now()}`, { waitUntil: "load", timeout: 60_000 });
     await page.waitForSelector(".resource-card", { timeout: 20_000 });
     state = await page.evaluate(() => {
@@ -38,11 +46,11 @@ try {
         canonical: document.querySelector('link[rel="canonical"]')?.href || ""
       };
     });
-    if (state.firstMeta.includes("preview") && state.firstMeta.includes("print")) break;
-    if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, 4000));
+    if (state.version === expectedVersion && state.firstMeta.includes("preview") && state.firstMeta.includes("print")) break;
+    if (attempt < 6) await new Promise((resolve) => setTimeout(resolve, 5000));
   }
 
-  assert(/^\d{8}[a-z]$/.test(state.version), `Unexpected asset version: ${state.version}`);
+  assert(state.version === expectedVersion, `Live version ${state.version} does not match repository version ${expectedVersion}.`);
   assert(state.cards === 42, `Expected 42 resource cards, found ${state.cards}.`);
   assert(state.frozen, "Home-page content is not frozen.");
   assert(state.firstMeta.includes("preview") && state.firstMeta.includes("print"), `Unexpected card metadata: ${state.firstMeta}`);
