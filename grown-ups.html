@@ -56,7 +56,7 @@
       if (themeColor) themeColor.content = theme === "dark" ? "#101c20" : "#fffefa";
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261120o">
+  <link rel="stylesheet" href="styles.css?v=20261120p">
 </head>
 <body data-page="grownups">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -76,8 +76,8 @@
         <a href="index.html" class="nav-cta">Back to Bobber <span aria-hidden="true">↗</span></a>
       </nav>
       <div class="header-tools">
-        <button class="header-language-toggle" id="header-language-toggle" type="button" aria-label="ES Español" aria-pressed="false" aria-controls="main"><span class="language-code" aria-hidden="true">ES</span> <span class="language-name" lang="es">Español</span></button>
-        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode"><span class="theme-icon" aria-hidden="true">◐</span><span class="theme-label">Dark</span></button>
+        <button class="header-language-toggle" id="header-language-toggle" type="button" aria-label="ES Español — switch the entire page to Spanish" title="ES Español — switch the entire page to Spanish"><span class="language-code" aria-hidden="true">ES</span> <span class="language-name" lang="es">Español</span></button>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode"><span class="theme-icon" aria-hidden="true">◐</span><span class="theme-label">Dark</span></button>
         <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open navigation"><span></span><span></span><span></span></button>
       </div>
     </div>
@@ -184,7 +184,7 @@
             <p class="teacher-tools-meta">ZIP · 13 MB · Print-quality PDFs</p>
           </div>
           <div class="teacher-tools-actions">
-            <a class="button button-coral" href="assets/downloads/Bobber_Classroom_Pack_2026.zip?v=20261120o" download>Download the classroom pack <span aria-hidden="true">↓</span></a>
+            <a class="button button-coral" href="assets/downloads/Bobber_Classroom_Pack_2026.zip?v=20261120p" download>Download the classroom pack <span aria-hidden="true">↓</span></a>
             <a class="button button-dark" href="poster.html">Print the QR poster <span aria-hidden="true">↗</span></a>
           </div>
         </div>
@@ -242,45 +242,45 @@
   <!-- partial:footer:end -->
   <!-- partial:pdf-reader:start -->
   <dialog class="pdf-reader" id="pdf-reader" aria-labelledby="pdf-reader-title">
-      <div class="pdf-reader-panel">
-        <div class="pdf-reader-header">
-          <button class="pdf-reader-control" id="pdf-reader-close" type="button" autofocus>Back to the library</button>
-          <a class="pdf-reader-control" id="pdf-reader-download">Download PDF</a>
-          <a class="pdf-reader-control" id="pdf-reader-print-full" href="#" target="_blank" rel="noopener">Print full PDF</a>
-          <h2 id="pdf-reader-title">PDF</h2>
-        </div>
-        <div class="pdf-reader-toolbar">
-          <div class="pdf-reader-tools">
-            <div class="pdf-reader-zoom" role="group" aria-labelledby="pdf-reader-zoom-label">
-              <span class="pdf-reader-tool-label" id="pdf-reader-zoom-label">Zoom</span>
-              <button class="pdf-reader-control pdf-reader-zoom-button" id="pdf-reader-zoom-out" type="button" aria-label="Zoom out">−</button>
-              <span class="pdf-reader-zoom-value" id="pdf-reader-zoom-value" aria-live="polite">100%</span>
-              <button class="pdf-reader-control pdf-reader-zoom-button" id="pdf-reader-zoom-in" type="button" aria-label="Zoom in">+</button>
-              <button class="pdf-reader-control" id="pdf-reader-zoom-reset" type="button">Fit</button>
-            </div>
-            <form class="pdf-reader-jump" id="pdf-reader-jump">
-              <label class="pdf-reader-tool-label" id="pdf-reader-page-label" for="pdf-reader-page-input">Page</label>
-              <input id="pdf-reader-page-input" type="number" inputmode="numeric" min="1" value="1" aria-label="Page number">
-              <span class="pdf-reader-page-total"><span id="pdf-reader-page-of">of</span> <span id="pdf-reader-page-total">1</span></span>
-              <button class="pdf-reader-control" id="pdf-reader-go" type="submit">Go</button>
-            </form>
-            <button class="pdf-reader-control" id="pdf-reader-print-page" type="button">Print this page</button>
-            <button class="pdf-reader-control" id="pdf-reader-toc-toggle" type="button" aria-expanded="false" aria-controls="pdf-reader-toc" hidden>Contents</button>
-          </div>
-          <nav class="pdf-reader-toc" id="pdf-reader-toc" aria-labelledby="pdf-reader-toc-title" hidden>
-            <h3 id="pdf-reader-toc-title">Contents</h3>
-            <ul id="pdf-reader-toc-list"></ul>
-          </nav>
-        </div>
-        <div class="pdf-reader-stage" id="pdf-reader-stage"></div>
-        <div class="pdf-print-page" id="pdf-print-page" aria-hidden="true"></div>
-        <div class="pdf-reader-footer">
-          <button class="pdf-reader-control" id="pdf-reader-prev" type="button" aria-disabled="true">Previous page</button>
-          <p id="pdf-reader-status" role="status"></p>
-          <button class="pdf-reader-control" id="pdf-reader-next" type="button" aria-disabled="true">Next page</button>
-        </div>
+    <div class="pdf-reader-panel">
+      <div class="pdf-reader-header">
+        <button class="pdf-reader-control" id="pdf-reader-close" type="button" autofocus>Back to the library</button>
+        <a class="pdf-reader-control" id="pdf-reader-download">Download PDF</a>
+        <a class="pdf-reader-control" id="pdf-reader-print-full" href="#" target="_blank" rel="noopener">Print full PDF</a>
+        <h2 id="pdf-reader-title">PDF</h2>
       </div>
-    </dialog>
+      <div class="pdf-reader-toolbar">
+        <div class="pdf-reader-tools">
+          <div class="pdf-reader-zoom" role="group" aria-labelledby="pdf-reader-zoom-label">
+            <span class="pdf-reader-tool-label" id="pdf-reader-zoom-label">Zoom</span>
+            <button class="pdf-reader-control pdf-reader-zoom-button" id="pdf-reader-zoom-out" type="button" aria-label="Zoom out">−</button>
+            <span class="pdf-reader-zoom-value" id="pdf-reader-zoom-value" aria-live="polite">100%</span>
+            <button class="pdf-reader-control pdf-reader-zoom-button" id="pdf-reader-zoom-in" type="button" aria-label="Zoom in">+</button>
+            <button class="pdf-reader-control" id="pdf-reader-zoom-reset" type="button">Fit</button>
+          </div>
+          <form class="pdf-reader-jump" id="pdf-reader-jump">
+            <label class="pdf-reader-tool-label" id="pdf-reader-page-label" for="pdf-reader-page-input">Page</label>
+            <input id="pdf-reader-page-input" type="number" inputmode="numeric" min="1" value="1" aria-label="Page number">
+            <span class="pdf-reader-page-total"><span id="pdf-reader-page-of">of</span> <span id="pdf-reader-page-total">1</span></span>
+            <button class="pdf-reader-control" id="pdf-reader-go" type="submit">Go</button>
+          </form>
+          <button class="pdf-reader-control" id="pdf-reader-print-page" type="button">Print this page</button>
+          <button class="pdf-reader-control" id="pdf-reader-toc-toggle" type="button" aria-expanded="false" aria-controls="pdf-reader-toc" hidden>Contents</button>
+        </div>
+        <nav class="pdf-reader-toc" id="pdf-reader-toc" aria-labelledby="pdf-reader-toc-title" hidden>
+          <h3 id="pdf-reader-toc-title">Contents</h3>
+          <ul id="pdf-reader-toc-list"></ul>
+        </nav>
+      </div>
+      <div class="pdf-reader-stage" id="pdf-reader-stage"></div>
+      <div class="pdf-print-page" id="pdf-print-page" aria-hidden="true"></div>
+      <div class="pdf-reader-footer">
+        <button class="pdf-reader-control" id="pdf-reader-prev" type="button" aria-disabled="true">Previous page</button>
+        <p id="pdf-reader-status" role="status"></p>
+        <button class="pdf-reader-control" id="pdf-reader-next" type="button" aria-disabled="true">Next page</button>
+      </div>
+    </div>
+  </dialog>
   <!-- partial:pdf-reader:end -->
   <dialog class="easter-dialog" id="easter-dialog" aria-labelledby="easter-title" aria-describedby="easter-copy">
     <div class="easter-confetti" id="easter-confetti" aria-hidden="true"></div>
@@ -294,9 +294,9 @@
       <span aria-hidden="true">→</span>
     </button>
   </dialog>
-  <script src="scripts/pdf-reader.js?v=20261120o" defer></script>
-  <script src="data/resources.js?v=20261120o" defer></script>
-  <script src="data/translations.js?v=20261120o" defer></script>
-  <script src="scripts/main.js?v=20261120o" defer></script>
+  <script src="scripts/pdf-reader.js?v=20261120p" defer></script>
+  <script src="data/resources.js?v=20261120p" defer></script>
+  <script src="data/translations.js?v=20261120p" defer></script>
+  <script src="scripts/main.js?v=20261120p" defer></script>
 </body>
 </html>

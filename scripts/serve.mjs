@@ -5,6 +5,7 @@ import { extname, join, normalize, sep } from "node:path";
 import { siteRoot } from "./lib/site-root.mjs";
 
 const root = siteRoot;
+const notFoundPage = join(root, "404.html");
 const port = Number(process.env.PORT || 4173);
 const types = {
   ".html": "text/html; charset=utf-8",
@@ -43,8 +44,13 @@ function resolveFile(urlPath) {
 const server = createServer((request, response) => {
   const filePath = resolveFile(request.url || "/");
   if (!filePath) {
-    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-    response.end("Not found");
+    if (existsSync(notFoundPage)) {
+      response.writeHead(404, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" });
+      createReadStream(notFoundPage).pipe(response);
+    } else {
+      response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+      response.end("Not found");
+    }
     return;
   }
   const stat = statSync(filePath);

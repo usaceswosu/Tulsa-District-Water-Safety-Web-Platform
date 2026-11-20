@@ -48,9 +48,14 @@ const gamePool = pageContent.gamePool || [];
 const appScript = [...document.scripts].find((script) => script.src.includes("main.js"));
 const assetVersion = appScript ? new URL(appScript.src).searchParams.get("v") || "" : "";
 // Capture authored English text once so the language toggle can switch both ways.
+// Skip empty nodes and non-content elements to keep the language pass small.
 const staticEnglishTextNodes = [];
 const textWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-while (textWalker.nextNode()) staticEnglishTextNodes.push({ node: textWalker.currentNode, original: textWalker.currentNode.nodeValue });
+while (textWalker.nextNode()) {
+  const node = textWalker.currentNode;
+  if (!node.nodeValue.trim() || ["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"].includes(node.parentElement?.tagName)) continue;
+  staticEnglishTextNodes.push({ node, original: node.nodeValue });
+}
 
 const grid = document.querySelector("#resource-grid");
 const searchInput = document.querySelector("#resource-search");
@@ -202,7 +207,7 @@ function makeCard(resource) {
   const preview = document.createElement("div");
   preview.className = "resource-thumb";
   const image = document.createElement("img");
-  image.src = assetPath(`graphics/${resource.image}`);
+  image.src = placeholderFile;
   image.alt = currentLanguage === "es" ? `Vista previa para imprimir: ${displayTitle}` : `${displayTitle} printable preview`;
   image.loading = "lazy";
   image.decoding = "async";
@@ -266,52 +271,69 @@ function makeCard(resource) {
   return article;
 }
 
-function resourceMatches(resource, query) {
-  const matchesCategory = activeFilter === "all" || resource.category === activeFilter;
-  if (!matchesCategory) return false;
-  if (activeLanguageFilter !== "all" && !(resource.languages || []).includes(activeLanguageFilter)) return false;
-  if (activeGradeFilter !== "all" && resource.gradeRange !== activeGradeFilter) return false;
-  if (!query) return true;
-  const languageNames = (resource.languages || []).map((code) => LANGUAGE_LABELS[currentLanguage][code] || code);
-  const searchable = [
+function normalizeSearchText(value) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+// Search both language variants and the category names shown in the UI. A
+// query for "poster", "cuento", or "accion" should find the same resources.
+function buildResourceSearchText(resource) {
+  const categoryNames = [categoryLabels, filterLabels].flatMap((labels) =>
+    Object.values(labels).map((names) => names[resource.category] || "")
+  );
+  const languageNames = Object.values(LANGUAGE_LABELS).flatMap((labels) =>
+    (resource.languages || []).map((code) => labels[code] || code)
+  );
+  return normalizeSearchText([
     resource.title,
     resourceTitlesEs[resource.title] || "",
     resource.description?.en || "",
     resource.description?.es || "",
     resource.gradeRange || "",
+    ...categoryNames,
     ...languageNames
-  ].join(" ");
-  return searchable.toLowerCase().includes(query);
+  ].join(" "));
+}
+
+function resourceMatches(resource, searchText, query) {
+  const matchesCategory = activeFilter === "all" || resource.category === activeFilter;
+  if (!matchesCategory) return false;
+  if (activeLanguageFilter !== "all" && !(resource.languages || []).includes(activeLanguageFilter)) return false;
+  if (activeGradeFilter !== "all" && resource.gradeRange !== activeGradeFilter) return false;
+  return !query || searchText.includes(query);
 }
 
 function renderResources() {
   if (!grid || !searchInput) return;
   resourcesRendered = true;
-  const query = searchInput.value.trim().toLowerCase();
+  const query = normalizeSearchText(searchInput.value.trim());
 
   // Rebuild only when the language changes; filtering reuses the existing cards.
   if (renderedLanguage !== currentLanguage || resourceCards.length !== resources.length) {
-    resourceCards = resources.map((resource) => ({ resource, card: makeCard(resource) }));
+    resourceCards = resources.map((resource) => ({
+      resource,
+      card: makeCard(resource),
+      searchText: buildResourceSearchText(resource)
+    }));
     grid.replaceChildren(...resourceCards.map(({ card }) => card));
     renderedLanguage = currentLanguage;
   }
 
-  const visibleResources = [];
-  for (const { resource, card } of resourceCards) {
-    const visible = resourceMatches(resource, query);
+  let count = 0;
+  for (const { resource, card, searchText } of resourceCards) {
+    const visible = resourceMatches(resource, searchText, query);
     card.hidden = !visible;
-    if (visible) visibleResources.push(resource);
+    if (visible) count += 1;
   }
 
-  emptyState.hidden = visibleResources.length !== 0;
-  const count = visibleResources.length;
+  emptyState.hidden = count !== 0;
   resultsMessage.textContent = currentLanguage === "es"
     ? `${count} ${count === 1 ? "recurso" : "recursos"}${query ? ` para “${searchInput.value.trim()}”` : ""}`
     : `${count} ${count === 1 ? "resource" : "resources"}${query ? ` matching “${searchInput.value.trim()}”` : ""}`;
 }
 
 function scheduleResources() {
-  if (resourcesRendered || resourcesScheduled) return;
+  if (!grid || !searchInput || resourcesRendered || resourcesScheduled) return;
   resourcesScheduled = true;
   const run = () => {
     resourcesScheduled = false;
@@ -472,8 +494,8 @@ function setLanguage(language) {
   for (const { node, original } of staticEnglishTextNodes) {
     if (!node.isConnected) continue;
     const text = original.trim();
-    const translated = isSpanish ? spanishText[text] : undefined;
-    const next = translated ? original.replace(text, translated) : original;
+    const translated = isSpanish && Object.hasOwn(spanishText, text) ? spanishText[text] : undefined;
+    const next = translated ? original.replace(text, () => translated) : original;
     if (node.nodeValue !== next) node.nodeValue = next;
   }
 
@@ -491,9 +513,11 @@ function setLanguage(language) {
   languageCode.textContent = isSpanish ? "EN" : "ES";
   languageName.textContent = isSpanish ? "Inglés" : "Español";
   languageName.lang = "es";
-  headerLanguageToggle.setAttribute("aria-pressed", String(isSpanish));
-  headerLanguageToggle.setAttribute("aria-label", isSpanish ? "EN Inglés" : "ES Español");
-  headerLanguageToggle.title = isSpanish ? "Inglés — cambiar toda la página a inglés" : "Español — switch the entire page to Spanish";
+  const languageAction = isSpanish
+    ? "EN Inglés — cambiar toda la página a inglés"
+    : "ES Español — switch the entire page to Spanish";
+  headerLanguageToggle.setAttribute("aria-label", languageAction);
+  headerLanguageToggle.title = languageAction;
 
   menuToggle.setAttribute("aria-label", menuButtonLabel(menuToggle.getAttribute("aria-expanded") === "true"));
   siteNav.setAttribute("aria-label", isSpanish ? "Navegación principal" : "Main navigation");
@@ -643,7 +667,6 @@ const themeLabel = themeToggle.querySelector(".theme-label");
 // Theme preferences remain usable when browser storage is unavailable.
 function updateThemeControl() {
   const isDark = document.documentElement.dataset.theme === "dark";
-  themeToggle.setAttribute("aria-pressed", String(isDark));
   const nextMode = currentLanguage === "es" ? (isDark ? "claro" : "oscuro") : (isDark ? "light" : "dark");
   themeToggle.setAttribute("aria-label", currentLanguage === "es" ? `Cambiar al modo ${nextMode}` : `Switch to ${nextMode} mode`);
   themeToggle.title = currentLanguage === "es" ? `Cambiar al modo ${nextMode}` : `Switch to ${nextMode} mode`;
@@ -898,12 +921,17 @@ function makeCardOpen(container, getInfo) {
 
 if (infoDialog) {
   document.querySelectorAll(".safety-card").forEach((card) => {
-    makeCardOpen(card, () => ({
-      art: card.querySelector(".safety-art")?.getAttribute("src") || "",
-      kicker: currentLanguage === "es" ? "Seguridad acuática" : "Water safety",
-      title: card.querySelector("h3")?.textContent || "",
-      copy: card.querySelector(":scope > h3 + p")?.textContent || ""
-    }));
+    makeCardOpen(card, () => {
+      const copy = currentLanguage === "es"
+        ? card.querySelector(".spanish-copy p")
+        : card.querySelector(":scope > h3 + p");
+      return {
+        art: card.querySelector(".safety-art")?.getAttribute("src") || "",
+        kicker: currentLanguage === "es" ? "Seguridad acuática" : "Water safety",
+        title: card.querySelector("h3")?.textContent || "",
+        copy: copy?.textContent || ""
+      };
+    });
   });
 
   document.querySelectorAll(".friends-row li").forEach((pal) => {
@@ -1075,14 +1103,14 @@ function renderGame() {
     gameFeedback.textContent = isRight
       ? gameText({ en: "That’s right!", es: "¡Correcto!" })
       : gameText({ en: "Not quite. The safe answer is: ", es: "Casi. La respuesta segura es: " }) + gameText(round.options[order[correctIndex]]);
-    gameNextHidden();
+    showGameNext();
   } else {
     gameFeedback.textContent = "";
     gameNext.hidden = true;
   }
 }
 
-function gameNextHidden() {
+function showGameNext() {
   gameNext.hidden = false;
   gameNextLabel.textContent = gameState.index === gameState.rounds.length - 1
     ? gameText({ en: "See my score", es: "Ver mi resultado" })

@@ -139,6 +139,7 @@ test("card details and their links stay in the selected language", async ({ page
     "Abrir detalles: Usa tu chaleco salvavidas"
   );
   await expect(page.locator("#info-title")).toHaveText("Usa tu chaleco salvavidas");
+  await expect(page.locator("#info-copy")).toContainText("Guardia Costera");
   await page.click("#info-close");
 
   await page.locator(".friends-row li").filter({ hasText: "Corkey" }).locator(".card-open").click();
@@ -186,6 +187,24 @@ test("library search and filters reuse the existing cards", async ({ page }) => 
 
   await page.click('[data-filter="all"]');
   await expect(page.locator(".resource-card:visible")).toHaveCount(42);
+});
+
+test("library search matches category names and unaccented Spanish", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".resource-card")).toHaveCount(42);
+
+  await page.fill("#resource-search", "coloring");
+  await expect(page.locator(".resource-card:visible")).toHaveCount(23);
+
+  await page.fill("#resource-search", "cuento");
+  await expect(page.locator(".resource-card:visible")).toHaveCount(5);
+
+  await page.fill("#resource-search", "accion");
+  await expect(page.locator(".resource-card:visible")).toHaveCount(2);
+  await expect(page.locator("#results-message")).toHaveText("2 resources matching “accion”");
+
+  await page.fill("#resource-search", "poster");
+  await expect(page.locator(".resource-card:visible")).toHaveCount(23);
 });
 
 test("reviewed resource metadata renders badges and filters", async ({ page }) => {

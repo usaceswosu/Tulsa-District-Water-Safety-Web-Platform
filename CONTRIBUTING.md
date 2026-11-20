@@ -154,7 +154,7 @@ The URL update rewrites canonical/OG/hreflang metadata, robots, poster text, REA
 
 ## Testing map
 
-All suites run in Chromium, Firefox, and WebKit.
+Desktop suites run in Chromium, Firefox, and WebKit. Mobile smoke tests run in Pixel 7 Chromium and iPhone 13 WebKit emulation.
 
 - Home/language/theme: `tests/home.spec.js`
 - Library, reader, filters, navigation: `tests/library.spec.js`

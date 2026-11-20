@@ -9,7 +9,7 @@ Bobber is a static, bilingual site for GitHub Pages. There is no bundler, framew
 3. **Deferred scripts execute in document order.**
    - `scripts/pdf-reader.js` defines the in-page reader.
    - `data/resources.js` defines the printable catalog.
-   - `data/content.js` (home page only) defines tips, pals, laundry-check copy, and quiz questions.
+   - `data/content.js` (home page only) defines tips, pals, lake-ready checklist copy, and quiz questions.
    - `data/pdf-meta.js` (home page only) is generated page counts/sizes/preview paths.
    - `data/translations.js` defines the Spanish interface dictionary.
    - `scripts/main.js` wires the page and calls `setLanguage()` once at boot.
@@ -89,7 +89,7 @@ A flat `Record<EnglishText, SpanishText>` used by the language toggle. Static te
 
 ## Library
 
-Cards are created once per language. Search and category filters only toggle `hidden` on the existing cards, so typing does not rebuild the DOM or reload images. `renderResources()` rebuilds cards when the language changes or the catalog length changes.
+Cards are created once per language. Search and category filters only toggle `hidden` on the existing cards, so typing does not rebuild the DOM or reload images. `renderResources()` rebuilds cards when the language changes or the catalog length changes. Search matches both title languages, descriptions, grades, language names, and category labels, and it ignores diacritics so “accion” finds “Acción”.
 
 ## In-page PDF reader
 

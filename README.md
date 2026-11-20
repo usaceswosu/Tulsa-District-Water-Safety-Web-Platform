@@ -1,6 +1,6 @@
-https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/
-
 # Bobber the Water Safety Dog — Tulsa District
+
+[Live site](https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/)
 
 A responsive, static website that brings together Bobber the Water Safety Dog resources and water safety information for the U.S. Army Corps of Engineers Tulsa District. It consolidates the Bobber program page and cartoons/graphics library into one searchable, accessibility-minded experience.
 
@@ -23,7 +23,7 @@ The links to YouTube, USACE, Recreation.gov, and other official sources are outb
 ## Quality checks
 
 ```bash
-npm run check       # versions, globals, content, URL/sitemap, HTML, CSS, precache, PDFs
+npm run check       # versions, globals, content, metadata, URL/sitemap, QR/pack, HTML, CSS, partials, precache, PDFs
 npm test            # Chromium, Firefox, WebKit + Pixel/iPhone mobile smoke tests
 npm run check:live  # post-deploy smoke test against the public URL
 ```

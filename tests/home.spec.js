@@ -27,12 +27,14 @@ test("Spanish deep links work and the URL follows the language toggle", async ({
   await expect(page.locator(".resource-meta").first()).toContainText("páginas");
   await expect(page.locator(".resource-meta").first()).toContainText("vista previa");
   await expect(page.locator('.footer-bottom a[href*="accessibility.html"]')).toHaveAttribute("href", "accessibility.html#espanol");
+  await expect(page.locator("#header-language-toggle")).toHaveAccessibleName("EN Inglés — cambiar toda la página a inglés");
   expect(page.url()).toContain("lang=es");
 
   await page.click("#header-language-toggle");
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   expect(page.url()).not.toContain("lang=es");
   await expect(page.locator('.footer-bottom a[href*="accessibility.html"]')).toHaveAttribute("href", "accessibility.html");
+  await expect(page.locator("#header-language-toggle")).toHaveAccessibleName("ES Español — switch the entire page to Spanish");
 
   await page.click("#header-language-toggle");
   expect(page.url()).toContain("lang=es");
@@ -91,10 +93,12 @@ test("theme toggle updates data-theme, theme-color, and persists", async ({ page
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#fffefa");
+  await expect(page.locator("#theme-toggle")).toHaveAccessibleName("Switch to dark mode");
 
   await page.click("#theme-toggle");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#101c20");
+  await expect(page.locator("#theme-toggle")).toHaveAccessibleName("Switch to light mode");
 
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
@@ -148,5 +152,11 @@ test("grown-ups page links to the classroom pack and QR poster", async ({ page }
   await expect(page.locator('a[href="poster.html"]')).toBeVisible();
   const response = await page.request.head("http://127.0.0.1:4173/assets/downloads/Bobber_Classroom_Pack_2026.zip");
   expect(response.ok()).toBeTruthy();
+});
+
+test("unknown paths render the custom not-found page", async ({ page }) => {
+  const response = await page.goto("/does-not-exist");
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole("heading", { level: 1, name: "This page swam away." })).toBeVisible();
 });
 
