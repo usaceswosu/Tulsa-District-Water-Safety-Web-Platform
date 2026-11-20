@@ -89,7 +89,7 @@ A flat `Record<EnglishText, SpanishText>` used by the language toggle. Static te
 
 ## Library
 
-Cards are created once per language. Search and category filters only toggle `hidden` on the existing cards, so typing does not rebuild the DOM or reload images. `renderResources()` rebuilds cards when the language changes or the catalog length changes. Search matches both title languages, descriptions, grades, language names, and category labels, and it ignores diacritics so “accion” finds “Acción”.
+Cards are created once per language. Search and category filters only toggle `hidden` on the existing cards, so typing does not rebuild the DOM or reload images. `renderResources()` rebuilds cards when the language changes or the catalog length changes. Search matches both title languages, descriptions, grades, language names, category labels, and familiar aliases such as “life vest” or “PFD”; it ignores diacritics and punctuation, so “accion” finds “Acción”. A zero-result search offers category shortcuts.
 
 ## In-page PDF reader
 

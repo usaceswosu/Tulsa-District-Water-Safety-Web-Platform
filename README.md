@@ -23,7 +23,7 @@ The links to YouTube, USACE, Recreation.gov, and other official sources are outb
 ## Quality checks
 
 ```bash
-npm run check       # versions, globals, content, metadata, URL/sitemap, QR/pack, HTML, CSS, partials, precache, PDFs
+npm run check       # versions, globals, content, translations, metadata, URL/sitemap, QR/pack, HTML, CSS, partials, precache, PDFs
 npm test            # Chromium, Firefox, WebKit + Pixel/iPhone mobile smoke tests
 npm run check:live  # post-deploy smoke test against the public URL
 ```

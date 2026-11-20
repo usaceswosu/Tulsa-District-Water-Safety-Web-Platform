@@ -21,7 +21,7 @@ npm run check
 npm test
 ```
 
-`npm run check` runs version, global-name, content, metadata coverage, site-integrity, public-URL, sitemap, QR, classroom-pack, HTML, CSS, partial, precache, PDF metadata, and PDF budget checks. The site-integrity check (`scripts/check-site.mjs`) is the cross-platform source of truth for catalog/assets/page links.
+`npm run check` runs version, global-name, content, translation, metadata coverage, site-integrity, public-URL, sitemap, QR, classroom-pack, HTML, CSS, partial, precache, PDF metadata, and PDF budget checks. The site-integrity check (`scripts/check-site.mjs`) is the cross-platform source of truth for catalog/assets/page links.
 
 CI additionally runs:
 
@@ -152,11 +152,16 @@ The URL update rewrites canonical/OG/hreflang metadata, robots, poster text, REA
 - Keep `aria-*`, focus movement, and keyboard behavior covered by a test when changing dialogs or controls.
 - Do not add a build step or third-party runtime dependency without discussing deployment constraints.
 
+## Dependency updates
+
+Dependabot checks npm packages and GitHub Actions weekly. Actions are pinned to full commit SHAs with a version comment; keep that comment when reviewing an update.
+
 ## Testing map
 
 Desktop suites run in Chromium, Firefox, and WebKit. Mobile smoke tests run in Pixel 7 Chromium and iPhone 13 WebKit emulation.
 
 - Home/language/theme: `tests/home.spec.js`
+- English-to-Spanish coverage: `tests/i18n.spec.js`
 - Library, reader, filters, navigation: `tests/library.spec.js`
 - Game/certificate: `tests/game.spec.js`
 - Offline/service worker: `tests/offline.spec.js`

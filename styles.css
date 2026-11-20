@@ -787,6 +787,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 }
 
 .resource-card {
+  position: relative;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -799,6 +800,15 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   transform: translateY(-4px);
   border-color: #bad7cc;
   box-shadow: 0 13px 28px #123c4512;
+}
+
+.resource-card:focus-within {
+  outline: 3px solid #efa94c;
+  outline-offset: 3px;
+}
+
+.resource-link:focus-visible {
+  outline: none;
 }
 
 .resource-thumb {
@@ -887,6 +897,12 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   font-weight: 700;
 }
 
+.resource-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
 .resource-link:hover {
   color: var(--coral-dark);
 }
@@ -915,6 +931,29 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   margin: 0;
   color: var(--muted);
   font-size: 12px;
+}
+
+.empty-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 14px 0 2px;
+}
+
+.empty-suggestion {
+  padding: 8px 13px;
+  border: 2px solid var(--outline);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 700 11px/1.2 var(--sans);
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--outline);
+}
+
+.empty-suggestion:hover {
+  background: var(--mint);
 }
 
 .reset-search {
@@ -1283,6 +1322,7 @@ body {
   margin: auto;
   padding: 15px 32px 19px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 20px;
   border-top: 1px solid #ffffff1c;

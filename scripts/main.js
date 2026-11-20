@@ -47,6 +47,7 @@ const palCards = pageContent.palCards || {};
 const gamePool = pageContent.gamePool || [];
 const appScript = [...document.scripts].find((script) => script.src.includes("main.js"));
 const assetVersion = appScript ? new URL(appScript.src).searchParams.get("v") || "" : "";
+const reportProblemLink = document.querySelector("#report-problem");
 // Capture authored English text once so the language toggle can switch both ways.
 // Skip empty nodes and non-content elements to keep the language pass small.
 const staticEnglishTextNodes = [];
@@ -62,6 +63,7 @@ const searchInput = document.querySelector("#resource-search");
 const filterButtons = [...document.querySelectorAll(".filter-button")];
 const resultsMessage = document.querySelector("#results-message");
 const emptyState = document.querySelector("#empty-state");
+const emptySuggestions = document.querySelector("#empty-suggestions");
 const metadataFilters = document.querySelector("#metadata-filters");
 let activeFilter = "all";
 let activeLanguageFilter = "all";
@@ -272,11 +274,28 @@ function makeCard(resource) {
 }
 
 function normalizeSearchText(value) {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }
 
-// Search both language variants and the category names shown in the UI. A
-// query for "poster", "cuento", or "accion" should find the same resources.
+// Familiar words that should find the same resources even when the catalog
+// uses a different term.
+const RESOURCE_SEARCH_ALIASES = [
+  { matches: () => true, terms: "printable print pdf download" },
+  { matches: (resource) => resource.category === "activity", terms: "worksheet activity sheet game" },
+  { matches: (resource) => resource.category === "poster", terms: "coloring colouring poster page" },
+  { matches: (resource) => resource.category === "storybook", terms: "story book reading" },
+  { matches: (resource) => /life\s*jacket|life\s*vest|vest|boating|pfd/i.test(resource.title), terms: "life vest lifejacket pfd personal flotation device" },
+  { matches: (resource) => /cold water/i.test(resource.title), terms: "hypothermia" },
+  { matches: (resource) => /swim|buddy/i.test(resource.title), terms: "swimming buddy" }
+];
+
+// Search both language variants, category names, and familiar aliases. A query
+// for "poster", "cuento", "life vest", or "accion" should find the resources.
 function buildResourceSearchText(resource) {
   const categoryNames = [categoryLabels, filterLabels].flatMap((labels) =>
     Object.values(labels).map((names) => names[resource.category] || "")
@@ -284,6 +303,9 @@ function buildResourceSearchText(resource) {
   const languageNames = Object.values(LANGUAGE_LABELS).flatMap((labels) =>
     (resource.languages || []).map((code) => labels[code] || code)
   );
+  const aliasTerms = RESOURCE_SEARCH_ALIASES
+    .filter((alias) => alias.matches(resource))
+    .map((alias) => alias.terms);
   return normalizeSearchText([
     resource.title,
     resourceTitlesEs[resource.title] || "",
@@ -291,7 +313,8 @@ function buildResourceSearchText(resource) {
     resource.description?.es || "",
     resource.gradeRange || "",
     ...categoryNames,
-    ...languageNames
+    ...languageNames,
+    ...aliasTerms
   ].join(" "));
 }
 
@@ -347,18 +370,43 @@ function warmPdfEngine() {
   window.prefetchPdfEngine?.();
 }
 
+function setActiveFilter(filter) {
+  activeFilter = filter;
+  filterButtons.forEach((button) => {
+    const selected = button.dataset.filter === filter;
+    button.classList.toggle("is-active", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+}
+
+function renderEmptySuggestions() {
+  if (!emptySuggestions || !searchInput || emptySuggestions.dataset.language === currentLanguage) return;
+  emptySuggestions.dataset.language = currentLanguage;
+  emptySuggestions.replaceChildren(...["activity", "poster", "storybook"].map((category) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "empty-suggestion";
+    button.textContent = filterLabels[currentLanguage][category];
+    button.addEventListener("click", () => {
+      searchInput.value = "";
+      activeLanguageFilter = "all";
+      activeGradeFilter = "all";
+      setActiveFilter(category);
+      refreshMetadataFilters();
+      renderResources();
+      searchInput.focus();
+    });
+    return button;
+  }));
+}
+
 if (grid && searchInput) {
   grid.addEventListener("pointerover", warmPdfEngine, { once: true });
   grid.addEventListener("focusin", warmPdfEngine, { once: true });
 
   filterButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      activeFilter = button.dataset.filter;
-      filterButtons.forEach((item) => {
-        const selected = item === button;
-        item.classList.toggle("is-active", selected);
-        item.setAttribute("aria-pressed", String(selected));
-      });
+      setActiveFilter(button.dataset.filter);
       renderResources();
     });
   });
@@ -368,14 +416,9 @@ if (grid && searchInput) {
   if (resetSearch) {
     resetSearch.addEventListener("click", () => {
       searchInput.value = "";
-      activeFilter = "all";
       activeLanguageFilter = "all";
       activeGradeFilter = "all";
-      filterButtons.forEach((button) => {
-        const selected = button.dataset.filter === "all";
-        button.classList.toggle("is-active", selected);
-        button.setAttribute("aria-pressed", String(selected));
-      });
+      setActiveFilter("all");
       refreshMetadataFilters();
       renderResources();
       searchInput.focus();
@@ -383,6 +426,7 @@ if (grid && searchInput) {
   }
   const countAll = document.querySelector("#count-all");
   if (countAll) countAll.textContent = resources.length;
+  renderEmptySuggestions();
 }
 
 const readerWarmTarget = grid?.closest(".library-section") || document.querySelector(".educator-section");
@@ -436,6 +480,17 @@ document.addEventListener("keydown", (event) => {
 const headerLanguageToggle = document.querySelector("#header-language-toggle");
 const spanishSafetyCopy = [...document.querySelectorAll(".spanish-copy")];
 const englishSafetyCopy = [...document.querySelectorAll(".safety-card > p")];
+function updateReportProblemLink() {
+  if (!reportProblemLink) return;
+  const isSpanish = currentLanguage === "es";
+  const url = new URL(reportProblemLink.href);
+  url.searchParams.set("title", isSpanish ? "Problema en el sitio web" : "Website problem");
+  url.searchParams.set("body", isSpanish
+    ? `Página: ${window.location.href}\n\nQué ocurrió:\n`
+    : `Page: ${window.location.href}\n\nWhat happened:\n`);
+  reportProblemLink.href = url.href;
+}
+
 function updateExternalLinkLabels() {
   document.querySelectorAll('a[target="_blank"]').forEach((link) => {
     const isReaderLink = link.dataset.readerLink === "true";
@@ -555,10 +610,12 @@ function setLanguage(language) {
     }
   });
   refreshMetadataFilters();
+  renderEmptySuggestions();
   if (resourcesRendered) renderResources();
   else scheduleResources();
   updateThemeControl();
   if (typeof window.updatePdfReaderLanguage === "function") window.updatePdfReaderLanguage();
+  updateReportProblemLink();
   updateExternalLinkLabels();
   updateEasterDialogLanguage();
   if (infoClose) infoClose.setAttribute("aria-label", isSpanish ? "Cerrar" : "Close");

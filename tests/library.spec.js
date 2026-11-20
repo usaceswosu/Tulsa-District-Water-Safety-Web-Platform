@@ -205,6 +205,41 @@ test("library search matches category names and unaccented Spanish", async ({ pa
 
   await page.fill("#resource-search", "poster");
   await expect(page.locator(".resource-card:visible")).toHaveCount(23);
+
+  await page.fill("#resource-search", "life-vest");
+  await expect(page.locator(".resource-card:visible")).toHaveCount(6);
+
+  await page.fill("#resource-search", "pfd");
+  await expect(page.locator(".resource-card:visible")).toHaveCount(6);
+
+  await page.fill("#resource-search", "worksheet");
+  await expect(page.locator(".resource-card:visible")).toHaveCount(14);
+
+  await page.fill("#resource-search", "colouring");
+  await expect(page.locator(".resource-card:visible")).toHaveCount(23);
+});
+
+test("zero results offer category shortcuts", async ({ page }) => {
+  await page.goto("/");
+  await page.fill("#resource-search", "zzzz-not-a-resource");
+  await expect(page.locator("#empty-state")).toBeVisible();
+  await expect(page.locator(".empty-suggestion")).toHaveCount(3);
+
+  await page.locator(".empty-suggestion").filter({ hasText: "Posters & coloring" }).click();
+  await expect(page.locator("#resource-search")).toHaveValue("");
+  await expect(page.locator("#empty-state")).toBeHidden();
+  await expect(page.locator(".resource-card:visible")).toHaveCount(23);
+  await expect(page.locator('[data-filter="poster"]')).toHaveAttribute("aria-pressed", "true");
+});
+
+test("the whole library card opens the reader", async ({ page }) => {
+  await page.goto("/");
+  const card = page.locator(".resource-card").first();
+  await card.scrollIntoViewIfNeeded();
+  const box = await card.boundingBox();
+  await page.mouse.click(box.x + box.width / 2, box.y + 24);
+  await expect(page.locator("#pdf-reader")).toHaveJSProperty("open", true);
+  await page.click("#pdf-reader-close");
 });
 
 test("reviewed resource metadata renders badges and filters", async ({ page }) => {

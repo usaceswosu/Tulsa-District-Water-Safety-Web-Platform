@@ -154,6 +154,21 @@ test("grown-ups page links to the classroom pack and QR poster", async ({ page }
   expect(response.ok()).toBeTruthy();
 });
 
+test("footer report link carries the current page and language", async ({ page }) => {
+  await page.goto("/grown-ups.html");
+  const link = page.locator("#report-problem");
+  let href = new URL(await link.getAttribute("href"));
+  expect(href.searchParams.get("title")).toBe("Website problem");
+  expect(href.searchParams.get("body")).toContain("http://127.0.0.1:4173/grown-ups.html");
+  expect(href.searchParams.get("body")).toContain("What happened:");
+
+  await page.click("#header-language-toggle");
+  await expect(link).toContainText("Informar de un problema");
+  href = new URL(await link.getAttribute("href"));
+  expect(href.searchParams.get("title")).toBe("Problema en el sitio web");
+  expect(href.searchParams.get("body")).toContain("Qué ocurrió:");
+});
+
 test("unknown paths render the custom not-found page", async ({ page }) => {
   const response = await page.goto("/does-not-exist");
   expect(response?.status()).toBe(404);

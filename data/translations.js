@@ -9,7 +9,6 @@ window.BOBBER_TRANSLATIONS_ES = {
   "Stay safe": "Cuídate",
   "Watch": "Videos",
   "Free resources": "Recursos gratis",
-  "For educators": "Para educadores",
   "For grown-ups": "Para adultos",
   "Back to Bobber": "Volver a Bobber",
   "For teachers, parents, and lake staff": "Para maestros, familias y personal de los lagos",
@@ -98,7 +97,6 @@ window.BOBBER_TRANSLATIONS_ES = {
   "Bobber’s safety game.": "El juego de seguridad de Bobber.",
   "Four quick questions, different every time. Pick the safe answer and see how you do.": "Cuatro preguntas rápidas, diferentes cada vez. Elige la respuesta segura y mira cómo te va.",
   "Next question": "Siguiente pregunta",
-  "See my score": "Ver mi resultado",
   "Play again": "Jugar otra vez",
   "Augmented reality": "Realidad aumentada",
   "Try on the volunteer outfit.": "Pruébate el traje de voluntario.",
@@ -131,9 +129,6 @@ window.BOBBER_TRANSLATIONS_ES = {
   "Activities": "Actividades",
   "Posters & coloring": "Afiches y dibujos para colorear",
   "Storybooks": "Cuentos",
-  "Activity": "Actividad",
-  "Open printable PDF": "Abrir PDF para imprimir",
-  "Read the story": "Leer el cuento",
   "No matching resources": "No se encontraron recursos",
   "Try another search or choose a different category.": "Prueba otra búsqueda o elige otra categoría.",
   "Show everything": "Mostrar todos los recursos",
@@ -185,5 +180,6 @@ window.BOBBER_TRANSLATIONS_ES = {
   "Built by Joseph McPhearson, Tanner Moore, Moses Michael Angel Garcia, and Austin Wilson at Southwestern Oklahoma State University.": "Creado por Joseph McPhearson, Tanner Moore, Moses Michael Angel Garcia y Austin Wilson en Southwestern Oklahoma State University.",
   "U.S. Army Corps of Engineers · Tulsa District": "Cuerpo de Ingenieros del Ejército de EE. UU. · Distrito de Tulsa",
   "Accessibility & privacy": "Accesibilidad y privacidad",
+  "Report a problem": "Informar de un problema",
   "Official U.S. Army website ↗": "Sitio web oficial del Ejército de EE. UU. ↗"
 };
