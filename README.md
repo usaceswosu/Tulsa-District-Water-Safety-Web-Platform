@@ -23,17 +23,11 @@ The links to YouTube, USACE, Recreation.gov, and other official sources are outb
 ## Quality checks
 
 ```bash
-npm run check   # versions, globals, content, HTML, CSS, partials, precache, PDFs
+npm run check   # versions, globals, content, site integrity, HTML, CSS, precache, PDFs
 npm test        # Playwright smoke, accessibility, reader, and offline tests
 ```
 
-On Windows, the catalog/link integrity check is also available as:
-
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-site.ps1
-```
-
-CI runs both plus Lighthouse and a scheduled link check.
+The catalog/link integrity check is cross-platform (`npm run check:site`). CI also runs `scripts/check-site.ps1` with PowerShell as a second opinion, alongside Lighthouse and a scheduled link check.
 
 ## Asset versions
 

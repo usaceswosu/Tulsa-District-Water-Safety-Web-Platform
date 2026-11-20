@@ -1,3 +1,6 @@
+# PowerShell second-opinion copy of scripts/check-site.mjs.
+# The Node check is the cross-platform source of truth; this remains in CI to
+# catch any divergence between the two implementations.
 $ErrorActionPreference = "Stop"
 $siteRoot = Split-Path -Parent $PSScriptRoot
 $script:siteProblems = [System.Collections.Generic.List[string]]::new()

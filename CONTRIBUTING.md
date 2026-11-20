@@ -21,9 +21,11 @@ npm run check
 npm test
 ```
 
-`npm run check` runs version, global-name, content, HTML, CSS, partial, precache, PDF metadata, and PDF budget checks. CI also runs:
+`npm run check` runs version, global-name, content, site-integrity, HTML, CSS, partial, precache, PDF metadata, and PDF budget checks. The site-integrity check (`scripts/check-site.mjs`) is the cross-platform source of truth for catalog/assets/page links.
 
-- `pwsh -NoProfile -File scripts/check-site.ps1` (catalog/assets/link integrity)
+CI additionally runs:
+
+- `pwsh -NoProfile -File scripts/check-site.ps1` as a second opinion
 - Lighthouse on the home and grown-ups pages
 - the full Playwright suite
 
@@ -82,6 +84,8 @@ The classic scripts share one global scope. Run `npm run check:globals` after ad
 ### Change CSS
 
 Read the stylesheet map at the top of `styles.css`. Keep the existing order; later sections intentionally refine earlier passes. The mobile navigation structure is owned by the `max-width:1200px` block, while the `max-width:640px` block adjusts spacing.
+
+Core dark surfaces and the fixed print palette are defined as tokens at the top of the file. Use those tokens for theme/print work; one-off illustration and state colors remain literal on purpose.
 
 ### Change PWA behavior
 

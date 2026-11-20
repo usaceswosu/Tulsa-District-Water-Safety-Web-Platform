@@ -15,7 +15,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Validate local assets, resource data, and page links
+      - name: Validate local assets, resource data, and page links (PowerShell second opinion)
         shell: pwsh
         run: ./scripts/check-site.ps1
 
@@ -42,6 +42,9 @@ jobs:
 
       - name: Check home-page content
         run: npm run check:content
+
+      - name: Validate local assets, catalog, and page links (Node)
+        run: npm run check:site
 
       - name: Validate HTML
         run: npm run check:html

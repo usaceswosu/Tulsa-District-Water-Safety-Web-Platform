@@ -166,7 +166,9 @@ It updates the pages, regenerates the precache, and verifies consistency. `npm r
 | `data/` | Catalog, generated PDF metadata, content, translations |
 | `sw.js` | Offline shell and runtime caching |
 | `precache.json` | Generated shell URL list |
-| `scripts/check-*.mjs` | Structural, version, content, CSS, PDF, and global checks |
+| `scripts/check-*.mjs` | Structural, site-integrity, version, content, CSS, PDF, and global checks |
+| `scripts/check-site.mjs` | Cross-platform catalog/assets/page-link check |
+| `scripts/check-site.ps1` | PowerShell second-opinion copy of the site-integrity check |
 | `scripts/bump-version.mjs` | Version bump + precache regeneration |
 | `scripts/generate-preview-pdf.py` | Optional raster preview generator |
 | `tests/` | Playwright smoke, accessibility, reader, offline tests |
