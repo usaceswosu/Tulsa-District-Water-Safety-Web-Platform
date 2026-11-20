@@ -43,6 +43,9 @@ jobs:
       - name: Check shared partials
         run: npm run check:partials
 
+      - name: Check offline precache list
+        run: npm run check:precache
+
       - name: Check PDF metadata
         run: npm run check:pdf-meta
 

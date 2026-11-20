@@ -24,7 +24,12 @@
   <link rel="alternate" hreflang="es" href="https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/?lang=es">
   <link rel="alternate" hreflang="x-default" href="https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/">
   <title>Bobber the Water Safety Dog | Tulsa District, USACE</title>
-  <link rel="icon" type="image/png" href="assets/bobber-logo.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <meta name="application-name" content="Bobber">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Bobber">
   <script>
     try {
       const params = new URLSearchParams(location.search);
@@ -43,8 +48,8 @@
       document.documentElement.dataset.locale = "en";
     }
   </script>
-  <link rel="preload" as="image" href="assets/bobber/bobber-thumbs-up.webp" fetchpriority="high">
-  <link rel="stylesheet" href="styles.css?v=20261120b">
+  <link rel="preload" as="image" href="assets/bobber/bobber-thumbs-up.webp" imagesrcset="assets/bobber/bobber-thumbs-up-300.webp 300w, assets/bobber/bobber-thumbs-up.webp 480w" imagesizes="(max-width: 900px) 120px, 150px" fetchpriority="high">
+  <link rel="stylesheet" href="styles.css?v=20261120c">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -90,7 +95,7 @@
           <div class="feature-topline"><span>Bobber’s lake-day reminder</span><span aria-hidden="true">✦</span></div>
           <p class="speech-bubble">Hi, I’m Bobber!</p>
           <div class="life-jacket-art" aria-hidden="true">
-            <img src="assets/bobber/bobber-thumbs-up.webp" alt="" width="480" height="601">
+            <img src="assets/bobber/bobber-thumbs-up.webp" srcset="assets/bobber/bobber-thumbs-up-300.webp 300w, assets/bobber/bobber-thumbs-up.webp 480w" sizes="(max-width: 900px) 120px, 150px" alt="" width="480" height="601">
 
           </div>
           <p class="feature-title">Wear your life jacket.</p>
@@ -532,10 +537,10 @@
       </div>
     </dialog>
   <!-- partial:pdf-reader:end -->
-  <script src="scripts/pdf-reader.js?v=20261120b" defer></script>
-  <script src="data/resources.js?v=20261120b" defer></script>
-  <script src="data/pdf-meta.js?v=20261120b" defer></script>
-  <script src="data/translations.js?v=20261120b" defer></script>
-  <script src="scripts/main.js?v=20261120b" defer></script>
+  <script src="scripts/pdf-reader.js?v=20261120c" defer></script>
+  <script src="data/resources.js?v=20261120c" defer></script>
+  <script src="data/pdf-meta.js?v=20261120c" defer></script>
+  <script src="data/translations.js?v=20261120c" defer></script>
+  <script src="scripts/main.js?v=20261120c" defer></script>
 </body>
 </html>

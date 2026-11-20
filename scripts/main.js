@@ -28,6 +28,8 @@ const resultsMessage = document.querySelector("#results-message");
 const emptyState = document.querySelector("#empty-state");
 let activeFilter = "all";
 let currentLanguage = "en";
+let resourcesRendered = false;
+let resourcesScheduled = false;
 
 function savePreference(name, value) {
   try {
@@ -116,6 +118,7 @@ function makeCard(resource) {
 
 function renderResources() {
   if (!grid || !searchInput) return;
+  resourcesRendered = true;
   const query = searchInput.value.trim().toLocaleLowerCase();
   const visibleResources = resources.filter((resource) => {
     const matchesCategory = activeFilter === "all" || resource.category === activeFilter;
@@ -129,6 +132,17 @@ function renderResources() {
   resultsMessage.textContent = currentLanguage === "es"
     ? `${visibleResources.length} ${visibleResources.length === 1 ? "recurso" : "recursos"}${query ? ` para “${searchInput.value.trim()}”` : ""}`
     : `${visibleResources.length} ${visibleResources.length === 1 ? "resource" : "resources"}${query ? ` matching “${searchInput.value.trim()}”` : ""}`;
+}
+
+function scheduleResources() {
+  if (resourcesRendered || resourcesScheduled) return;
+  resourcesScheduled = true;
+  const run = () => {
+    resourcesScheduled = false;
+    if (!resourcesRendered) renderResources();
+  };
+  if ("requestIdleCallback" in window) window.requestIdleCallback(run, { timeout: 1200 });
+  else window.setTimeout(run, 120);
 }
 
 if (grid && searchInput) {
@@ -256,14 +270,16 @@ function setLanguage(language) {
     if (!node.isConnected) continue;
     const text = original.trim();
     const translated = isSpanish ? spanishText[text] : undefined;
-    node.nodeValue = translated ? original.replace(text, translated) : original;
+    const next = translated ? original.replace(text, translated) : original;
+    if (node.nodeValue !== next) node.nodeValue = next;
   }
 
   const heroTitle = document.querySelector("#hero-title");
   if (heroTitle) {
-    heroTitle.innerHTML = isSpanish
+    const nextTitle = isSpanish
       ? "Disfruta del agua<br><span>con seguridad</span>."
       : "Big fun.<br><span>Water-safe</span> adventures.";
+    if (heroTitle.innerHTML !== nextTitle) heroTitle.innerHTML = nextTitle;
   }
 
   const languageCode = headerLanguageToggle.querySelector(".language-code");
@@ -307,7 +323,8 @@ function setLanguage(language) {
       button.textContent = categoryLabels[language][key];
     }
   });
-  renderResources();
+  if (resourcesRendered) renderResources();
+  else scheduleResources();
   updateThemeControl();
   updateExternalLinkLabels();
   updateEasterDialogLanguage();
@@ -321,6 +338,84 @@ function setLanguage(language) {
   updateChecklist();
   renderGame();
   updateCertificateLanguage();
+  updatePwaCopy();
+}
+
+let offlineBanner;
+let updateBanner;
+let swRegistration;
+let pwaReloadRequested = false;
+
+function updatePwaCopy() {
+  if (!offlineBanner || !updateBanner) return;
+  const isSpanish = currentLanguage === "es";
+  offlineBanner.textContent = isSpanish
+    ? "Estás sin conexión. Los consejos de seguridad de Bobber siguen disponibles."
+    : "You’re offline. Bobber’s safety tips are still available.";
+  offlineBanner.hidden = navigator.onLine;
+  const label = updateBanner.querySelector("span");
+  const button = updateBanner.querySelector("button");
+  if (label) label.textContent = isSpanish ? "Hay una nueva versión de Bobber." : "A new version of Bobber is ready.";
+  if (button) button.textContent = isSpanish ? "Actualizar" : "Refresh";
+}
+
+function showUpdateBanner() {
+  if (!updateBanner || !navigator.serviceWorker.controller) return;
+  updatePwaCopy();
+  updateBanner.hidden = false;
+}
+
+function setupPwa() {
+  if (!("serviceWorker" in navigator) || !/^https?:$/.test(location.protocol)) return;
+  const stack = document.createElement("div");
+  stack.className = "pwa-stack";
+  offlineBanner = document.createElement("div");
+  offlineBanner.className = "pwa-banner";
+  offlineBanner.hidden = true;
+  offlineBanner.setAttribute("role", "status");
+  updateBanner = document.createElement("div");
+  updateBanner.className = "pwa-banner";
+  updateBanner.hidden = true;
+  updateBanner.setAttribute("role", "status");
+  const message = document.createElement("span");
+  const refresh = document.createElement("button");
+  refresh.type = "button";
+  refresh.className = "pwa-action";
+  refresh.addEventListener("click", () => {
+    pwaReloadRequested = true;
+    swRegistration?.waiting?.postMessage({ type: "SKIP_WAITING" });
+  });
+  updateBanner.append(message, refresh);
+  stack.append(offlineBanner, updateBanner);
+  document.body.append(stack);
+  updatePwaCopy();
+
+  window.addEventListener("online", updatePwaCopy);
+  window.addEventListener("offline", updatePwaCopy);
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (pwaReloadRequested) location.reload();
+  });
+
+  window.addEventListener("load", () => {
+    const register = async () => {
+      try {
+        const mainScript = [...document.scripts].find((script) => script.src.includes("main.js"));
+        const version = mainScript ? new URL(mainScript.src).searchParams.get("v") : "";
+        swRegistration = await navigator.serviceWorker.register(`sw.js${version ? `?v=${encodeURIComponent(version)}` : ""}`);
+        if (swRegistration.waiting) showUpdateBanner();
+        swRegistration.addEventListener("updatefound", () => {
+          const worker = swRegistration.installing;
+          worker?.addEventListener("statechange", () => {
+            if (worker.state === "installed" && navigator.serviceWorker.controller) showUpdateBanner();
+          });
+        });
+      } catch {
+        // Offline support is an enhancement; the site works without it.
+      }
+    };
+    if ("requestIdleCallback" in window) window.requestIdleCallback(register, { timeout: 2500 });
+    else window.setTimeout(register, 500);
+  });
 }
 
 headerLanguageToggle.addEventListener("click", () => {
@@ -1092,4 +1187,5 @@ if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-mot
   revealTargets.forEach((element) => revealObserver.observe(element));
 }
 
+setupPwa();
 setLanguage(document.documentElement.dataset.locale === "es" ? "es" : "en");

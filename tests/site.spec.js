@@ -191,6 +191,7 @@ for (const pagePath of ["/", "/grown-ups.html"]) {
       // their final colors rather than a mid-transition composite.
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto(pagePath);
+      if (pagePath === "/") await expect(page.locator(".resource-card")).toHaveCount(42);
       if (theme === "dark") await page.click("#theme-toggle");
       await page.waitForTimeout(200);
       const results = await new AxeBuilder({ page }).analyze();
@@ -234,4 +235,30 @@ test("grown-ups page links to the classroom pack and QR poster", async ({ page }
   await expect(page.locator('a[href="poster.html"]')).toBeVisible();
   const response = await page.request.head("http://127.0.0.1:4173/assets/downloads/Bobber_Classroom_Pack_2026.zip");
   expect(response.ok()).toBeTruthy();
+});
+
+test("key pages remain usable with forced colors", async ({ page }) => {
+  await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
+  for (const path of ["/", "/grown-ups.html"]) {
+    await page.goto(path);
+    await expect(page.locator("h1")).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+  }
+});
+
+test("the offline shell loads after installation", async ({ page, context }) => {
+  await page.goto("/?offline=" + Date.now(), { waitUntil: "load" });
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready;
+    if (!navigator.serviceWorker.controller) {
+      await new Promise((resolve) => navigator.serviceWorker.addEventListener("controllerchange", resolve, { once: true }));
+    }
+  });
+  await context.setOffline(true);
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await expect(page).toHaveTitle(/Bobber/);
+  await expect(page.locator("h1")).toContainText("Big fun");
+  await expect(page.locator(".pwa-banner").filter({ hasText: /offline/i })).toBeVisible();
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector(".site-header")).position)).toBe("sticky");
+  await context.setOffline(false);
 });

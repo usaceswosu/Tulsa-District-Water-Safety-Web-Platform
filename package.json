@@ -16,7 +16,9 @@
     "update:teacher-pack": "node scripts/make-teacher-pack.mjs",
     "update:partials": "node scripts/apply-partials.mjs",
     "check:partials": "node scripts/apply-partials.mjs --check",
-    "check:css": "node scripts/check-css.mjs"
+    "check:css": "node scripts/check-css.mjs",
+    "update:precache": "node scripts/update-precache.mjs",
+    "check:precache": "node scripts/update-precache.mjs --check"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",

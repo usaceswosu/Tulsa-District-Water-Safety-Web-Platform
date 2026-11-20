@@ -1,0 +1,66 @@
+{
+  "id": "./",
+  "name": "Bobber the Water Safety Dog",
+  "short_name": "Bobber",
+  "description": "Water safety fun, cartoons, and free printables from the U.S. Army Corps of Engineers, Tulsa District.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fffefa",
+  "theme_color": "#fffefa",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "kids", "safety"],
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Safety basics",
+      "short_name": "Safety",
+      "url": "./index.html#safety",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Bobber library",
+      "short_name": "Library",
+      "url": "./index.html#resources",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "For grown-ups",
+      "short_name": "Grown-ups",
+      "url": "./grown-ups.html",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "En español",
+      "short_name": "Español",
+      "url": "./index.html?lang=es",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
