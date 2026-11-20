@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -28,7 +28,7 @@
     }
   </script>
   <link rel="preload" as="image" href="assets/bobber/bobber-thumbs-up.webp">
-  <link rel="stylesheet" href="styles.css?v=20261119i">
+  <link rel="stylesheet" href="styles.css?v=20261119k">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -68,7 +68,7 @@
           </div>
           <div class="hero-note"><span class="note-icon" aria-hidden="true">✦</span><span>Made for little learners, families, and the grown-ups who keep watch.</span></div>
         </div>
-        <aside class="hero-feature" aria-label="Bobber’s water safety reminder">
+        <div class="hero-feature" role="group" aria-label="Bobber’s water safety reminder">
           <div class="feature-topline"><span>Bobber’s lake-day reminder</span><span aria-hidden="true">✦</span></div>
           <p class="speech-bubble">Hi, I’m Bobber!</p>
           <div class="life-jacket-art" aria-hidden="true">
@@ -78,7 +78,7 @@
           <p class="feature-title">Wear your life jacket.</p>
           <p class="feature-description">Every trip. Every time you’re in, on, or around open water.</p>
           <a class="feature-link" href="#safety">See Bobber’s safety reminders <span aria-hidden="true">→</span></a>
-        </aside>
+        </div>
       </div>
       <div class="hero-ripple" aria-hidden="true"><span></span><span></span><span></span></div>
     </section>
@@ -91,12 +91,12 @@
       </a>
       <a href="#videos">
         <span class="quick-icon">02</span>
-        <span><strong>Watch & learn</strong><small>Cartoons in English & Spanish</small></span>
+        <span><strong>Watch &amp; learn</strong><small>Cartoons in English &amp; Spanish</small></span>
         <b aria-hidden="true">↗</b>
       </a>
       <a href="#resources">
         <span class="quick-icon">03</span>
-        <span><strong>Print & play</strong><small>Free Bobber activities</small></span>
+        <span><strong>Print &amp; play</strong><small>Free Bobber activities</small></span>
         <b aria-hidden="true">↗</b>
       </a>
     </section>
@@ -340,7 +340,7 @@
           <p>Color, play, and learn together. Every resource below is ready to open or print.</p>
         </div>
         <div class="library-tools">
-          <label class="search-box" for="resource-search">
+          <label class="search-box">
             <span aria-hidden="true">⌕</span>
             <input id="resource-search" type="search" aria-label="Search Bobber resources" placeholder="Search activities, posters, books…" autocomplete="off">
             <kbd aria-hidden="true">/</kbd>
@@ -348,7 +348,7 @@
           <div class="filters" role="group" aria-label="Filter resources">
             <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">All <span id="count-all"></span></button>
             <button class="filter-button" type="button" data-filter="activity" aria-pressed="false">Activities</button>
-            <button class="filter-button" type="button" data-filter="poster" aria-pressed="false">Posters & coloring</button>
+            <button class="filter-button" type="button" data-filter="poster" aria-pressed="false">Posters &amp; coloring</button>
             <button class="filter-button" type="button" data-filter="storybook" aria-pressed="false">Storybooks</button>
           </div>
         </div>
@@ -368,7 +368,7 @@
     </section>
 
     <section class="closing section-wrap">
-      <img class="closing-logo" src="assets/bobber/bobber-sitting.webp" loading="lazy" decoding="async" loading="lazy" decoding="async" alt="Bobber the Water Safety Dog">
+      <img class="closing-logo" src="assets/bobber/bobber-sitting.webp" loading="lazy" decoding="async" alt="Bobber the Water Safety Dog">
       <div>
         <span class="section-kicker">Before you head out</span>
         <h2>Have a plan. Wear a life jacket. Look out for each other.</h2>
@@ -414,7 +414,7 @@
     <button class="info-close" id="info-close" type="button" aria-label="Close">×</button>
     <img class="info-art" id="info-art" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">
     <p class="info-kicker" id="info-kicker"></p>
-    <h2 id="info-title"></h2>
+    <h2 id="info-title">Details</h2>
     <p class="info-copy" id="info-copy"></p>
     <a class="button button-dark info-link" id="info-link" href="#" target="_blank" rel="noopener" hidden>Open the printable sheet <span aria-hidden="true">↗</span></a>
   </dialog>
@@ -432,22 +432,22 @@
   </dialog>
   <dialog class="pdf-reader" id="pdf-reader" aria-labelledby="pdf-reader-title">
     <div class="pdf-reader-panel">
-      <header class="pdf-reader-header">
+      <div class="pdf-reader-header">
         <button class="pdf-reader-control" id="pdf-reader-close" type="button" autofocus>Back to the library</button>
-        <a class="pdf-reader-control" id="pdf-reader-download" download>Download PDF</a>
-        <h2 id="pdf-reader-title"></h2>
-      </header>
+        <a class="pdf-reader-control" id="pdf-reader-download">Download PDF</a>
+        <h2 id="pdf-reader-title">PDF</h2>
+      </div>
       <div class="pdf-reader-stage" id="pdf-reader-stage"></div>
-      <footer class="pdf-reader-footer">
+      <div class="pdf-reader-footer">
         <button class="pdf-reader-control" id="pdf-reader-prev" type="button" aria-disabled="true">Previous page</button>
         <p id="pdf-reader-status" role="status"></p>
         <button class="pdf-reader-control" id="pdf-reader-next" type="button" aria-disabled="true">Next page</button>
-      </footer>
+      </div>
     </div>
   </dialog>
-  <script src="scripts/pdf-reader.js?v=20261119i" defer></script>
-  <script src="data/resources.js?v=20261119i" defer></script>
-  <script src="data/translations.js?v=20261119i" defer></script>
-  <script src="scripts/main.js?v=20261119i" defer></script>
+  <script src="scripts/pdf-reader.js?v=20261119k" defer></script>
+  <script src="data/resources.js?v=20261119k" defer></script>
+  <script src="data/translations.js?v=20261119k" defer></script>
+  <script src="scripts/main.js?v=20261119k" defer></script>
 </body>
 </html>

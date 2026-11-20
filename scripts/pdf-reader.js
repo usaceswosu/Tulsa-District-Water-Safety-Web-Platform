@@ -42,7 +42,7 @@ function showPdfFallback(session) {
   frame.title = `${session.title} PDF`;
   pdfReaderStage.replaceChildren(frame);
   pdfReaderStatus.textContent = readerCopy(
-    "Showing this PDF in your browser's viewer. You can also download it.",
+    "Showing this PDF in your browser’s viewer. You can also download it.",
     "Mostrando este PDF en el visor de tu navegador. También puedes descargarlo."
   );
 }
@@ -88,7 +88,12 @@ function updateReaderChrome() {
   pdfReaderDownload.textContent = readerCopy("Download PDF", "Descargar PDF");
   pdfReaderPrevious.textContent = readerCopy("Previous page", "Página anterior");
   pdfReaderNext.textContent = readerCopy("Next page", "Página siguiente");
-  if (activePdf?.page) {
+  if (activePdf?.fallback) {
+    pdfReaderStatus.textContent = readerCopy(
+      "Showing this PDF in your browser’s viewer. You can also download it.",
+      "Mostrando este PDF en el visor de tu navegador. También puedes descargarlo."
+    );
+  } else if (activePdf?.page) {
     pdfReaderStatus.textContent = readerCopy(
       `Page ${activePdf.page} of ${activePdf.document.numPages}`,
       `Página ${activePdf.page} de ${activePdf.document.numPages}`
@@ -105,6 +110,7 @@ async function openPdfReader(url, title, opener) {
   pdfReaderTitle.textContent = title;
   updateReaderChrome();
   pdfReaderDownload.href = url;
+  pdfReaderDownload.setAttribute("download", "");
   pdfReaderStage.replaceChildren();
   pdfReaderStatus.textContent = readerCopy("Loading PDF…", "Cargando PDF…");
   setPdfControls(null);

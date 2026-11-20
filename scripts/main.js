@@ -264,6 +264,9 @@ function setLanguage(language) {
   updateExternalLinkLabels();
   updateEasterDialogLanguage();
   if (infoClose) infoClose.setAttribute("aria-label", isSpanish ? "Cerrar" : "Close");
+  document.querySelectorAll(".card-open").forEach((button) => {
+    button.setAttribute("aria-label", `${isSpanish ? "Abrir detalles" : "Open details"}: ${button.dataset.title}`);
+  });
   if (infoDialog?.open) infoDialog.close();
   if (typeof window.updatePdfReaderLanguage === "function") window.updatePdfReaderLanguage();
   updateSpeechBubble();
@@ -534,21 +537,19 @@ function openInfoCard({ art, kicker, title, copy, link }) {
 
 function makeCardOpen(container, getInfo) {
   if (!container || !infoDialog) return;
-  container.tabIndex = 0;
-  container.setAttribute("role", "button");
-  container.setAttribute("aria-haspopup", "dialog");
-  container.classList.add("is-clickable");
   const open = () => {
     const info = getInfo();
     if (info) openInfoCard(info);
   };
-  container.addEventListener("click", open);
-  container.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      open();
-    }
-  });
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "card-open";
+  button.dataset.title = container.querySelector("h3, strong")?.textContent || "";
+  button.setAttribute("aria-haspopup", "dialog");
+  button.setAttribute("aria-label", `Open details: ${button.dataset.title}`);
+  button.addEventListener("click", open);
+  container.classList.add("is-clickable");
+  container.append(button);
 }
 
 if (infoDialog) {
