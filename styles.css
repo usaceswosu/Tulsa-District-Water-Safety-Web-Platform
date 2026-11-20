@@ -3894,7 +3894,7 @@ html[data-theme="dark"] .ar-section {
 }
 
 .game-option.is-correct::after {
-  content: " ?";
+  content: " ✓";
   font-weight: 900;
 }
 
@@ -3904,7 +3904,7 @@ html[data-theme="dark"] .ar-section {
 }
 
 .game-option.is-wrong::after {
-  content: " ?";
+  content: " ✕";
   font-weight: 900;
 }
 

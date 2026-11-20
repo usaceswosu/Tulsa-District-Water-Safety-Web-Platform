@@ -4,7 +4,20 @@ test("quiz review and the Safety Hero certificate work", async ({ page }) => {
   await page.goto("/");
   await page.locator("#game").scrollIntoViewIfNeeded();
   for (let index = 0; index < 4; index += 1) {
-    await page.locator(".game-option").first().click();
+    if (index === 0) {
+      const wrongIndex = await page.evaluate(() => {
+        const round = gameState.rounds[gameState.index];
+        const order = gameState.orders[gameState.index];
+        return order.findIndex((sourceIndex) => !round.options[sourceIndex].correct);
+      });
+      await page.locator(".game-option").nth(wrongIndex).click();
+      const wrongMarker = await page.locator(".game-option.is-wrong").evaluate((button) => getComputedStyle(button, "::after").content);
+      expect(wrongMarker).toContain("✕");
+    } else {
+      await page.locator(".game-option").first().click();
+    }
+    const correctMarker = await page.locator(".game-option.is-correct").evaluate((button) => getComputedStyle(button, "::after").content);
+    expect(correctMarker).toContain("✓");
     await page.locator("#game-next").click();
   }
   await expect(page.locator(".game-score")).toContainText("of 4");
