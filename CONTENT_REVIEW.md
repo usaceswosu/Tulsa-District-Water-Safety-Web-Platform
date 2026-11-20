@@ -28,6 +28,13 @@ This checklist is for district staff reviewing the Bobber water-safety site befo
 - [ ] Confirm the rasterized in-page PDF previews and print-quality downloads are acceptable for the library. The previews are for on-screen reading; tagged print originals are preserved for download.
 - [ ] Confirm the Spanish `?lang=es` URL and hreflang metadata match the district's bilingual publishing plan.
 
+## Outreach tools
+
+- [ ] Review the classroom pack contents and ZIP size. Regenerate the QR codes, poster, and classroom pack if the site moves to a custom domain.
+- [ ] Review the bilingual QR poster with Public Affairs, including official marks, URLs, and print layout.
+- [ ] Review the Safety Hero certificate wording and quiz answer review. The child's name is not stored; confirm that matches district practice.
+- [ ] Confirm the certificate print layout, poster print layout, and classroom pack on the district's printer before distribution.
+
 ## Review record
 
 | Reviewer / role | Date | Scope / notes |

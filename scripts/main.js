@@ -1,6 +1,18 @@
 // Browser-only enhancements for the static GitHub Pages site.
 const resources = window.BOBBER_RESOURCES;
 const categoryLabels = window.BOBBER_CATEGORY_LABELS;
+const educatorPdfLinks = [...document.querySelectorAll(".educator-card a[href$='.pdf'], .educator-note a[href$='.pdf']")];
+if (educatorPdfLinks.length && typeof pdfReader !== "undefined" && pdfReader && typeof openPdfReader === "function") {
+  educatorPdfLinks.forEach((link) => {
+    link.setAttribute("aria-haspopup", "dialog");
+    link.addEventListener("click", (event) => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      const title = link.closest(".educator-card")?.querySelector("h3")?.textContent.trim() || link.textContent.trim();
+      openPdfReader(link.href, title, link);
+    });
+  });
+}
 const resourceTitlesEs = window.BOBBER_RESOURCE_TITLES_ES;
 const pdfMeta = window.BOBBER_PDF_META || {};
 const spanishText = window.BOBBER_TRANSLATIONS_ES;
@@ -308,6 +320,7 @@ function setLanguage(language) {
   updateSpeechBubble();
   updateChecklist();
   renderGame();
+  updateCertificateLanguage();
 }
 
 headerLanguageToggle.addEventListener("click", () => {
@@ -796,7 +809,27 @@ const gameNext = document.querySelector("#game-next");
 const gameNextLabel = document.querySelector("#game-next-label");
 const gameResult = document.querySelector("#game-result");
 const gameRestart = document.querySelector("#game-restart");
-const gameState = { index: 0, score: 0, answered: false, chosen: -1, done: false, rounds: [], orders: [] };
+const gameFinishActions = document.querySelector("#game-finish-actions");
+const gameCertificate = document.querySelector("#game-certificate");
+const gameRestartLabel = document.querySelector("#game-restart-label");
+const gameCertificateLabel = document.querySelector("#game-certificate-label");
+const certificateDialog = document.querySelector("#certificate-dialog");
+const certificateName = document.querySelector("#certificate-name");
+const certificatePreviewName = document.querySelector("#certificate-preview-name");
+const certificatePreviewDate = document.querySelector("#certificate-preview-date");
+const certificatePrintSection = document.querySelector("#certificate-print-sheet");
+const certificatePrintName = document.querySelector("#certificate-print-name");
+const certificatePrintDate = document.querySelector("#certificate-print-date");
+const gameState = {
+  index: 0,
+  score: 0,
+  answered: false,
+  chosen: -1,
+  done: false,
+  rounds: [],
+  orders: [],
+  answers: []
+};
 
 function gameText(pair) {
   return currentLanguage === "es" ? pair.es : pair.en;
@@ -820,6 +853,7 @@ function startGame() {
   gameState.answered = false;
   gameState.chosen = -1;
   gameState.done = false;
+  gameState.answers = [];
 }
 
 function renderGame() {
@@ -835,15 +869,51 @@ function renderGame() {
     gameFeedback.textContent = "";
     gameNext.hidden = true;
     gameResult.hidden = false;
-    gameResult.textContent = gameText({ en: `You got ${gameState.score} of ${total} right!`, es: `¡Acertaste ${gameState.score} de ${total}!` });
+    gameResult.replaceChildren();
+
+    const score = document.createElement("p");
+    score.className = "game-score";
+    score.textContent = gameText({ en: `You got ${gameState.score} of ${total} right!`, es: `¡Acertaste ${gameState.score} de ${total}!` });
+
+    const review = document.createElement("div");
+    review.className = "game-review";
+    const reviewTitle = document.createElement("h3");
+    reviewTitle.className = "game-review-title";
+    reviewTitle.textContent = gameText({ en: "Answer review", es: "Repaso de respuestas" });
+    const list = document.createElement("ol");
+    list.className = "game-review-list";
+    gameState.rounds.forEach((round, index) => {
+      const answer = gameState.answers[index];
+      if (!answer) return;
+      const item = document.createElement("li");
+      item.className = `game-review-item ${answer.isCorrect ? "is-correct" : "is-missed"}`;
+      const question = document.createElement("p");
+      question.className = "game-review-question";
+      question.textContent = gameText(round.question);
+      const response = document.createElement("p");
+      response.className = "game-review-answer";
+      response.textContent = answer.isCorrect
+        ? `✓ ${gameText({ en: "Correct", es: "Correcto" })}: ${gameText(round.options[answer.chosen])}`
+        : `${gameText({ en: "Your answer", es: "Tu respuesta" })}: ${gameText(round.options[answer.chosen])} · ${gameText({ en: "Safe answer", es: "Respuesta segura" })}: ${gameText(round.options[answer.correct])}`;
+      item.append(question, response);
+      list.append(item);
+    });
+    const link = document.createElement("a");
+    link.className = "game-review-link";
+    link.href = "#safety";
+    link.textContent = gameText({ en: "Review the safety basics", es: "Repasa lo básico de seguridad" });
+    review.append(reviewTitle, list, link);
+    gameResult.append(score, review);
+    gameFinishActions.hidden = false;
     gameRestart.hidden = false;
+    gameCertificate.hidden = false;
     return;
   }
 
   const round = gameState.rounds[gameState.index];
   const order = gameState.orders[gameState.index];
   gameResult.hidden = true;
-  gameRestart.hidden = true;
+  gameFinishActions.hidden = true;
   gameQuestion.hidden = false;
   gameArt.hidden = false;
   gameProgress.textContent = gameText({ en: `Question ${gameState.index + 1} of ${total}`, es: `Pregunta ${gameState.index + 1} de ${total}` });
@@ -892,9 +962,95 @@ function chooseGameOption(index) {
   const correctIndex = order.findIndex((sourceIndex) => round.options[sourceIndex].correct);
   gameState.answered = true;
   gameState.chosen = index;
+  gameState.answers[gameState.index] = {
+    chosen: order[index],
+    correct: order[correctIndex],
+    isCorrect: index === correctIndex
+  };
   if (index === correctIndex) gameState.score += 1;
   renderGame();
   gameNext.focus();
+}
+
+function certificateNameValue() {
+  if (!certificateName) return "";
+  return certificateName.value.trim() || gameText({ en: "Safety Hero", es: "Héroe de seguridad" });
+}
+
+function certificateDateValue() {
+  return new Intl.DateTimeFormat(currentLanguage === "es" ? "es-US" : "en-US", { dateStyle: "long" }).format(new Date());
+}
+
+function updateCertificatePreview() {
+  if (!certificatePreviewName) return;
+  certificatePreviewName.textContent = certificateNameValue();
+  certificatePreviewDate.textContent = certificateDateValue();
+}
+
+function updateCertificateLanguage() {
+  if (!certificateDialog) return;
+  const isSpanish = currentLanguage === "es";
+  document.querySelector("#certificate-kicker").textContent = isSpanish ? "El héroe de seguridad de Bobber" : "Bobber’s Safety Hero";
+  document.querySelector("#certificate-title").textContent = isSpanish ? "¡Hazlo oficial!" : "Make it official!";
+  document.querySelector("#certificate-copy").textContent = isSpanish
+    ? "Escribe tu nombre e imprime tu certificado de héroe de seguridad. Tu nombre permanece en esta pestaña del navegador."
+    : "Type your name and print your Safety Hero certificate. Your name stays in this browser tab.";
+  document.querySelector("#certificate-name-label").textContent = isSpanish ? "Tu nombre" : "Your name";
+  certificateName.placeholder = isSpanish ? "Tu nombre" : "Your name";
+  document.querySelector("#certificate-preview-kicker").textContent = isSpanish ? "Héroe de seguridad" : "Safety Hero";
+  document.querySelector("#certificate-print-label").textContent = isSpanish ? "Imprimir mi certificado" : "Print my certificate";
+  document.querySelector("#certificate-cancel-label").textContent = isSpanish ? "Todavía no" : "Not yet";
+  document.querySelector("#certificate-close").setAttribute("aria-label", isSpanish ? "Cerrar" : "Close");
+  gameCertificateLabel.textContent = isSpanish ? "Imprimir mi certificado de héroe de seguridad" : "Print my Safety Hero certificate";
+  gameRestartLabel.textContent = isSpanish ? "Jugar de nuevo" : "Play again";
+  updateCertificatePreview();
+}
+
+function updateCertificatePrintSheet() {
+  if (!certificatePrintSection) return;
+  const isSpanish = currentLanguage === "es";
+  certificatePrintName.textContent = certificateNameValue();
+  certificatePrintDate.textContent = `${isSpanish ? "Fecha" : "Date"}: ${certificateDateValue()}`;
+  document.querySelector("#certificate-sheet-kicker").textContent = isSpanish ? "Bobber, el perro de seguridad acuática" : "Bobber’s Water Safety Dog";
+  document.querySelector("#certificate-sheet-eyebrow").textContent = isSpanish ? "Certificado de valentía" : "Certificate of awesomeness";
+  document.querySelector("#certificate-sheet-title").textContent = isSpanish ? "Héroe de seguridad" : "Safety Hero";
+  document.querySelector("#certificate-sheet-copy").textContent = isSpanish ? "Esto certifica que" : "This certifies that";
+  document.querySelector("#certificate-sheet-copy-two").textContent = isSpanish
+    ? "completó el desafío de seguridad acuática de Bobber y está listo para un día seguro en el lago."
+    : "completed Bobber’s water-safety challenge and is ready for a safe day at the lake.";
+  document.querySelector("#certificate-sheet-signature-label").textContent = isSpanish ? "Bobber, el perro de seguridad acuática" : "Bobber the Water Safety Dog";
+}
+
+function openCertificateDialog() {
+  if (!certificateDialog) return;
+  updateCertificateLanguage();
+  updateCertificatePreview();
+  certificateDialog.showModal();
+  certificateName.focus();
+  certificateName.select();
+}
+
+function printCertificate() {
+  if (!certificatePrintSection) return;
+  updateCertificatePrintSheet();
+  certificatePrintSection.setAttribute("aria-hidden", "false");
+  document.body.classList.add("printing-certificate");
+  window.addEventListener("afterprint", () => {
+    document.body.classList.remove("printing-certificate");
+    certificatePrintSection.setAttribute("aria-hidden", "true");
+  }, { once: true });
+  window.print();
+}
+
+if (certificateDialog && gameCertificate) {
+  gameCertificate.addEventListener("click", openCertificateDialog);
+  document.querySelector("#certificate-close").addEventListener("click", () => certificateDialog.close());
+  document.querySelector("#certificate-cancel").addEventListener("click", () => certificateDialog.close());
+  document.querySelector("#certificate-print").addEventListener("click", printCertificate);
+  certificateName.addEventListener("input", updateCertificatePreview);
+  certificateDialog.addEventListener("click", (event) => {
+    if (event.target === certificateDialog) certificateDialog.close();
+  });
 }
 
 if (gameNext) {

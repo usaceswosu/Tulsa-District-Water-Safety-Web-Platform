@@ -44,10 +44,11 @@
     }
   </script>
   <link rel="preload" as="image" href="assets/bobber/bobber-thumbs-up.webp" fetchpriority="high">
-  <link rel="stylesheet" href="styles.css?v=20261119v">
+  <link rel="stylesheet" href="styles.css?v=20261120b">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
+  <!-- partial:header:start -->
   <header class="site-header">
     <div class="header-inner">
       <a class="brand" href="#top">
@@ -60,7 +61,7 @@
         <a href="#videos">Watch</a>
         <a href="#resources">Free resources</a>
         <a href="grown-ups.html">For grown-ups</a>
-        <a class="nav-cta" href="#resources">Explore the library <span aria-hidden="true">↗</span></a>
+        <a href="#resources" class="nav-cta">Explore the library <span aria-hidden="true">↗</span></a>
       </nav>
       <div class="header-tools">
         <button class="header-language-toggle" id="header-language-toggle" type="button" aria-label="ES Español" aria-pressed="false" aria-controls="main"><span class="language-code" aria-hidden="true">ES</span> <span class="language-name" lang="es">Español</span></button>
@@ -69,6 +70,7 @@
       </div>
     </div>
   </header>
+  <!-- partial:header:end -->
 
   <main id="main">
     <section class="hero" id="top" aria-labelledby="hero-title">
@@ -323,8 +325,11 @@
           <div class="game-options" id="game-options"></div>
           <p class="game-feedback" id="game-feedback" aria-live="polite"></p>
           <button class="button button-dark" id="game-next" type="button" hidden><span id="game-next-label">Next question</span> <span aria-hidden="true">→</span></button>
-          <p class="game-result" id="game-result" aria-live="polite" hidden></p>
-          <button class="button button-coral" id="game-restart" type="button" hidden>Play again <span aria-hidden="true">↻</span></button>
+          <div class="game-result" id="game-result" aria-live="polite" hidden></div>
+          <div class="game-finish-actions" id="game-finish-actions" hidden>
+            <button class="button button-coral" id="game-certificate" type="button"><span id="game-certificate-label">Print my Safety Hero certificate</span> <span aria-hidden="true">🖨</span></button>
+            <button class="button button-dark" id="game-restart" type="button"><span id="game-restart-label">Play again</span> <span aria-hidden="true">↻</span></button>
+          </div>
         </div>
       </div>
     </section>
@@ -393,6 +398,7 @@
     </section>
   </main>
 
+  <!-- partial:footer:start -->
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-brand">
@@ -427,6 +433,7 @@
       <a href="https://www.usace.army.mil/" target="_blank" rel="noopener noreferrer">Official U.S. Army website ↗</a>
     </div>
   </footer>
+  <!-- partial:footer:end -->
   <dialog class="info-dialog" id="info-dialog" aria-labelledby="info-title">
     <button class="info-close" id="info-close" type="button" aria-label="Close">×</button>
     <img class="info-art" id="info-art" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">
@@ -447,25 +454,88 @@
       <span aria-hidden="true">→</span>
     </button>
   </dialog>
-  <dialog class="pdf-reader" id="pdf-reader" aria-labelledby="pdf-reader-title">
-    <div class="pdf-reader-panel">
-      <div class="pdf-reader-header">
-        <button class="pdf-reader-control" id="pdf-reader-close" type="button" autofocus>Back to the library</button>
-        <a class="pdf-reader-control" id="pdf-reader-download">Download PDF</a>
-        <h2 id="pdf-reader-title">PDF</h2>
+  <dialog class="certificate-dialog" id="certificate-dialog" aria-labelledby="certificate-title" aria-describedby="certificate-copy">
+    <div class="certificate-panel">
+      <button class="info-close" id="certificate-close" type="button" aria-label="Close">×</button>
+      <p class="certificate-kicker" id="certificate-kicker">Bobber’s Safety Hero</p>
+      <h2 id="certificate-title">Make it official!</h2>
+      <p id="certificate-copy">Type your name and print your Safety Hero certificate. Your name stays in this browser tab.</p>
+      <label class="certificate-name-label" id="certificate-name-label" for="certificate-name">Your name</label>
+      <input class="certificate-name" id="certificate-name" type="text" maxlength="40" autocomplete="off" placeholder="Your name">
+      <div class="certificate-preview" aria-hidden="true">
+        <p class="certificate-preview-kicker" id="certificate-preview-kicker">Safety Hero</p>
+        <p class="certificate-preview-name" id="certificate-preview-name">Your name</p>
+        <p class="certificate-preview-date" id="certificate-preview-date"></p>
       </div>
-      <div class="pdf-reader-stage" id="pdf-reader-stage"></div>
-      <div class="pdf-reader-footer">
-        <button class="pdf-reader-control" id="pdf-reader-prev" type="button" aria-disabled="true">Previous page</button>
-        <p id="pdf-reader-status" role="status"></p>
-        <button class="pdf-reader-control" id="pdf-reader-next" type="button" aria-disabled="true">Next page</button>
+      <div class="certificate-actions">
+        <button class="button button-coral" id="certificate-print" type="button"><span id="certificate-print-label">Print my certificate</span> <span aria-hidden="true">🖨</span></button>
+        <button class="button button-dark" id="certificate-cancel" type="button"><span id="certificate-cancel-label">Not yet</span></button>
       </div>
     </div>
   </dialog>
-  <script src="scripts/pdf-reader.js?v=20261119v" defer></script>
-  <script src="data/resources.js?v=20261119v" defer></script>
-  <script src="data/pdf-meta.js?v=20261119v" defer></script>
-  <script src="data/translations.js?v=20261119v" defer></script>
-  <script src="scripts/main.js?v=20261119v" defer></script>
+  <section class="certificate-print" id="certificate-print-sheet" aria-hidden="true">
+    <div class="certificate-sheet">
+      <div class="certificate-sheet-top">
+        <div>
+          <p class="certificate-sheet-kicker" id="certificate-sheet-kicker">Bobber’s Water Safety Dog</p>
+          <p class="certificate-sheet-eyebrow" id="certificate-sheet-eyebrow">Certificate of awesomeness</p>
+        </div>
+        <img src="assets/bobber/bobber-thumbs-up.webp" alt="" width="240" height="300">
+      </div>
+      <h2 class="certificate-sheet-title" id="certificate-sheet-title">Safety Hero</h2>
+      <p class="certificate-sheet-copy" id="certificate-sheet-copy">This certifies that</p>
+      <p class="certificate-sheet-name" id="certificate-print-name">Safety Hero</p>
+      <p class="certificate-sheet-copy" id="certificate-sheet-copy-two">completed Bobber’s water-safety challenge and is ready for a safe day at the lake.</p>
+      <p class="certificate-sheet-date" id="certificate-print-date"></p>
+      <div class="certificate-sheet-signature">
+        <span id="certificate-sheet-signature-label">Bobber the Water Safety Dog</span>
+        <span class="certificate-sheet-line" aria-hidden="true"></span>
+      </div>
+    </div>
+  </section>
+  <!-- partial:pdf-reader:start -->
+  <dialog class="pdf-reader" id="pdf-reader" aria-labelledby="pdf-reader-title">
+      <div class="pdf-reader-panel">
+        <div class="pdf-reader-header">
+          <button class="pdf-reader-control" id="pdf-reader-close" type="button" autofocus>Back to the library</button>
+          <a class="pdf-reader-control" id="pdf-reader-download">Download PDF</a>
+          <h2 id="pdf-reader-title">PDF</h2>
+        </div>
+        <div class="pdf-reader-toolbar">
+          <div class="pdf-reader-tools">
+            <div class="pdf-reader-zoom" role="group" aria-labelledby="pdf-reader-zoom-label">
+              <span class="pdf-reader-tool-label" id="pdf-reader-zoom-label">Zoom</span>
+              <button class="pdf-reader-control pdf-reader-zoom-button" id="pdf-reader-zoom-out" type="button" aria-label="Zoom out">−</button>
+              <span class="pdf-reader-zoom-value" id="pdf-reader-zoom-value" aria-live="polite">100%</span>
+              <button class="pdf-reader-control pdf-reader-zoom-button" id="pdf-reader-zoom-in" type="button" aria-label="Zoom in">+</button>
+              <button class="pdf-reader-control" id="pdf-reader-zoom-reset" type="button">Fit</button>
+            </div>
+            <form class="pdf-reader-jump" id="pdf-reader-jump">
+              <label class="pdf-reader-tool-label" id="pdf-reader-page-label" for="pdf-reader-page-input">Page</label>
+              <input id="pdf-reader-page-input" type="number" inputmode="numeric" min="1" value="1" aria-label="Page number">
+              <span class="pdf-reader-page-total"><span id="pdf-reader-page-of">of</span> <span id="pdf-reader-page-total">1</span></span>
+              <button class="pdf-reader-control" id="pdf-reader-go" type="submit">Go</button>
+            </form>
+            <button class="pdf-reader-control" id="pdf-reader-toc-toggle" type="button" aria-expanded="false" aria-controls="pdf-reader-toc" hidden>Contents</button>
+          </div>
+          <nav class="pdf-reader-toc" id="pdf-reader-toc" aria-labelledby="pdf-reader-toc-title" hidden>
+            <h3 id="pdf-reader-toc-title">Contents</h3>
+            <ul id="pdf-reader-toc-list"></ul>
+          </nav>
+        </div>
+        <div class="pdf-reader-stage" id="pdf-reader-stage"></div>
+        <div class="pdf-reader-footer">
+          <button class="pdf-reader-control" id="pdf-reader-prev" type="button" aria-disabled="true">Previous page</button>
+          <p id="pdf-reader-status" role="status"></p>
+          <button class="pdf-reader-control" id="pdf-reader-next" type="button" aria-disabled="true">Next page</button>
+        </div>
+      </div>
+    </dialog>
+  <!-- partial:pdf-reader:end -->
+  <script src="scripts/pdf-reader.js?v=20261120b" defer></script>
+  <script src="data/resources.js?v=20261120b" defer></script>
+  <script src="data/pdf-meta.js?v=20261120b" defer></script>
+  <script src="data/translations.js?v=20261120b" defer></script>
+  <script src="scripts/main.js?v=20261120b" defer></script>
 </body>
 </html>

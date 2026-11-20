@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="darkreader-lock">
+  <meta name="theme-color" content="#fffefa">
+  <meta name="description" content="Printable QR posters for the Bobber the Water Safety Dog website, in English and Spanish.">
+  <link rel="canonical" href="https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/poster.html">
+  <title>Bobber QR poster | Tulsa District, USACE</title>
+  <link rel="icon" type="image/png" href="assets/bobber-logo.png">
+  <script>
+    try {
+      const theme = localStorage.getItem("bobber-theme") ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.dataset.theme = theme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = theme === "dark" ? "#101c20" : "#fffefa";
+    } catch {
+      document.documentElement.dataset.theme = "light";
+    }
+  </script>
+  <style>
+    :root {
+      --ink: #16383d;
+      --deep: #123c45;
+      --coral: #f17658;
+      --sand: #f2f8f5;
+      --paper: #fffefa;
+      --muted: #536866;
+      --outline: #123c45;
+      --display: "Trebuchet MS", system-ui, "Segoe UI", sans-serif;
+      color-scheme: light;
+    }
+
+    html[data-theme="dark"] {
+      --ink: #e4eeea;
+      --sand: #101c20;
+      --paper: #1d3033;
+      --muted: #a4b5b0;
+      --outline: #6fa39a;
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0 18px 40px;
+      background: var(--sand);
+      color: var(--ink);
+      font-family: system-ui, "Segoe UI", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 16px;
+      top: -70px;
+      padding: 10px 16px;
+      background: var(--paper);
+      border: 2px solid var(--outline);
+      border-radius: 6px;
+      color: var(--deep);
+      z-index: 10;
+    }
+
+    .skip-link:focus { top: 12px; }
+
+    .topbar {
+      width: min(100%, 880px);
+      margin: 20px auto 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .brand img { width: 52px; height: auto; }
+    .brand strong { display: block; font: 800 18px/1.1 var(--display); }
+    .brand small { display: block; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+
+    .topbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    a { color: #0f6663; text-underline-offset: 3px; }
+    html[data-theme="dark"] a { color: #8bd2c2; }
+
+    button {
+      padding: 10px 16px;
+      background: var(--coral);
+      color: #102e32;
+      border: 3px solid var(--outline);
+      border-radius: 999px;
+      box-shadow: 3px 3px 0 var(--outline);
+      font: 800 14px/1.2 var(--display);
+      cursor: pointer;
+    }
+
+    .intro {
+      width: min(100%, 880px);
+      margin: 0 auto 22px;
+    }
+
+    .intro h1 {
+      margin: 0 0 6px;
+      font: 900 clamp(32px, 5vw, 46px)/1.05 var(--display);
+      letter-spacing: -.02em;
+    }
+
+    .intro p { max-width: 620px; margin: 0; color: var(--muted); }
+
+    .poster-list {
+      display: grid;
+      gap: 24px;
+      width: min(100%, 880px);
+      margin: 0 auto;
+    }
+
+    .poster-sheet {
+      width: 100%;
+      min-height: 980px;
+      padding: clamp(24px, 5vw, 48px);
+      display: flex;
+      flex-direction: column;
+      background: #fffefa;
+      color: #16383d;
+      border: 10px solid #123c45;
+      border-radius: 28px;
+      box-shadow: 8px 8px 0 #123c45;
+    }
+
+    .poster-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .poster-kicker {
+      margin: 0 0 4px;
+      color: #11706c;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .poster-brand {
+      margin: 0;
+      color: #123c45;
+      font: 800 16px/1.2 var(--display);
+    }
+
+    .poster-top img {
+      width: 100px;
+      height: auto;
+      display: block;
+      background: #c2ded5;
+      border: 4px solid #123c45;
+      border-radius: 18px;
+    }
+
+    .poster-sheet h2 {
+      margin: clamp(22px, 4vw, 36px) 0 10px;
+      color: #123c45;
+      text-align: center;
+      font: 900 clamp(34px, 7vw, 64px)/.98 var(--display);
+      letter-spacing: -.03em;
+    }
+
+    .poster-lede {
+      max-width: 620px;
+      margin: 0 auto 20px;
+      color: #365b5b;
+      text-align: center;
+      font-size: clamp(15px, 2vw, 18px);
+    }
+
+    .poster-qr {
+      display: block;
+      width: min(70vw, 250px);
+      height: auto;
+      margin: 0 auto 12px;
+      padding: 10px;
+      background: #fff;
+      border: 4px solid #123c45;
+      border-radius: 12px;
+    }
+
+    .poster-scan {
+      margin: 0 0 16px;
+      color: #123c45;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .poster-url {
+      margin: 0 auto 22px;
+      color: #11706c;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .poster-safety {
+      margin: auto 0 0;
+      padding-top: 16px;
+      border-top: 3px solid #123c45;
+      color: #123c45;
+      text-align: center;
+      font: 800 clamp(15px, 2.4vw, 20px)/1.3 var(--display);
+    }
+
+    .poster-foot {
+      margin: 8px 0 0;
+      color: #536866;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    @media (max-width: 560px) {
+      body { padding: 0 10px 28px; }
+      .poster-sheet { min-height: 760px; padding: 22px 18px; border-width: 7px; }
+      .poster-top img { width: 72px; }
+    }
+
+    @media print {
+      @page { size: letter portrait; margin: .3in; }
+
+      body { padding: 0; background: #fff; }
+      .skip-link, .topbar, .intro { display: none !important; }
+      .poster-list { display: block; width: 100%; margin: 0; }
+      .poster-sheet {
+        width: 100%;
+        min-height: 10.1in;
+        padding: .5in;
+        border: 8px solid #123c45;
+        border-radius: 24px;
+        box-shadow: none;
+        break-after: page;
+        page-break-after: always;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+      .poster-sheet:last-child { break-after: auto; page-break-after: auto; }
+      .poster-sheet h2 { font-size: 40pt; }
+      .poster-qr { width: 3.1in; }
+      .poster-lede { font-size: 14pt; }
+      .poster-scan { font-size: 14pt; }
+      .poster-safety { font-size: 15pt; }
+      .poster-url { font-size: 9pt; }
+      .poster-top img { width: 1.1in; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar">
+    <a class="brand" href="grown-ups.html#educators">
+      <img src="assets/bobber-logo.webp" alt="" width="160" height="159">
+      <span><strong>Bobber</strong><small>Water Safety Dog</small></span>
+    </a>
+    <div class="topbar-actions">
+      <a href="grown-ups.html#educators">Back to educator materials</a>
+      <button type="button" id="poster-print">Print this poster</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="intro">
+      <h1>Bobber QR poster</h1>
+      <p>Print these two pages for a lake office, classroom, or outreach table. Each poster has a QR code that opens the live site. Print at 100% or actual size.</p>
+    </div>
+
+    <div class="poster-list">
+      <section class="poster-sheet" lang="en" aria-labelledby="poster-en-title">
+        <div class="poster-top">
+          <div>
+            <p class="poster-kicker">U.S. Army Corps of Engineers · Tulsa District</p>
+            <p class="poster-brand">Bobber the Water Safety Dog</p>
+          </div>
+          <img src="assets/bobber/bobber-thumbs-up.webp" alt="" width="480" height="601">
+        </div>
+        <h2 id="poster-en-title">Scan for water safety fun.</h2>
+        <p class="poster-lede">Meet Bobber, play the safety game, and print free activities for kids and families.</p>
+        <a href="https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/">
+          <img class="poster-qr" src="assets/qr/bobber-site.svg" alt="QR code for the English Bobber website" width="512" height="512">
+        </a>
+        <p class="poster-scan">Scan with your phone camera.</p>
+        <p class="poster-url">usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/</p>
+        <p class="poster-safety">Wear a life jacket. Swim with a buddy. Look out for each other.</p>
+        <p class="poster-foot">Free water safety resources from the U.S. Army Corps of Engineers, Tulsa District.</p>
+      </section>
+
+      <section class="poster-sheet" lang="es" aria-labelledby="poster-es-title">
+        <div class="poster-top">
+          <div>
+            <p class="poster-kicker">Cuerpo de Ingenieros del Ejército de EE. UU. · Distrito de Tulsa</p>
+            <p class="poster-brand">Bobber, el perro de seguridad acuática</p>
+          </div>
+          <img src="assets/bobber/bobber-standing.webp" alt="" width="480" height="415">
+        </div>
+        <h2 id="poster-es-title">Escanea para divertirte con seguridad.</h2>
+        <p class="poster-lede">Conoce a Bobber, juega y descarga actividades gratis para niños y familias.</p>
+        <a href="https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/?lang=es">
+          <img class="poster-qr" src="assets/qr/bobber-site-es.svg" alt="Código QR para el sitio de Bobber en español" width="512" height="512">
+        </a>
+        <p class="poster-scan">Escanea con la cámara de tu teléfono.</p>
+        <p class="poster-url">usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/?lang=es</p>
+        <p class="poster-safety">Usa tu chaleco salvavidas. Nada con un compañero. Cuídense entre todos.</p>
+        <p class="poster-foot">Recursos gratuitos de seguridad acuática del Cuerpo de Ingenieros del Ejército de EE. UU., Distrito de Tulsa.</p>
+      </section>
+    </div>
+  </main>
+  <script>
+    document.querySelector("#poster-print").addEventListener("click", () => window.print());
+  </script>
+</body>
+</html>

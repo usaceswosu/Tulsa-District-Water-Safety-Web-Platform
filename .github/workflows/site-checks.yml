@@ -37,6 +37,12 @@ jobs:
       - name: Validate HTML
         run: npm run check:html
 
+      - name: Check CSS structure
+        run: npm run check:css
+
+      - name: Check shared partials
+        run: npm run check:partials
+
       - name: Check PDF metadata
         run: npm run check:pdf-meta
 

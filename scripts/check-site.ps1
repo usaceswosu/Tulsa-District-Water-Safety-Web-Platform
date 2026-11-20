@@ -68,7 +68,7 @@ foreach ($page in $pages) {
   }
 
   # 404.html is intentionally self-contained; GitHub Pages serves it from any missing path.
-  if ($name -notin @('404.html', 'accessibility.html')) {
+  if ($name -notin @('404.html', 'accessibility.html', 'poster.html')) {
     $scriptOrder = @('data/resources.js', 'data/translations.js', 'scripts/main.js')
     $lastIndex = -1
     foreach ($script in $scriptOrder) {

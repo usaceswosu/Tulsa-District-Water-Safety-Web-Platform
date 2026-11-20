@@ -11,13 +11,21 @@
     "check:pdf-meta": "node scripts/update-pdf-meta.mjs --check",
     "update:image-dimensions": "node scripts/update-image-dimensions.mjs",
     "check:pdf-budget": "node scripts/check-pdf-budget.mjs",
-    "check:html": "html-validate index.html grown-ups.html 404.html accessibility.html"
+    "check:html": "html-validate index.html grown-ups.html 404.html accessibility.html poster.html",
+    "update:qr": "node scripts/make-qr.mjs",
+    "update:teacher-pack": "node scripts/make-teacher-pack.mjs",
+    "update:partials": "node scripts/apply-partials.mjs",
+    "check:partials": "node scripts/apply-partials.mjs --check",
+    "check:css": "node scripts/check-css.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
     "@playwright/test": "^1.55.0",
     "html-validate": "^9.7.1",
     "image-size": "^2.0.2",
-    "pdfjs-dist": "^6.5.438"
+    "jszip": "^3.10.2",
+    "pdfjs-dist": "^6.5.438",
+    "postcss": "^8.5.33",
+    "qrcode": "^1.5.4"
   }
 }

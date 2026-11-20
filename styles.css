@@ -2955,8 +2955,7 @@ html[data-theme="dark"] .safety-language-hint {
   color: #afc0bb;
 }
 
-@media(max-width:1160px) {
-}
+
 
 .header-tools {
   flex: 0 0 auto;
@@ -3645,14 +3644,6 @@ html[data-theme="dark"] .ar-section {
 }
 
 
-/* Larger safety-card artwork */
-.safety-art {
-  width: 100%;
-  max-width: 190px;
-  height: 112px;
-  object-position: left center;
-}
-
 @media(max-width:640px) {
   .safety-art {
     max-width: 150px;
@@ -3873,7 +3864,76 @@ html[data-theme="dark"] .ar-section {
 
 .game-result {
   margin: 0 0 16px;
+}
+
+.game-score {
+  margin: 0 0 14px;
   font: 900 26px/1.25 var(--display);
+}
+
+.game-review {
+  padding: 16px 18px;
+  background: #f2f7f3;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+}
+
+.game-review-title {
+  margin: 0 0 10px;
+  font: 800 16px/1.2 var(--display);
+}
+
+.game-review-list {
+  margin: 0;
+  padding-left: 1.25em;
+}
+
+.game-review-item {
+  margin: 0 0 10px;
+}
+
+.game-review-item:last-child {
+  margin-bottom: 0;
+}
+
+.game-review-question {
+  margin: 0 0 2px;
+  font-weight: 800;
+  font-size: 13.5px;
+}
+
+.game-review-answer {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.game-review-item.is-correct .game-review-answer {
+  color: #1c6f63;
+}
+
+.game-review-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--teal);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.game-finish-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+html[data-theme="dark"] .game-review {
+  background: #132427;
+  border-color: #304346;
+}
+
+html[data-theme="dark"] .game-review-item.is-correct .game-review-answer {
+  color: #8bd2c2;
 }
 
 @media(max-width:640px) {
@@ -4344,9 +4404,9 @@ html:has(.pdf-reader[open]) {
 
 .pdf-reader-panel {
   display: grid;
-  grid-template-rows: auto minmax(160px, 1fr) auto;
+  grid-template-rows: auto auto minmax(160px, 1fr) auto;
   gap: clamp(8px, 2vh, 18px);
-  height: min(790px, calc(100dvh - 26px));
+  height: min(820px, calc(100dvh - 26px));
   padding: clamp(12px, 3vw, 26px);
 }
 
@@ -4367,11 +4427,133 @@ html:has(.pdf-reader[open]) {
   font: 800 clamp(1.2rem, 3vw, 1.85rem)/1.2 var(--display);
 }
 
-.pdf-reader-stage {
+.pdf-reader-toolbar {
   display: grid;
-  place-items: center;
-  container-type: size;
+  gap: 8px;
+}
+
+.pdf-reader-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pdf-reader-zoom,
+.pdf-reader-jump {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pdf-reader-tool-label,
+.pdf-reader-page-total {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.pdf-reader-zoom-value {
+  min-width: 3.4em;
+  color: var(--ink);
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.pdf-reader-zoom-button {
+  min-width: 36px;
+  padding: 6px 8px;
+  font-size: 1rem;
+}
+
+.pdf-reader-jump input {
+  width: 4.2em;
+  padding: 6px 8px;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  font: 700 0.875rem/1.25 var(--sans);
+}
+
+.pdf-reader-toc {
+  max-height: 180px;
+  overflow: auto;
+  padding: 12px 14px;
+  background: var(--sand);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.pdf-reader-toc h3 {
+  margin: 0 0 8px;
+  font: 800 0.95rem/1.2 var(--display);
+}
+
+.pdf-reader-toc ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pdf-reader-toc li {
+  margin: 0;
+}
+
+.pdf-reader-toc-link {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 8px;
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  border-radius: 5px;
+  font: 600 0.85rem/1.3 var(--sans);
+  text-align: left;
+  cursor: pointer;
+}
+
+.pdf-reader-toc-link:hover,
+.pdf-reader-toc-link:focus-visible {
+  background: var(--mint);
+}
+
+.pdf-reader-toc-link span {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.pdf-reader-toc-label {
+  display: block;
+  padding: 6px 8px;
+  color: var(--muted);
+  font: 700 0.85rem/1.3 var(--sans);
+}
+
+.pdf-reader-toc-link[data-depth="1"],
+.pdf-reader-toc-label[data-depth="1"] {
+  padding-left: 26px;
+}
+
+.pdf-reader-toc-link[data-depth="2"],
+.pdf-reader-toc-label[data-depth="2"] {
+  padding-left: 44px;
+}
+
+.pdf-reader-stage {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
   min-width: 0;
+  min-height: 0;
+  overflow: auto;
   padding: 8px;
   border-radius: 8px;
   background: var(--sand);
@@ -4393,7 +4575,8 @@ html:has(.pdf-reader[open]) {
   background: var(--sand);
 }
 
-.pdf-reader-control[aria-disabled="true"] {
+.pdf-reader-control[aria-disabled="true"],
+.pdf-reader-control:disabled {
   color: var(--muted);
   opacity: 0.65;
   cursor: default;
@@ -4519,8 +4702,9 @@ html:has(.pdf-reader[open]) {
 /* Canvas pages in the scripted reader */
 .pdf-reader-stage canvas {
   display: block;
-  width: min(100cqw, calc(100cqh * var(--page-ratio)));
+  max-width: none;
   height: auto;
+  margin: auto;
   box-shadow: 0 3px 14px #071e2a26;
 }
 
@@ -4565,5 +4749,299 @@ html[data-theme="dark"] .language-code {
     min-width: 0;
     max-width: none;
     width: 100%;
+  }
+}
+
+/* Safety Hero certificate dialog and print sheet */
+.certificate-dialog {
+  position: fixed;
+  inset: 0;
+  width: min(92vw, 560px);
+  max-width: 560px;
+  max-height: min(92vh, 760px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: 3px solid var(--outline);
+  border-radius: 24px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--pop-shadow);
+}
+
+.certificate-dialog::backdrop {
+  background: #082d45c9;
+  backdrop-filter: blur(4px);
+}
+
+.certificate-panel {
+  position: relative;
+  padding: 28px 28px 24px;
+}
+
+.certificate-kicker {
+  margin: 0;
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.certificate-dialog h2 {
+  margin: 8px 0 10px;
+  font: 900 clamp(26px, 5vw, 36px)/1.1 var(--display);
+  letter-spacing: -.02em;
+}
+
+.certificate-dialog p {
+  margin: 0 0 12px;
+}
+
+.certificate-name-label {
+  display: block;
+  margin: 18px 0 6px;
+  font-weight: 800;
+}
+
+.certificate-name {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  font: inherit;
+}
+
+.certificate-name:focus-visible {
+  outline: 3px solid #efa94c;
+  outline-offset: 2px;
+}
+
+.certificate-preview {
+  margin: 16px 0 18px;
+  padding: 20px 16px;
+  text-align: center;
+  background: var(--sand);
+  border: 3px dashed var(--outline);
+  border-radius: 16px;
+}
+
+.certificate-preview-kicker {
+  margin: 0;
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.certificate-preview-name {
+  margin: 8px 0 6px;
+  font: 900 clamp(24px, 6vw, 38px)/1.1 var(--display);
+  overflow-wrap: anywhere;
+}
+
+.certificate-preview-date {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.certificate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+html[data-theme="dark"] .certificate-preview {
+  background: #132427;
+}
+
+.certificate-print {
+  display: none;
+}
+
+@media(max-width:640px) {
+  .certificate-panel {
+    padding: 24px 18px 20px;
+  }
+}
+
+@media print {
+  @page {
+    size: letter portrait;
+    margin: .35in;
+  }
+
+  body.printing-certificate > *:not(.certificate-print) {
+    display: none !important;
+  }
+
+  body.printing-certificate {
+    margin: 0;
+    padding: 0;
+    background: #fff !important;
+    color: #16383d !important;
+  }
+
+  body.printing-certificate .certificate-print {
+    display: block !important;
+  }
+
+  .certificate-sheet {
+    position: relative;
+    box-sizing: border-box;
+    width: 7.6in;
+    min-height: 9.9in;
+    margin: 0 auto;
+    padding: .5in;
+    overflow: hidden;
+    background: #fffefa;
+    color: #16383d;
+    border: 10px solid #123c45;
+    border-radius: 28px;
+    font-family: system-ui, "Segoe UI", Arial, sans-serif;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .certificate-sheet-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .certificate-sheet-top img {
+    width: 1.6in;
+    height: auto;
+    display: block;
+    background: #c2ded5;
+    border: 4px solid #123c45;
+    border-radius: 18px;
+  }
+
+  .certificate-sheet-kicker {
+    margin: 0 0 4px;
+    color: #123c45;
+    font: 800 13pt/1.2 var(--display);
+  }
+
+  .certificate-sheet-eyebrow {
+    margin: 0;
+    color: #11706c;
+    font-size: 10pt;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .certificate-sheet-title {
+    margin: .35in 0 .1in;
+    color: #123c45;
+    text-align: center;
+    font: 900 54pt/.95 var(--display);
+    letter-spacing: -.03em;
+  }
+
+  .certificate-sheet-copy {
+    margin: .08in 0;
+    color: #16383d;
+    text-align: center;
+    font-size: 15pt;
+  }
+
+  .certificate-sheet-name {
+    max-width: 6.2in;
+    margin: .08in auto .16in;
+    padding: 0 0 .08in;
+    color: #123c45;
+    text-align: center;
+    font: 900 30pt/1.15 var(--display);
+    border-bottom: 3px solid #123c45;
+    overflow-wrap: anywhere;
+  }
+
+  .certificate-sheet-date {
+    margin: .28in 0 0;
+    color: #536866;
+    text-align: center;
+    font-size: 12pt;
+  }
+
+  .certificate-sheet-signature {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .06in;
+    margin-top: .5in;
+    color: #123c45;
+    font-size: 12pt;
+    font-weight: 700;
+  }
+
+  .certificate-sheet-line {
+    width: 3.2in;
+    border-top: 2px solid #123c45;
+  }
+}
+
+/* Classroom pack and QR poster tools */
+.teacher-tools {
+  margin-top: 24px;
+  padding: 24px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: var(--paper);
+  border: 3px solid var(--outline);
+  border-radius: 18px;
+  box-shadow: var(--pop-shadow);
+}
+
+.teacher-tools h3 {
+  margin: 4px 0 8px;
+  font: 900 22px/1.15 var(--display);
+}
+
+.teacher-tools p {
+  max-width: 590px;
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.teacher-tools-kicker {
+  color: var(--teal);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.teacher-tools-meta {
+  font-size: 11px !important;
+  font-weight: 700;
+}
+
+.teacher-tools-actions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+html[data-theme="dark"] .teacher-tools {
+  background: #192a2d;
+}
+
+@media(max-width:900px) {
+  .teacher-tools {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

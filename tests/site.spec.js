@@ -99,6 +99,14 @@ test("the library opens a fast preview and keeps the print PDF for download", as
   await expect(canvas.or(fallback)).toBeVisible({ timeout: 15_000 });
   if (await canvas.isVisible()) {
     await expect(page.locator("#pdf-reader-status")).toHaveText("Page 1 of 2");
+    await expect(page.locator("#pdf-reader-zoom-value")).toHaveText("100%");
+    await page.click("#pdf-reader-zoom-in");
+    await expect(page.locator("#pdf-reader-zoom-value")).toHaveText("125%");
+    await page.fill("#pdf-reader-page-input", "2");
+    await page.press("#pdf-reader-page-input", "Enter");
+    await expect(page.locator("#pdf-reader-status")).toHaveText("Page 2 of 2");
+    await page.click("#pdf-reader-zoom-reset");
+    await expect(page.locator("#pdf-reader-zoom-value")).toHaveText("100%");
   } else {
     await expect(page.locator("#pdf-reader-status")).toContainText("Showing this PDF");
   }
@@ -109,6 +117,49 @@ test("the library opens a fast preview and keeps the print PDF for download", as
   await page.click("#header-language-toggle");
   await page.locator(".resource-link").first().click();
   await expect(page.locator("#pdf-reader-download")).toHaveText("Descargar PDF para imprimir");
+  await page.click("#pdf-reader-close");
+});
+
+test("quiz review and the Safety Hero certificate work", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("#game").scrollIntoViewIfNeeded();
+  for (let index = 0; index < 4; index += 1) {
+    await page.locator(".game-option").first().click();
+    await page.locator("#game-next").click();
+  }
+  await expect(page.locator(".game-score")).toContainText("of 4");
+  await expect(page.locator(".game-review-item")).toHaveCount(4);
+  await expect(page.locator("#game-certificate")).toBeVisible();
+  await page.click("#game-certificate");
+  await expect(page.locator("#certificate-dialog")).toHaveJSProperty("open", true);
+  await page.fill("#certificate-name", "Ada");
+  await expect(page.locator("#certificate-preview-name")).toHaveText("Ada");
+  await page.evaluate(() => { window.print = () => { window.__printed = true; }; });
+  await page.click("#certificate-print");
+  expect(await page.evaluate(() => window.__printed)).toBe(true);
+  await expect(page.locator("#certificate-print-name")).toHaveText("Ada");
+  expect(await page.evaluate(() => document.body.classList.contains("printing-certificate"))).toBe(true);
+  await page.evaluate(() => window.dispatchEvent(new Event("afterprint")));
+  expect(await page.evaluate(() => document.body.classList.contains("printing-certificate"))).toBe(false);
+  await page.click("#certificate-close");
+});
+
+test("reader outline TOC navigates the long resource guide", async ({ page }) => {
+  await page.goto("/grown-ups.html");
+  await page.getByRole("link", { name: /Water Safety Resource Guide/i }).click();
+  const canvas = page.locator("#pdf-reader-stage canvas");
+  const fallback = page.locator("#pdf-reader-stage iframe");
+  await expect(canvas.or(fallback)).toBeVisible({ timeout: 20_000 });
+  test.skip(!(await canvas.isVisible()), "Browser PDF viewer fallback was used in this environment.");
+  await expect(page.locator("#pdf-reader-toc-toggle")).toBeVisible();
+  await page.click("#pdf-reader-toc-toggle");
+  await expect(page.locator("#pdf-reader-toc")).toBeVisible();
+  const links = page.locator(".pdf-reader-toc-link");
+  expect(await links.count()).toBeGreaterThan(3);
+  await links.last().click();
+  await expect(page.locator("#pdf-reader-page-input")).not.toHaveValue("1");
+  const results = await new AxeBuilder({ page }).include("#pdf-reader").analyze();
+  expect(results.violations).toEqual([]);
   await page.click("#pdf-reader-close");
 });
 
@@ -159,4 +210,28 @@ test("accessibility and privacy page passes axe and reflows at 320px", async ({ 
   await page.setViewportSize({ width: 320, height: 900 });
   await page.goto("/accessibility.html");
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+});
+
+test("QR poster page passes axe, reflows, and triggers print", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const colorScheme of ["light", "dark"]) {
+    await page.emulateMedia({ colorScheme });
+    await page.goto("/poster.html");
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations, colorScheme).toEqual([]);
+  }
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto("/poster.html");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+  await page.evaluate(() => { window.print = () => { window.__printed = true; }; });
+  await page.click("#poster-print");
+  expect(await page.evaluate(() => window.__printed)).toBe(true);
+});
+
+test("grown-ups page links to the classroom pack and QR poster", async ({ page }) => {
+  await page.goto("/grown-ups.html");
+  await expect(page.locator('a[href*="Bobber_Classroom_Pack_2026.zip"]')).toBeVisible();
+  await expect(page.locator('a[href="poster.html"]')).toBeVisible();
+  const response = await page.request.head("http://127.0.0.1:4173/assets/downloads/Bobber_Classroom_Pack_2026.zip");
+  expect(response.ok()).toBeTruthy();
 });
