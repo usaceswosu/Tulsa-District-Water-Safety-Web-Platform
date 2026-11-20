@@ -8,7 +8,7 @@ test("home page loads with complete metadata and no broken images", async ({ pag
   await expect(page.locator("h1")).toHaveCount(1);
   await expect(page.locator(".resource-card")).toHaveCount(42);
   await expect(page.locator(".resource-meta")).toHaveCount(42);
-  await expect(page.locator(".resource-meta").first()).toHaveText("2 pages · 5.5 MB");
+  await expect(page.locator(".resource-meta").first()).toHaveText("2 pages · 412 KB preview · 5.5 MB print");
   expect(await page.evaluate(() => Object.isFrozen(window.BOBBER_CONTENT))).toBe(true);
   const broken = await page.locator("img").evaluateAll((images) =>
     images.filter((image) => image.complete && image.naturalWidth === 0).length
@@ -22,6 +22,7 @@ test("Spanish deep links work and the URL follows the language toggle", async ({
   await expect(page.locator("html")).toHaveAttribute("lang", "es");
   await expect(page).toHaveTitle(/perro de seguridad acuática/i);
   await expect(page.locator(".resource-meta").first()).toContainText("páginas");
+  await expect(page.locator(".resource-meta").first()).toContainText("vista previa");
   await expect(page.locator('.footer-bottom a[href*="accessibility.html"]')).toHaveAttribute("href", "accessibility.html#espanol");
   expect(page.url()).toContain("lang=es");
 

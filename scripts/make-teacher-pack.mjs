@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "no
 import { join } from "node:path";
 import JSZip from "jszip";
 import { siteRoot } from "./lib/site-root.mjs";
+import { siteUrl } from "./lib/site-config.mjs";
 
 const root = siteRoot;
 const outputDir = join(root, "assets/downloads");
@@ -40,10 +41,10 @@ Included:
 - Water Safety Resource Guide
 - English and Spanish QR codes for the website
 
-Website: https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/
-Spanish: https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/?lang=es
-QR poster: https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/poster.html
-Accessibility and privacy: https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/accessibility.html
+Website: ${siteUrl}/
+Spanish: ${siteUrl}/?lang=es
+QR poster: ${siteUrl}/poster.html
+Accessibility and privacy: ${siteUrl}/accessibility.html
 
 Print the PDFs at 100% / actual size. The website has the full library of posters,
 coloring sheets, storybooks, and the printable Safety Hero certificate.

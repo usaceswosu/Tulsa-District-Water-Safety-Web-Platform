@@ -3,9 +3,10 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import QRCode from "qrcode";
 import { siteRoot } from "./lib/site-root.mjs";
+import { siteUrl } from "./lib/site-config.mjs";
 
 const root = siteRoot;
-const site = "https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/";
+const site = `${siteUrl}/`;
 const targets = [
   { file: "assets/qr/bobber-site.svg", url: site },
   { file: "assets/qr/bobber-site-es.svg", url: `${site}?lang=es` }

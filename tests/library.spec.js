@@ -5,7 +5,11 @@ test("the library opens a fast preview and keeps the print PDF for download", as
   await page.goto("/");
   await page.route("**/*-web.pdf*", async (route) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    await route.continue();
+    try {
+      await route.continue();
+    } catch {
+      // Firefox may cancel and retry a range request after the route was handled.
+    }
   });
   const previewRequest = page.waitForRequest((request) => request.url().includes("-web.pdf"), { timeout: 15_000 });
   await page.locator(".resource-link").first().click();
@@ -191,7 +195,7 @@ test("every catalog resource has page and size metadata", async ({ page }) => {
   );
   expect(missing).toEqual([]);
   const previews = await page.evaluate(() => Object.values(window.BOBBER_PDF_META).filter((entry) => entry.webFile).length);
-  expect(previews).toBe(8);
+  expect(previews).toBe(12);
 });
 
 test("the reader engine warms when the library approaches", async ({ page }) => {

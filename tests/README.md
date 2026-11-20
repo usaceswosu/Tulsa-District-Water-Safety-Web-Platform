@@ -1,6 +1,6 @@
 # Tests
 
-Playwright runs against the local server configured in `playwright.config.js`.
+Playwright runs against the local server configured in `playwright.config.js` in Chromium, Firefox, and WebKit.
 
 | File | Covers |
 | --- | --- |
@@ -17,10 +17,11 @@ Run everything:
 npm test
 ```
 
-Run one file or grep a test:
+Run one file, one browser, or grep a test:
 
 ```bash
 npx playwright test tests/library.spec.js
+npx playwright test --project=firefox
 npx playwright test -g "offline shell"
 ```
 

@@ -23,11 +23,12 @@ The links to YouTube, USACE, Recreation.gov, and other official sources are outb
 ## Quality checks
 
 ```bash
-npm run check   # versions, globals, content, site integrity, HTML, CSS, precache, PDFs
-npm test        # Playwright smoke, accessibility, reader, and offline tests
+npm run check       # versions, globals, content, URL/sitemap, HTML, CSS, precache, PDFs
+npm test            # Chromium, Firefox, and WebKit smoke/accessibility/reader/offline tests
+npm run check:live  # post-deploy smoke test against the public URL
 ```
 
-The catalog/link integrity check is cross-platform (`npm run check:site`). CI also runs `scripts/check-site.ps1` with PowerShell as a second opinion, alongside Lighthouse and a scheduled link check.
+The catalog/link integrity check is cross-platform (`npm run check:site`). CI also runs `scripts/check-site.ps1` with PowerShell as a second opinion, alongside Lighthouse, a live deployment smoke test, and a scheduled link check.
 
 ## Asset versions
 
@@ -37,7 +38,18 @@ Every local stylesheet/script uses a shared `?v=` value. Do not edit those value
 npm run bump:version -- 20261121a
 ```
 
-The command updates both pages, the classroom-pack link, and `precache.json`, then verifies consistency. Run `npm run check` afterward.
+The command updates both pages, the classroom-pack link, `sitemap.xml`, and `precache.json`, then verifies consistency. Run `npm run check` afterward.
+
+## Change the public URL
+
+`site.config.json` is the source of truth for the public base URL. When the site moves to a custom domain or another path:
+
+```bash
+npm run update:site-url -- https://example.gov/bobber
+npm run bump:version -- 20261121a
+```
+
+The first command rewrites metadata, robots, poster URLs, README links, sitemap, QR codes, and the classroom pack, then verifies consistency. The version bump refreshes client caches for the regenerated QR/pack assets.
 
 ## Publish with GitHub Pages
 
@@ -62,9 +74,10 @@ GitHub Pages serves the files directly. Internal links are relative to the proje
 - `scripts/main.js` — page controller: library, language/theme, navigation, PWA banners, game/certificate.
 - `scripts/pdf-reader.js` — in-page reader, fallback viewer, TOC, zoom, and print.
 - `sw.js` + `precache.json` — versioned offline shell and runtime caching.
-- `scripts/` — maintenance, validation, versioning, QR/pack, and preview-generation tools.
-- `tests/` — Playwright suites by feature.
-- `.github/workflows/` — static checks, Lighthouse, and scheduled link check.
+- `site.config.json` — single source of truth for the public site URL.
+- `scripts/` — maintenance, validation, versioning, URL/sitemap, QR/pack, preview, and live-smoke tools.
+- `tests/` — Playwright suites by feature, run in Chromium, Firefox, and WebKit.
+- `.github/workflows/` — static checks, Lighthouse, live deployment smoke test, and scheduled link check.
 - `assets/` — artwork, thumbnails, self-hosted PDFs, previews, QR codes, and the classroom ZIP.
 
 ## Updating resources

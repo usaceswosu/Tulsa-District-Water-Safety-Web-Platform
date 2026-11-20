@@ -46,6 +46,12 @@ jobs:
       - name: Validate local assets, catalog, and page links (Node)
         run: npm run check:site
 
+      - name: Check public site URL
+        run: npm run check:site-url
+
+      - name: Check sitemap
+        run: npm run check:sitemap
+
       - name: Validate HTML
         run: npm run check:html
 
@@ -64,8 +70,8 @@ jobs:
       - name: Check PDF budget
         run: npm run check:pdf-budget
 
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Run accessibility and smoke tests
         run: npm test

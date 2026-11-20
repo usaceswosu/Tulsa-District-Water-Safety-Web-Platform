@@ -1,0 +1,97 @@
+// Post-deploy smoke test against the public GitHub Pages URL.
+// Usage: npm run check:live
+import { chromium } from "@playwright/test";
+import { siteUrl } from "./lib/site-config.mjs";
+
+// Optional first argument lets maintainers smoke-test a local/staging origin.
+// Canonical metadata is still checked against site.config.json.
+const target = (process.argv[2] || siteUrl).replace(/\/+$/, "");
+const home = `${target}/index.html`;
+const browser = await chromium.launch();
+const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: "reduce" });
+const page = await context.newPage();
+const errors = [];
+const previewRequests = [];
+page.on("pageerror", (error) => errors.push(error.message));
+page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+page.on("request", (request) => {
+  if (request.url().includes("-web.pdf")) previewRequests.push(request.url());
+});
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+try {
+  let state;
+  // Pages can take a few seconds to propagate after the deployment workflow.
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    await page.goto(`${home}?live-smoke=${Date.now()}`, { waitUntil: "load", timeout: 60_000 });
+    await page.waitForSelector(".resource-card", { timeout: 20_000 });
+    state = await page.evaluate(() => {
+      const script = [...document.scripts].find((item) => item.src.includes("main.js"));
+      return {
+        version: script ? new URL(script.src).searchParams.get("v") : "",
+        cards: document.querySelectorAll(".resource-card").length,
+        frozen: Object.isFrozen(window.BOBBER_CONTENT),
+        firstMeta: document.querySelector(".resource-meta")?.textContent || "",
+        canonical: document.querySelector('link[rel="canonical"]')?.href || ""
+      };
+    });
+    if (state.firstMeta.includes("preview") && state.firstMeta.includes("print")) break;
+    if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, 4000));
+  }
+
+  assert(/^\d{8}[a-z]$/.test(state.version), `Unexpected asset version: ${state.version}`);
+  assert(state.cards === 42, `Expected 42 resource cards, found ${state.cards}.`);
+  assert(state.frozen, "Home-page content is not frozen.");
+  assert(state.firstMeta.includes("preview") && state.firstMeta.includes("print"), `Unexpected card metadata: ${state.firstMeta}`);
+  assert(state.canonical.startsWith(siteUrl), `Unexpected canonical URL: ${state.canonical}`);
+
+  await page.click('[data-filter="activity"]');
+  const visible = await page.locator(".resource-card:visible").count();
+  assert(visible === 14, `Expected 14 activity cards, found ${visible}.`);
+
+  const previewRequest = page.waitForRequest((request) => request.url().includes("-web.pdf"), { timeout: 20_000 }).catch(() => null);
+  await page.locator(".resource-link").first().click();
+  const canvas = page.locator("#pdf-reader-stage canvas");
+  const fallback = page.locator("#pdf-reader-stage iframe");
+  await canvas.or(fallback).waitFor({ state: "visible", timeout: 30_000 });
+  await previewRequest;
+  assert(previewRequests.some((url) => url.includes(`?v=${state.version}`)), "Preview URL is not versioned.");
+  await page.click("#pdf-reader-close");
+
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready;
+    if (!navigator.serviceWorker.controller) {
+      await new Promise((resolve) => navigator.serviceWorker.addEventListener("controllerchange", resolve, { once: true }));
+    }
+  });
+  const pwa = await page.evaluate(async () => {
+    const keys = await caches.keys();
+    const shell = keys.find((key) => key.startsWith("bobber-shell-"));
+    const cache = shell ? await caches.open(shell) : null;
+    return { keys, shellCount: cache ? (await cache.keys()).length : 0 };
+  });
+  assert(pwa.keys.some((key) => key === `bobber-shell-${state.version}`), "Versioned shell cache is missing.");
+  assert(pwa.shellCount >= 80, `Shell cache looks incomplete: ${pwa.shellCount} entries.`);
+
+  await context.setOffline(true);
+  await page.reload({ waitUntil: "domcontentloaded", timeout: 30_000 });
+  assert((await page.locator("h1").textContent())?.includes("Big fun"), "Offline home page did not load.");
+  await page.goto(`${target}/grown-ups.html?lang=es`, { waitUntil: "domcontentloaded", timeout: 30_000 });
+  assert((await page.locator("h1").textContent()) === "Cosas de adultos.", "Offline Spanish grown-ups page did not load.");
+  await context.setOffline(false);
+
+  assert(errors.length === 0, `Browser errors: ${errors.join(" | ")}`);
+  console.log(
+    `Live smoke passed: version ${state.version}, 42 cards, reader preview, ` +
+      `${pwa.shellCount} shell entries, offline navigation.`
+  );
+} catch (error) {
+  console.error(`Live smoke failed: ${error.message}`);
+  if (errors.length) console.error(errors.map((message) => ` - ${message}`).join("\n"));
+  process.exitCode = 1;
+} finally {
+  await browser.close();
+}

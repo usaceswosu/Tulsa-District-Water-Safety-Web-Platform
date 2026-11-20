@@ -31,6 +31,8 @@ if (!matched) {
   process.exit(1);
 }
 
-console.log(`${changed ? `Updated ${changed} page(s)` : "Pages already current"} for ?v=${next}. Regenerating precache.json…`);
+console.log(`${changed ? `Updated ${changed} page(s)` : "Pages already current"} for ?v=${next}. Regenerating sitemap and precache…`);
+execFileSync(process.execPath, [join(siteRoot, "scripts/update-sitemap.mjs")], { stdio: "inherit" });
 execFileSync(process.execPath, [join(siteRoot, "scripts/update-precache.mjs")], { stdio: "inherit" });
 execFileSync(process.execPath, [join(siteRoot, "scripts/check-versions.mjs")], { stdio: "inherit" });
+execFileSync(process.execPath, [join(siteRoot, "scripts/update-sitemap.mjs"), "--check"], { stdio: "inherit" });

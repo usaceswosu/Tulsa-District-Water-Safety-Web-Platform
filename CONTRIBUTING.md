@@ -9,7 +9,7 @@ Requires Node 22+.
 ```bash
 npm ci
 npm run serve      # http://127.0.0.1:4173/
-npm test           # Playwright
+npm test           # Playwright: Chromium, Firefox, WebKit
 ```
 
 Python is only needed if you regenerate reader previews.
@@ -21,13 +21,20 @@ npm run check
 npm test
 ```
 
-`npm run check` runs version, global-name, content, site-integrity, HTML, CSS, partial, precache, PDF metadata, and PDF budget checks. The site-integrity check (`scripts/check-site.mjs`) is the cross-platform source of truth for catalog/assets/page links.
+`npm run check` runs version, global-name, content, site-integrity, public-URL, sitemap, HTML, CSS, partial, precache, PDF metadata, and PDF budget checks. The site-integrity check (`scripts/check-site.mjs`) is the cross-platform source of truth for catalog/assets/page links.
 
 CI additionally runs:
 
 - `pwsh -NoProfile -File scripts/check-site.ps1` as a second opinion
 - Lighthouse on the home and grown-ups pages
-- the full Playwright suite
+- the full Playwright suite in Chromium, Firefox, and WebKit
+- `npm run check:live` after a successful GitHub Pages deployment
+
+The live smoke test can also target a local server:
+
+```bash
+npm run check:live -- http://127.0.0.1:4173
+```
 
 ## Common changes
 
@@ -57,7 +64,7 @@ python3 scripts/generate-preview-pdf.py \
 npm run update:pdf-meta
 ```
 
-To regenerate the current eight previews on macOS/Linux:
+To regenerate the current twelve previews on macOS/Linux:
 
 ```bash
 while IFS= read -r name; do
@@ -101,7 +108,19 @@ Core dark surfaces and the fixed print palette are defined as tokens at the top 
 npm run bump:version -- 20261121a
 ```
 
-Use the next `YYYYMMDDx` value. This updates both pages, the classroom-pack link, regenerates `precache.json`, and verifies consistency. Run `npm run check` afterwards.
+Use the next `YYYYMMDDx` value. This updates both pages, the classroom-pack link, `sitemap.xml`, and `precache.json`, then verifies consistency. Run `npm run check` afterwards.
+
+### Change the public URL
+
+`site.config.json` is the source of truth. Do not search-and-replace URLs by hand:
+
+```bash
+npm run update:site-url -- https://example.gov/bobber
+npm run bump:version -- 20261121a
+npm run check
+```
+
+The URL update rewrites canonical/OG/hreflang metadata, robots, poster text, README links, sitemap, QR codes, and the classroom pack. The version bump refreshes client caches for the regenerated QR/pack assets.
 
 ## Code conventions
 
@@ -114,11 +133,14 @@ Use the next `YYYYMMDDx` value. This updates both pages, the classroom-pack link
 
 ## Testing map
 
+All suites run in Chromium, Firefox, and WebKit.
+
 - Home/language/theme: `tests/home.spec.js`
 - Library, reader, filters, navigation: `tests/library.spec.js`
 - Game/certificate: `tests/game.spec.js`
 - Offline/service worker: `tests/offline.spec.js`
 - Axe/print/forced colors: `tests/accessibility.spec.js`
+- Production/deployed smoke: `scripts/check-live.mjs`
 
 ## Review status
 

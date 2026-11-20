@@ -93,6 +93,17 @@ function formatPageCount(pages) {
     : `${pages} ${pages === 1 ? "page" : "pages"}`;
 }
 
+function formatResourceSize(meta) {
+  const printSize = formatFileSize(meta.bytes);
+  const printLabel = currentLanguage === "es" ? "para imprimir" : "print";
+  if (!meta.webFile || !meta.webBytes) return printSize ? `${printSize} ${printLabel}` : "";
+  const previewSize = formatFileSize(meta.webBytes);
+  if (!previewSize) return `${printSize} ${printLabel}`;
+  return currentLanguage === "es"
+    ? `${previewSize} vista previa · ${printSize} ${printLabel}`
+    : `${previewSize} preview · ${printSize} ${printLabel}`;
+}
+
 // Resource library: cards use local PDFs and previews from the repository.
 function makeCard(resource) {
   const displayTitle = currentLanguage === "es" ? (resourceTitlesEs[resource.title] || resource.title) : resource.title;
@@ -123,7 +134,7 @@ function makeCard(resource) {
   title.textContent = displayTitle;
   const metaLine = document.createElement("p");
   metaLine.className = "resource-meta";
-  metaLine.textContent = [formatPageCount(meta.pages), formatFileSize(meta.bytes)].filter(Boolean).join(" · ");
+  metaLine.textContent = [formatPageCount(meta.pages), formatResourceSize(meta)].filter(Boolean).join(" · ");
   const link = document.createElement("a");
   link.className = "resource-link";
   link.href = printFile;
