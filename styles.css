@@ -70,7 +70,8 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: #fffefa;
+  background: #fffefaed;
+  backdrop-filter: blur(14px);
   border-bottom: 1px solid #16383d0d;
 }
 
@@ -1657,7 +1658,7 @@ html[data-theme="dark"] {
 }
 
 html[data-theme="dark"] .site-header {
-  background: #101c20;
+  background: #101c20ed;
   border-bottom-color: #ffffff12;
 }
 
