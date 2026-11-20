@@ -2,6 +2,9 @@ const pdfReader = document.querySelector("#pdf-reader");
 const pdfReaderTitle = document.querySelector("#pdf-reader-title");
 const pdfReaderClose = document.querySelector("#pdf-reader-close");
 const pdfReaderDownload = document.querySelector("#pdf-reader-download");
+const pdfReaderPrintFull = document.querySelector("#pdf-reader-print-full");
+const pdfReaderPrintPage = document.querySelector("#pdf-reader-print-page");
+const pdfPrintPage = document.querySelector("#pdf-print-page");
 const pdfReaderStage = document.querySelector("#pdf-reader-stage");
 const pdfReaderStatus = document.querySelector("#pdf-reader-status");
 const pdfReaderPrevious = document.querySelector("#pdf-reader-prev");
@@ -63,6 +66,7 @@ function updateReaderTools(session, page = 1) {
   pdfReaderZoomReset.disabled = busy || zoomIndex === 1;
   pdfReaderPageInput.disabled = busy;
   pdfReaderGo.disabled = busy;
+  pdfReaderPrintPage.disabled = busy || !session.page;
   pdfReaderPageInput.max = String(session.document.numPages);
   pdfReaderPageInput.value = String(Math.min(Math.max(1, page || session.page || 1), session.document.numPages));
   pdfReaderPageTotal.textContent = String(session.document.numPages);
@@ -191,6 +195,14 @@ function updateReaderChrome() {
   pdfReaderDownload.title = activePdf?.preview
     ? readerCopy("Full print-quality PDF", "PDF de calidad para imprimir")
     : "";
+  pdfReaderPrintFull.textContent = readerCopy("Print full PDF", "Imprimir PDF completo");
+  pdfReaderPrintFull.title = readerCopy(
+    "Open the full print-quality PDF in a new tab to print",
+    "Abre el PDF completo de calidad para imprimir en una pestaña nueva"
+  );
+  pdfReaderPrintFull.href = activePdf?.downloadUrl || activePdf?.url || "#";
+  pdfReaderPrintPage.textContent = readerCopy("Print this page", "Imprimir esta página");
+  pdfReaderPrintPage.title = readerCopy("Print the page you are viewing", "Imprime la página que estás viendo");
   pdfReaderPrevious.textContent = readerCopy("Previous page", "Página anterior");
   pdfReaderNext.textContent = readerCopy("Next page", "Página siguiente");
   pdfReaderZoomLabel.textContent = readerCopy("Zoom", "Zoom");
@@ -219,6 +231,43 @@ function updateReaderChrome() {
 
 // The page language can change while the reader is open.
 window.updatePdfReaderLanguage = updateReaderChrome;
+
+function cleanupPrintPage() {
+  document.body.classList.remove("printing-reader-page");
+  pdfPrintPage?.setAttribute("aria-hidden", "true");
+  pdfPrintPage?.replaceChildren();
+  if (activePdf?.page) {
+    pdfReaderStatus.textContent = readerCopy(
+      `Page ${activePdf.page} of ${activePdf.document.numPages}`,
+      `Página ${activePdf.page} de ${activePdf.document.numPages}`
+    );
+    updateReaderTools(activePdf, activePdf.page);
+  }
+}
+
+async function printCurrentPage() {
+  if (!activePdf?.document || !activePdf.page || activePdf.rendering || activePdf.fallback) return;
+  pdfReaderPrintPage.disabled = true;
+  pdfReaderStatus.textContent = readerCopy("Preparing the print view…", "Preparando la vista de impresión…");
+  try {
+    const page = await activePdf.document.getPage(activePdf.page);
+    const natural = page.getViewport({ scale: 1 });
+    const scale = Math.min(4, 2550 / Math.max(natural.width, natural.height));
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.ceil(viewport.width);
+    canvas.height = Math.ceil(viewport.height);
+    await page.render({ canvas, viewport }).promise;
+    pdfPrintPage.replaceChildren(canvas);
+    pdfPrintPage.setAttribute("aria-hidden", "false");
+    document.body.classList.add("printing-reader-page");
+    window.print();
+    cleanupPrintPage();
+  } catch {
+    pdfReaderStatus.textContent = readerCopy("Could not prepare the print view. Use Print full PDF.", "No se pudo preparar la vista de impresión. Usa Imprimir PDF completo.");
+    pdfReaderPrintPage.disabled = false;
+  }
+}
 
 async function outlinePage(session, destination) {
   let dest = destination;
@@ -348,6 +397,14 @@ pdfReaderNext.addEventListener("click", () => stepPdfPage(1));
 pdfReaderZoomOut.addEventListener("click", () => stepPdfZoom(-1));
 pdfReaderZoomIn.addEventListener("click", () => stepPdfZoom(1));
 pdfReaderZoomReset.addEventListener("click", resetPdfZoom);
+pdfReaderPrintPage.addEventListener("click", printCurrentPage);
+pdfReaderPrintFull.addEventListener("click", () => {
+  if (!activePdf) return;
+  pdfReaderStatus.textContent = readerCopy(
+    "The full PDF opened in a new tab. Use your viewer’s print button.",
+    "El PDF completo se abrió en una pestaña nueva. Usa el botón de imprimir del visor."
+  );
+});
 pdfReaderJump.addEventListener("submit", (event) => {
   event.preventDefault();
   if (!activePdf?.document || activePdf.fallback || activePdf.rendering) return;

@@ -3,6 +3,7 @@
       <div class="pdf-reader-header">
         <button class="pdf-reader-control" id="pdf-reader-close" type="button" autofocus>Back to the library</button>
         <a class="pdf-reader-control" id="pdf-reader-download">Download PDF</a>
+        <a class="pdf-reader-control" id="pdf-reader-print-full" href="#" target="_blank" rel="noopener">Print full PDF</a>
         <h2 id="pdf-reader-title">PDF</h2>
       </div>
       <div class="pdf-reader-toolbar">
@@ -20,6 +21,7 @@
             <span class="pdf-reader-page-total"><span id="pdf-reader-page-of">of</span> <span id="pdf-reader-page-total">1</span></span>
             <button class="pdf-reader-control" id="pdf-reader-go" type="submit">Go</button>
           </form>
+          <button class="pdf-reader-control" id="pdf-reader-print-page" type="button">Print this page</button>
           <button class="pdf-reader-control" id="pdf-reader-toc-toggle" type="button" aria-expanded="false" aria-controls="pdf-reader-toc" hidden>Contents</button>
         </div>
         <nav class="pdf-reader-toc" id="pdf-reader-toc" aria-labelledby="pdf-reader-toc-title" hidden>
@@ -28,6 +30,7 @@
         </nav>
       </div>
       <div class="pdf-reader-stage" id="pdf-reader-stage"></div>
+      <div class="pdf-print-page" id="pdf-print-page" aria-hidden="true"></div>
       <div class="pdf-reader-footer">
         <button class="pdf-reader-control" id="pdf-reader-prev" type="button" aria-disabled="true">Previous page</button>
         <p id="pdf-reader-status" role="status"></p>

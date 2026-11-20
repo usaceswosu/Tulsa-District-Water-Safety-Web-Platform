@@ -5110,3 +5110,59 @@ html[data-theme="dark"] .pwa-banner {
     display: none;
   }
 }
+
+/* Print-only page generated from the current PDF page */
+.pdf-print-page {
+  display: none;
+}
+
+@media print {
+  body.printing-reader-page > *:not(#pdf-reader) {
+    display: none !important;
+  }
+
+  body.printing-reader-page #pdf-reader {
+    position: static;
+    inset: auto;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    background: #fff;
+    color: #000;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  body.printing-reader-page #pdf-reader::backdrop {
+    display: none;
+  }
+
+  body.printing-reader-page .pdf-reader-panel {
+    display: block;
+    height: auto;
+    padding: 0;
+    gap: 0;
+  }
+
+  body.printing-reader-page .pdf-reader-header,
+  body.printing-reader-page .pdf-reader-toolbar,
+  body.printing-reader-page .pdf-reader-stage,
+  body.printing-reader-page .pdf-reader-footer {
+    display: none !important;
+  }
+
+  body.printing-reader-page .pdf-print-page {
+    display: block;
+  }
+
+  body.printing-reader-page .pdf-print-page canvas {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+}

@@ -107,6 +107,24 @@ test("the library opens a fast preview and keeps the print PDF for download", as
     await expect(page.locator("#pdf-reader-status")).toHaveText("Page 2 of 2");
     await page.click("#pdf-reader-zoom-reset");
     await expect(page.locator("#pdf-reader-zoom-value")).toHaveText("100%");
+    await expect(page.locator("#pdf-reader-print-full")).toHaveText("Print full PDF");
+    await expect(page.locator("#pdf-reader-print-full")).toHaveAttribute(
+      "href",
+      /Bobber%20Boating%20Items%20Actitvty%20Sheet\.pdf$/
+    );
+    expect(await page.locator("#pdf-reader-print-full").getAttribute("download")).toBeNull();
+    await expect(page.locator("#pdf-reader-print-page")).toBeVisible();
+    await page.evaluate(() => {
+      window.print = () => {
+        window.__printSnapshot = {
+          class: document.body.classList.contains("printing-reader-page"),
+          canvas: !!document.querySelector("#pdf-print-page canvas")
+        };
+      };
+    });
+    await page.click("#pdf-reader-print-page");
+    await expect.poll(async () => page.evaluate(() => window.__printSnapshot)).toEqual({ class: true, canvas: true });
+    expect(await page.evaluate(() => document.body.classList.contains("printing-reader-page"))).toBe(false);
   } else {
     await expect(page.locator("#pdf-reader-status")).toContainText("Showing this PDF");
   }
