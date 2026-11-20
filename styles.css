@@ -656,6 +656,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 
 .library-tools {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
@@ -712,6 +713,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 .metadata-filters {
   display: flex;
   flex-wrap: wrap;
+  flex-basis: 100%;
   gap: 10px;
   width: 100%;
 }

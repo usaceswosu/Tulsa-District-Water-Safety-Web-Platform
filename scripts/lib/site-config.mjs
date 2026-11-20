@@ -13,6 +13,5 @@ if (typeof config.url !== "string" || !/^https?:\/\//.test(config.url)) {
 }
 
 export const siteUrl = config.url.replace(/\/+$/, "");
-export const siteOrigin = new URL(siteUrl).origin;
-export const sitePath = new URL(siteUrl).pathname.replace(/\/+$/, "") || "";
-export const siteDisplay = `${new URL(siteUrl).host}${sitePath}`;
+const parsed = new URL(siteUrl);
+export const siteDisplay = `${parsed.host}${parsed.pathname.replace(/\/+$/, "")}`;

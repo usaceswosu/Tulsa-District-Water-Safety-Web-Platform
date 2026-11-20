@@ -13,7 +13,9 @@
     "check:pdf-budget": "node scripts/check-pdf-budget.mjs",
     "check:html": "html-validate index.html grown-ups.html 404.html accessibility.html poster.html",
     "update:qr": "node scripts/make-qr.mjs",
+    "check:qr": "node scripts/make-qr.mjs --check",
     "update:teacher-pack": "node scripts/make-teacher-pack.mjs",
+    "check:teacher-pack": "node scripts/make-teacher-pack.mjs --check",
     "update:partials": "node scripts/apply-partials.mjs",
     "check:partials": "node scripts/apply-partials.mjs --check",
     "check:css": "node scripts/check-css.mjs",
@@ -30,7 +32,7 @@
     "update:precache": "node scripts/update-precache.mjs",
     "check:precache": "node scripts/update-precache.mjs --check",
     "bump:version": "node scripts/bump-version.mjs",
-    "check": "npm run check:versions && npm run check:globals && npm run check:content && npm run check:metadata && npm run check:site && npm run check:site-url && npm run check:sitemap && npm run check:html && npm run check:css && npm run check:partials && npm run check:precache && npm run check:pdf-meta && npm run check:pdf-budget"
+    "check": "npm run check:versions && npm run check:globals && npm run check:content && npm run check:metadata && npm run check:site && npm run check:site-url && npm run check:sitemap && npm run check:qr && npm run check:teacher-pack && npm run check:html && npm run check:css && npm run check:partials && npm run check:precache && npm run check:pdf-meta && npm run check:pdf-budget"
   },
   "engines": {
     "node": ">=22"

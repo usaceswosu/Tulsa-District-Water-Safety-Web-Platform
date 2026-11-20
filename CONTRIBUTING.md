@@ -21,7 +21,7 @@ npm run check
 npm test
 ```
 
-`npm run check` runs version, global-name, content, site-integrity, public-URL, sitemap, HTML, CSS, partial, precache, PDF metadata, and PDF budget checks. The site-integrity check (`scripts/check-site.mjs`) is the cross-platform source of truth for catalog/assets/page links.
+`npm run check` runs version, global-name, content, metadata coverage, site-integrity, public-URL, sitemap, QR, classroom-pack, HTML, CSS, partial, precache, PDF metadata, and PDF budget checks. The site-integrity check (`scripts/check-site.mjs`) is the cross-platform source of truth for catalog/assets/page links.
 
 CI additionally runs:
 

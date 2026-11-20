@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: site-checks-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate-local-site:
     runs-on: ubuntu-latest
@@ -54,6 +58,12 @@ jobs:
 
       - name: Check sitemap
         run: npm run check:sitemap
+
+      - name: Check QR codes
+        run: npm run check:qr
+
+      - name: Check classroom pack
+        run: npm run check:teacher-pack
 
       - name: Validate HTML
         run: npm run check:html

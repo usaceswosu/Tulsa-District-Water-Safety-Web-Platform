@@ -211,6 +211,22 @@ test("reviewed resource metadata renders badges and filters", async ({ page }) =
   await expect(firstCard.locator(".resource-badge").first()).toHaveText("English · Spanish");
   await expect(firstCard.locator(".resource-badge").nth(1)).toHaveText("Grades K–4");
   await expect(page.locator("#metadata-filters")).toBeVisible();
+  const filtersLayout = await page.evaluate(() => {
+    const toolbar = document.querySelector(".library-tools").getBoundingClientRect();
+    const search = document.querySelector(".search-box").getBoundingClientRect();
+    const metadata = document.querySelector("#metadata-filters").getBoundingClientRect();
+    return {
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      toolbarRight: toolbar.right,
+      metadataRight: metadata.right,
+      metadataBelowSearch: metadata.top >= search.bottom
+    };
+  });
+  expect(filtersLayout.overflow).toBe(0);
+  expect(filtersLayout.metadataRight).toBeLessThanOrEqual(filtersLayout.toolbarRight);
+  expect(filtersLayout.metadataBelowSearch).toBe(true);
+  const metadataA11y = await new AxeBuilder({ page }).include("#resources").analyze();
+  expect(metadataA11y.violations).toEqual([]);
 
   await page.selectOption("#metadata-language-filter", "es");
   await expect(page.locator(".resource-card:visible")).toHaveCount(1);

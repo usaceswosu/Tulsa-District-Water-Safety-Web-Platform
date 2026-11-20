@@ -64,7 +64,9 @@ try {
   assert(state.canonical.startsWith(siteUrl), `Unexpected canonical URL: ${state.canonical}`);
   const graph = state.jsonLd?.["@graph"] || [];
   const websiteNode = graph.find((node) => node["@type"] === "WebSite");
+  const organizationNode = graph.find((node) => node["@type"] === "GovernmentOrganization");
   assert(websiteNode?.url === `${siteUrl}/`, "JSON-LD WebSite URL is missing or stale.");
+  assert(organizationNode?.["@id"]?.endsWith("#organization"), "JSON-LD organization node is missing.");
 
   const versionDate = `${expectedVersion.slice(0, 4)}-${expectedVersion.slice(4, 6)}-${expectedVersion.slice(6, 8)}`;
   for (const path of ["/accessibility.html", "/poster.html", "/manifest.webmanifest", "/assets/qr/bobber-site.svg", "/assets/qr/bobber-site-es.svg", "/assets/downloads/Bobber_Classroom_Pack_2026.zip"]) {

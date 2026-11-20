@@ -6,6 +6,7 @@ import { siteRoot } from "./lib/site-root.mjs";
 import { siteUrl } from "./lib/site-config.mjs";
 
 const root = siteRoot;
+const checkOnly = process.argv.includes("--check");
 const outputDir = join(root, "assets/downloads");
 const output = join(outputDir, "Bobber_Classroom_Pack_2026.zip");
 const folderName = "Bobber_Classroom_Pack";
@@ -52,18 +53,43 @@ coloring sheets, storybooks, and the printable Safety Hero certificate.
 These are official USACE program materials; check the Bobber program page for updates.
 `;
 
-const zip = new JSZip();
-const folder = zip.folder(folderName);
-for (const [name, source] of files) {
-  folder.file(name, readFileSync(join(root, source)), { compression: "STORE" });
-}
-folder.file("README.txt", readme, { compression: "DEFLATE" });
+if (checkOnly) {
+  const problems = [];
+  if (!existsSync(output)) {
+    problems.push("Classroom pack is missing. Run: npm run update:teacher-pack");
+  } else {
+    const archive = await JSZip.loadAsync(readFileSync(output));
+    for (const [name, source] of files) {
+      const entry = archive.file(`${folderName}/${name}`);
+      if (!entry) {
+        problems.push(`Classroom pack is missing ${name}.`);
+      } else if (!(await entry.async("nodebuffer")).equals(readFileSync(join(root, source)))) {
+        problems.push(`Classroom pack has a stale copy of ${name}.`);
+      }
+    }
+    const readmeEntry = archive.file(`${folderName}/README.txt`);
+    if (!readmeEntry) problems.push("Classroom pack is missing README.txt.");
+    else if ((await readmeEntry.async("string")) !== readme) problems.push("Classroom pack README is out of date.");
+  }
+  if (problems.length) {
+    console.error(problems.map((problem) => ` - ${problem}`).join("\n"));
+    process.exit(1);
+  }
+  console.log(`Classroom pack is current (${files.length} files + README).`);
+} else {
+  const zip = new JSZip();
+  const folder = zip.folder(folderName);
+  for (const [name, source] of files) {
+    folder.file(name, readFileSync(join(root, source)), { compression: "STORE" });
+  }
+  folder.file("README.txt", readme, { compression: "DEFLATE" });
 
-mkdirSync(outputDir, { recursive: true });
-const content = await zip.generateAsync({
-  type: "nodebuffer",
-  compression: "DEFLATE",
-  compressionOptions: { level: 6 }
-});
-writeFileSync(output, content);
-console.log(`Wrote ${output} (${(statSync(output).size / 1048576).toFixed(1)} MB) with ${files.length} files + README.`);
+  mkdirSync(outputDir, { recursive: true });
+  const content = await zip.generateAsync({
+    type: "nodebuffer",
+    compression: "DEFLATE",
+    compressionOptions: { level: 6 }
+  });
+  writeFileSync(output, content);
+  console.log(`Wrote ${output} (${(statSync(output).size / 1048576).toFixed(1)} MB) with ${files.length} files + README.`);
+}
