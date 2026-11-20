@@ -57,7 +57,10 @@ const searchInput = document.querySelector("#resource-search");
 const filterButtons = [...document.querySelectorAll(".filter-button")];
 const resultsMessage = document.querySelector("#results-message");
 const emptyState = document.querySelector("#empty-state");
+const metadataFilters = document.querySelector("#metadata-filters");
 let activeFilter = "all";
+let activeLanguageFilter = "all";
+let activeGradeFilter = "all";
 let currentLanguage = "en";
 let resourcesRendered = false;
 let resourcesScheduled = false;
@@ -104,6 +107,86 @@ function formatResourceSize(meta) {
     : `${previewSize} preview · ${printSize} ${printLabel}`;
 }
 
+const LANGUAGE_LABELS = {
+  en: { en: "English", es: "Spanish" },
+  es: { en: "Inglés", es: "Español" }
+};
+
+function availableLanguages() {
+  return [...new Set(resources.flatMap((resource) => resource.languages || []))]
+    .filter((code) => LANGUAGE_LABELS[currentLanguage][code])
+    .sort();
+}
+
+function availableGrades() {
+  return [...new Set(resources.map((resource) => resource.gradeRange).filter(Boolean))].sort();
+}
+
+function formatGrade(gradeRange) {
+  return currentLanguage === "es" ? `Grados ${gradeRange}` : `Grades ${gradeRange}`;
+}
+
+function refreshMetadataFilters() {
+  if (!metadataFilters) return;
+  const languages = availableLanguages();
+  const grades = availableGrades();
+  metadataFilters.replaceChildren();
+  metadataFilters.hidden = !languages.length && !grades.length;
+  if (!languages.length && !grades.length) return;
+
+  if (languages.length) {
+    if (activeLanguageFilter !== "all" && !languages.includes(activeLanguageFilter)) activeLanguageFilter = "all";
+    const label = document.createElement("label");
+    label.className = "metadata-filter";
+    label.textContent = currentLanguage === "es" ? "Idioma" : "Language";
+    const select = document.createElement("select");
+    select.id = "metadata-language-filter";
+    const all = document.createElement("option");
+    all.value = "all";
+    all.textContent = currentLanguage === "es" ? "Todos los idiomas" : "All languages";
+    select.append(all);
+    for (const code of languages) {
+      const option = document.createElement("option");
+      option.value = code;
+      option.textContent = LANGUAGE_LABELS[currentLanguage][code];
+      select.append(option);
+    }
+    select.value = activeLanguageFilter;
+    select.addEventListener("change", () => {
+      activeLanguageFilter = select.value;
+      renderResources();
+    });
+    label.append(select);
+    metadataFilters.append(label);
+  }
+
+  if (grades.length) {
+    if (activeGradeFilter !== "all" && !grades.includes(activeGradeFilter)) activeGradeFilter = "all";
+    const label = document.createElement("label");
+    label.className = "metadata-filter";
+    label.textContent = currentLanguage === "es" ? "Grado" : "Grade";
+    const select = document.createElement("select");
+    select.id = "metadata-grade-filter";
+    const all = document.createElement("option");
+    all.value = "all";
+    all.textContent = currentLanguage === "es" ? "Todos los grados" : "All grades";
+    select.append(all);
+    for (const grade of grades) {
+      const option = document.createElement("option");
+      option.value = grade;
+      option.textContent = formatGrade(grade);
+      select.append(option);
+    }
+    select.value = activeGradeFilter;
+    select.addEventListener("change", () => {
+      activeGradeFilter = select.value;
+      renderResources();
+    });
+    label.append(select);
+    metadataFilters.append(label);
+  }
+}
+
 // Resource library: cards use local PDFs and previews from the repository.
 function makeCard(resource) {
   const displayTitle = currentLanguage === "es" ? (resourceTitlesEs[resource.title] || resource.title) : resource.title;
@@ -132,6 +215,24 @@ function makeCard(resource) {
   body.className = "resource-body";
   const title = document.createElement("h3");
   title.textContent = displayTitle;
+  const description = document.createElement("p");
+  description.className = "resource-description";
+  description.textContent = resource.description?.[currentLanguage] || "";
+  const badges = document.createElement("p");
+  badges.className = "resource-badges";
+  const languages = (resource.languages || []).filter((code) => LANGUAGE_LABELS[currentLanguage][code]);
+  if (languages.length) {
+    const languageBadge = document.createElement("span");
+    languageBadge.className = "resource-badge";
+    languageBadge.textContent = languages.map((code) => LANGUAGE_LABELS[currentLanguage][code]).join(" · ");
+    badges.append(languageBadge);
+  }
+  if (resource.gradeRange) {
+    const gradeBadge = document.createElement("span");
+    gradeBadge.className = "resource-badge";
+    gradeBadge.textContent = formatGrade(resource.gradeRange);
+    badges.append(gradeBadge);
+  }
   const metaLine = document.createElement("p");
   metaLine.className = "resource-meta";
   metaLine.textContent = [formatPageCount(meta.pages), formatResourceSize(meta)].filter(Boolean).join(" · ");
@@ -157,6 +258,8 @@ function makeCard(resource) {
   arrow.textContent = "→";
   link.append(linkLabel, arrow);
   body.append(title);
+  if (description.textContent) body.append(description);
+  if (badges.childElementCount) body.append(badges);
   if (metaLine.textContent) body.append(metaLine);
   body.append(link);
   article.append(preview, body);
@@ -166,11 +269,19 @@ function makeCard(resource) {
 function resourceMatches(resource, query) {
   const matchesCategory = activeFilter === "all" || resource.category === activeFilter;
   if (!matchesCategory) return false;
+  if (activeLanguageFilter !== "all" && !(resource.languages || []).includes(activeLanguageFilter)) return false;
+  if (activeGradeFilter !== "all" && resource.gradeRange !== activeGradeFilter) return false;
   if (!query) return true;
-  const searchableTitle = currentLanguage === "es"
-    ? `${resource.title} ${resourceTitlesEs[resource.title] || ""}`
-    : resource.title;
-  return searchableTitle.toLowerCase().includes(query);
+  const languageNames = (resource.languages || []).map((code) => LANGUAGE_LABELS[currentLanguage][code] || code);
+  const searchable = [
+    resource.title,
+    resourceTitlesEs[resource.title] || "",
+    resource.description?.en || "",
+    resource.description?.es || "",
+    resource.gradeRange || "",
+    ...languageNames
+  ].join(" ");
+  return searchable.toLowerCase().includes(query);
 }
 
 function renderResources() {
@@ -236,11 +347,14 @@ if (grid && searchInput) {
     resetSearch.addEventListener("click", () => {
       searchInput.value = "";
       activeFilter = "all";
+      activeLanguageFilter = "all";
+      activeGradeFilter = "all";
       filterButtons.forEach((button) => {
         const selected = button.dataset.filter === "all";
         button.classList.toggle("is-active", selected);
         button.setAttribute("aria-pressed", String(selected));
       });
+      refreshMetadataFilters();
       renderResources();
       searchInput.focus();
     });
@@ -416,6 +530,7 @@ function setLanguage(language) {
       button.textContent = text;
     }
   });
+  refreshMetadataFilters();
   if (resourcesRendered) renderResources();
   else scheduleResources();
   updateThemeControl();

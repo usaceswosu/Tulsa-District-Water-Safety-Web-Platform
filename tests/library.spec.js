@@ -188,6 +188,49 @@ test("library search and filters reuse the existing cards", async ({ page }) => 
   await expect(page.locator(".resource-card:visible")).toHaveCount(42);
 });
 
+test("reviewed resource metadata renders badges and filters", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("#metadata-filters")).toBeHidden();
+
+  await page.evaluate(() => {
+    const resource = resources.find((item) => item.file.includes("Boating Items"));
+    resource.description = {
+      en: "A boating safety activity sheet with a life-jacket checklist.",
+      es: "Una hoja de seguridad para navegar con una lista del chaleco salvavidas."
+    };
+    resource.languages = ["en", "es"];
+    resource.gradeRange = "K–4";
+    refreshMetadataFilters();
+    renderedLanguage = null;
+    renderResources();
+  });
+
+  const firstCard = page.locator(".resource-card").first();
+  await expect(firstCard.locator(".resource-description")).toContainText("boating safety activity");
+  await expect(firstCard.locator(".resource-badge")).toHaveCount(2);
+  await expect(firstCard.locator(".resource-badge").first()).toHaveText("English · Spanish");
+  await expect(firstCard.locator(".resource-badge").nth(1)).toHaveText("Grades K–4");
+  await expect(page.locator("#metadata-filters")).toBeVisible();
+
+  await page.selectOption("#metadata-language-filter", "es");
+  await expect(page.locator(".resource-card:visible")).toHaveCount(1);
+  await page.selectOption("#metadata-grade-filter", "K–4");
+  await expect(page.locator(".resource-card:visible")).toHaveCount(1);
+  await page.selectOption("#metadata-language-filter", "all");
+  await expect(page.locator(".resource-card:visible")).toHaveCount(1);
+  await page.selectOption("#metadata-grade-filter", "all");
+  await expect(page.locator(".resource-card:visible")).toHaveCount(42);
+
+  await page.fill("#resource-search", "life-jacket checklist");
+  await expect(page.locator(".resource-card:visible")).toHaveCount(1);
+  await page.fill("#resource-search", "");
+
+  await page.click("#header-language-toggle");
+  await expect(page.locator(".resource-card").first().locator(".resource-description")).toContainText("seguridad para navegar");
+  await expect(page.locator(".resource-card").first().locator(".resource-badge").first()).toHaveText("Inglés · Español");
+  await expect(page.locator("#metadata-language-filter option").first()).toHaveText("Todos los idiomas");
+});
+
 test("every catalog resource has page and size metadata", async ({ page }) => {
   await page.goto("/");
   const missing = await page.evaluate(() =>

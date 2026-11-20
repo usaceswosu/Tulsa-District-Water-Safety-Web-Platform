@@ -5,6 +5,9 @@
  * @property {"activity" | "poster" | "storybook"} category
  * @property {string} file PDF path under assets/
  * @property {string} image thumbnail filename under assets/graphics/
+ * @property {Array<"en" | "es">} [languages] reviewed language availability
+ * @property {string} [gradeRange] reviewed range, e.g. "K–4"
+ * @property {{ en: string, es: string }} [description] short reviewed card description
  */
 /** @type {BobberResource[]} */
 window.BOBBER_RESOURCES = [

@@ -10,6 +10,9 @@ test("home page loads with complete metadata and no broken images", async ({ pag
   await expect(page.locator(".resource-meta")).toHaveCount(42);
   await expect(page.locator(".resource-meta").first()).toHaveText("2 pages · 412 KB preview · 5.5 MB print");
   expect(await page.evaluate(() => Object.isFrozen(window.BOBBER_CONTENT))).toBe(true);
+  const jsonLd = await page.locator('script[type="application/ld+json"]').evaluate((script) => JSON.parse(script.textContent));
+  expect(jsonLd["@graph"].some((node) => node["@type"] === "WebSite")).toBe(true);
+  expect(jsonLd["@graph"].some((node) => node["@type"] === "GovernmentOrganization")).toBe(true);
   const broken = await page.locator("img").evaluateAll((images) =>
     images.filter((image) => image.complete && image.naturalWidth === 0).length
   );

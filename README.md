@@ -24,7 +24,7 @@ The links to YouTube, USACE, Recreation.gov, and other official sources are outb
 
 ```bash
 npm run check       # versions, globals, content, URL/sitemap, HTML, CSS, precache, PDFs
-npm test            # Chromium, Firefox, and WebKit smoke/accessibility/reader/offline tests
+npm test            # Chromium, Firefox, WebKit + Pixel/iPhone mobile smoke tests
 npm run check:live  # post-deploy smoke test against the public URL
 ```
 
@@ -67,8 +67,9 @@ GitHub Pages serves the files directly. Internal links are relative to the proje
 - `accessibility.html` / `poster.html` / `404.html` — self-contained statement, QR poster, and not-found pages.
 - `partials/` — shared header, footer, and reader markup copied into both main pages.
 - `styles.css` — design tokens, components, responsive layouts, dark theme, and print rules (section map at the top).
-- `data/resources.js` — printable catalog and Spanish display titles.
-- `data/pdf-meta.js` — generated page counts, print sizes, and preview paths.
+- `data/resources.js` — printable catalog, Spanish display titles, and optional reviewed metadata.
+- `data/resource-review.csv` — district review template for languages, grades, and bilingual descriptions.
+- `data/pdf-meta.js` — generated page counts, print sizes, preview paths, and preview sizes.
 - `data/content.js` — home-page tips, pal cards, checklist feedback, and quiz questions.
 - `data/translations.js` — Spanish interface dictionary.
 - `scripts/main.js` — page controller: library, language/theme, navigation, PWA banners, game/certificate.
@@ -83,6 +84,8 @@ GitHub Pages serves the files directly. Internal links are relative to the proje
 ## Updating resources
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full recipe. In short: add the print PDF and thumbnail, add a `data/resources.js` entry and Spanish title, run `npm run update:pdf-meta`, optionally generate a reader preview, then bump the version and run the checks.
+
+Reviewed language, grade, and bilingual description metadata is optional until district approval. Fill `data/resource-review.csv`, copy approved values into `data/resources.js`, and run `npm run check:metadata`. Badges and language/grade filters appear automatically once values exist.
 
 External video and official program links point to YouTube and USACE websites. The safety reminders are educational and do not replace local rules, adult supervision, or professional guidance.
 

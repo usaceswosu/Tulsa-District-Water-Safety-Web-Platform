@@ -709,6 +709,42 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   gap: 6px;
 }
 
+.metadata-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.metadata-filter {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.metadata-filter select {
+  padding: 7px 9px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  font: inherit;
+}
+
+@media(max-width:640px) {
+  .metadata-filter {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+
+  .metadata-filter select {
+    max-width: 62%;
+  }
+}
+
 .filter-button {
   padding: 9px 12px;
   border: 1px solid transparent;
@@ -805,6 +841,29 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 .resource-body h3 {
   margin: 0 0 4px;
   font: 800 14px/1.35 var(--display);
+}
+
+.resource-description {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.resource-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 10px;
+}
+
+.resource-badge {
+  padding: 3px 6px;
+  background: var(--mint);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-size: 9px;
+  font-weight: 700;
 }
 
 .resource-meta {

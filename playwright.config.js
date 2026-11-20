@@ -16,9 +16,11 @@ export default defineConfig({
     screenshot: "only-on-failure"
   },
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
-    { name: "webkit", use: { ...devices["Desktop Safari"] } }
+    { name: "chromium", testIgnore: /mobile\.spec\.js/, use: { ...devices["Desktop Chrome"] } },
+    { name: "firefox", testIgnore: /mobile\.spec\.js/, use: { ...devices["Desktop Firefox"] } },
+    { name: "webkit", testIgnore: /mobile\.spec\.js/, use: { ...devices["Desktop Safari"] } },
+    { name: "mobile-chromium", testMatch: /mobile\.spec\.js/, use: { ...devices["Pixel 7"] } },
+    { name: "mobile-webkit", testMatch: /mobile\.spec\.js/, use: { ...devices["iPhone 13"] } }
   ],
   webServer: {
     command: "node scripts/serve.mjs",

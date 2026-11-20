@@ -43,7 +43,14 @@ try {
         cards: document.querySelectorAll(".resource-card").length,
         frozen: Object.isFrozen(window.BOBBER_CONTENT),
         firstMeta: document.querySelector(".resource-meta")?.textContent || "",
-        canonical: document.querySelector('link[rel="canonical"]')?.href || ""
+        canonical: document.querySelector('link[rel="canonical"]')?.href || "",
+        jsonLd: (() => {
+          try {
+            return JSON.parse(document.querySelector('script[type="application/ld+json"]')?.textContent || "null");
+          } catch {
+            return null;
+          }
+        })()
       };
     });
     if (state.version === expectedVersion && state.firstMeta.includes("preview") && state.firstMeta.includes("print")) break;
@@ -55,6 +62,21 @@ try {
   assert(state.frozen, "Home-page content is not frozen.");
   assert(state.firstMeta.includes("preview") && state.firstMeta.includes("print"), `Unexpected card metadata: ${state.firstMeta}`);
   assert(state.canonical.startsWith(siteUrl), `Unexpected canonical URL: ${state.canonical}`);
+  const graph = state.jsonLd?.["@graph"] || [];
+  const websiteNode = graph.find((node) => node["@type"] === "WebSite");
+  assert(websiteNode?.url === `${siteUrl}/`, "JSON-LD WebSite URL is missing or stale.");
+
+  const versionDate = `${expectedVersion.slice(0, 4)}-${expectedVersion.slice(4, 6)}-${expectedVersion.slice(6, 8)}`;
+  for (const path of ["/accessibility.html", "/poster.html", "/manifest.webmanifest", "/assets/qr/bobber-site.svg", "/assets/qr/bobber-site-es.svg", "/assets/downloads/Bobber_Classroom_Pack_2026.zip"]) {
+    const response = await context.request.head(`${target}${path}`, { failOnStatusCode: false });
+    assert(response.ok(), `Critical URL failed (${response.status()}): ${path}`);
+  }
+  const sitemap = await context.request.get(`${target}/sitemap.xml`, { failOnStatusCode: false });
+  const sitemapText = await sitemap.text();
+  assert(sitemap.ok() && sitemapText.includes(`<loc>${siteUrl}/</loc>`), "Sitemap is missing or has the wrong home URL.");
+  assert(sitemapText.includes(`<lastmod>${versionDate}</lastmod>`), "Sitemap lastmod does not match the asset version.");
+  const robots = await context.request.get(`${target}/robots.txt`, { failOnStatusCode: false });
+  assert(robots.ok() && (await robots.text()).includes(`Sitemap: ${siteUrl}/sitemap.xml`), "Robots sitemap reference is missing or stale.");
 
   await page.click('[data-filter="activity"]');
   const visible = await page.locator(".resource-card:visible").count();

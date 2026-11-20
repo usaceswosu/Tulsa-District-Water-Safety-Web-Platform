@@ -34,12 +34,17 @@ before adding a top-level name. Why not modules? The site is intentionally build
  *   title: string,
  *   category: "activity" | "poster" | "storybook",
  *   file: string,   // "pdfs/name.pdf"
- *   image: string   // thumbnail filename under assets/graphics/
+ *   image: string,  // thumbnail filename under assets/graphics/
+ *   languages?: Array<"en" | "es">,
+ *   gradeRange?: string,
+ *   description?: { en: string, es: string }
  * }>} */
 window.BOBBER_RESOURCES
 ```
 
 Also exports `BOBBER_CATEGORY_LABELS` (singular badges) and `BOBBER_FILTER_LABELS` (plural filter buttons). `BOBBER_RESOURCE_TITLES_ES` must contain an entry for every resource title; `npm run check` and `scripts/check-site.ps1` enforce that.
+
+Optional language/grade/description fields drive card badges and the library filters. `data/resource-review.csv` is the district review template; `npm run check:metadata` reports coverage and validates any filled values. Add `--require` once all 42 records are reviewed.
 
 ### `data/pdf-meta.js`
 
@@ -69,6 +74,10 @@ Home-page-only curated content, deep-frozen so accidental mutation fails loudly:
 ### `data/translations.js`
 
 A flat `Record<EnglishText, SpanishText>` used by the language toggle. Static text is captured once at boot and replaced by looking up its exact trimmed text. Dynamic widgets (resource cards, quiz, certificate, reader chrome) translate themselves in JavaScript. Add a new static sentence to this file, or it will remain English in Spanish mode.
+
+### Structured data
+
+`index.html` contains JSON-LD for the `WebSite` and the publishing `GovernmentOrganization`. `check-site-url.mjs` validates the URLs against `site.config.json`, and `check-live.mjs` verifies the deployed graph. Keep claims conservative and Public Affairs-reviewed.
 
 ## Language and theme
 
@@ -166,7 +175,8 @@ The public base URL lives in `site.config.json`. `npm run update:site-url -- <ur
 | `scripts/apply-partials.mjs` | Sync/check partials into both pages |
 | `scripts/main.js` | Page controller: library, language, theme, PWA, game, dialogs |
 | `scripts/pdf-reader.js` | Reader engine, fallback, TOC, zoom, print |
-| `data/` | Catalog, generated PDF metadata, content, translations |
+| `data/` | Catalog, review template, generated PDF metadata, content, translations |
+| `data/resource-review.csv` | District review template for language, grade, and description metadata |
 | `sw.js` | Offline shell and runtime caching |
 | `precache.json` | Generated shell URL list |
 | `site.config.json` | Single source of truth for the public base URL |

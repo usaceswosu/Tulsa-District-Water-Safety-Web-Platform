@@ -9,7 +9,7 @@ Requires Node 22+.
 ```bash
 npm ci
 npm run serve      # http://127.0.0.1:4173/
-npm test           # Playwright: Chromium, Firefox, WebKit
+npm test           # Playwright: Chromium, Firefox, WebKit, Pixel 7, iPhone 13
 ```
 
 Python is only needed if you regenerate reader previews.
@@ -27,8 +27,8 @@ CI additionally runs:
 
 - `pwsh -NoProfile -File scripts/check-site.ps1` as a second opinion
 - Lighthouse on the home and grown-ups pages
-- the full Playwright suite in Chromium, Firefox, and WebKit
-- `npm run check:live` after static checks, verifying the live version matches the commit, plus a daily schedule
+- the full Playwright suite in Chromium, Firefox, WebKit, Pixel 7, and iPhone 13
+- `npm run check:live` after static checks, verifying the live version, critical URLs, reader, offline shell, and JSON-LD, plus a daily schedule
 
 The live smoke test can also target a local server:
 
@@ -79,6 +79,27 @@ Get-Content scripts/reader-previews.txt | ForEach-Object {
   python scripts/generate-preview-pdf.py "assets/pdfs/$_" "assets/pdfs/web/$($_.Replace('.pdf','-web.pdf'))" --dpi 120 --quality 72
 }
 ```
+
+### Add reviewed language, grade, and description metadata
+
+`data/resource-review.csv` is the review template: one row per resource with `languages`, `gradeRange`, and bilingual descriptions. Fill only values the district has approved.
+
+After review, add the approved fields to the matching `data/resources.js` entry:
+
+```js
+{
+  title: "Bobber Boating Items",
+  // ...
+  languages: ["en", "es"],
+  gradeRange: "K–4",
+  description: {
+    en: "A short family-friendly description.",
+    es: "Una descripción breve para las familias."
+  }
+}
+```
+
+Run `npm run check:metadata`. Once every resource is filled, switch CI to `npm run check:metadata -- --require` so future resources cannot ship without review metadata. The UI automatically shows badges and language/grade filters when values exist.
 
 ### Change tips, quiz questions, or pal cards
 

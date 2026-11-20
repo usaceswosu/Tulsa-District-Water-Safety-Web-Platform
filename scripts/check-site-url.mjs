@@ -34,6 +34,25 @@ for (const [file, path] of [
 
 expectIncludes("404.html", `href="${siteUrl}/assets/bobber-logo.png"`, "absolute 404 logo URL");
 expectIncludes("robots.txt", `Sitemap: ${siteUrl}/sitemap.xml`, "robots sitemap URL");
+
+const jsonLdMatch = read("index.html").match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+if (!jsonLdMatch) {
+  problems.push("index.html is missing JSON-LD structured data.");
+} else {
+  try {
+    const graph = JSON.parse(jsonLdMatch[1])["@graph"] || [];
+    const site = graph.find((node) => node["@type"] === "WebSite");
+    const organization = graph.find((node) => node["@type"] === "GovernmentOrganization");
+    if (!site || site.url !== `${siteUrl}/` || site["@id"] !== `${siteUrl}/#website`) {
+      problems.push("JSON-LD WebSite URL does not match site.config.json.");
+    }
+    if (!organization || organization["@id"] !== `${siteUrl}/#organization`) {
+      problems.push("JSON-LD organization graph is missing or uses a stale URL.");
+    }
+  } catch (error) {
+    problems.push(`index.html JSON-LD is invalid: ${error.message}`);
+  }
+}
 expectIncludes("sitemap.xml", `<loc>${siteUrl}/</loc>`, "sitemap home URL");
 expectIncludes("poster.html", `>${siteDisplay}/<`, "poster display URL");
 expectIncludes("poster.html", `>${siteDisplay}/?lang=es<`, "poster Spanish display URL");

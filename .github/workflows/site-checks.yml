@@ -43,6 +43,9 @@ jobs:
       - name: Check home-page content
         run: npm run check:content
 
+      - name: Check resource metadata
+        run: npm run check:metadata
+
       - name: Validate local assets, catalog, and page links (Node)
         run: npm run check:site
 

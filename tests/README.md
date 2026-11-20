@@ -1,6 +1,6 @@
 # Tests
 
-Playwright runs against the local server configured in `playwright.config.js` in Chromium, Firefox, and WebKit.
+Playwright runs against the local server configured in `playwright.config.js` in Chromium, Firefox, WebKit, and Pixel 7/iPhone 13 mobile emulation.
 
 | File | Covers |
 | --- | --- |
@@ -9,6 +9,7 @@ Playwright runs against the local server configured in `playwright.config.js` in
 | `game.spec.js` | Quiz flow, focus management, certificate print lifecycle |
 | `accessibility.spec.js` | Axe scans, 320px reflow, dark-mode print, forced colors, poster print |
 | `offline.spec.js` | Service-worker install, offline root, query-tolerant navigation, encoded thumbnails |
+| `mobile.spec.js` | Pixel 7/Chromium and iPhone 13/WebKit: navigation, language, reader, offline shell |
 | `helpers.js` | Shared console/page-error collector |
 
 Run everything:
