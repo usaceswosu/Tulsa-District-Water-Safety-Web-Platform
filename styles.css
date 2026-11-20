@@ -4528,3 +4528,7 @@ html:has(.pdf-reader[open]) {
   color: #0f6663;
   font-weight: 800;
 }
+
+html[data-theme="dark"] .language-code {
+  color: #8bd2c2;
+}
