@@ -1,3 +1,13 @@
+/*
+ * In-page PDF reader.
+ *
+ * Loaded before scripts/main.js on both pages. It exposes openPdfReader(),
+ * prefetchPdfEngine(), and updatePdfReaderLanguage() to the page controller.
+ *
+ * Session rule: every async continuation checks `activePdf === session` before
+ * touching the DOM. Closing, reopening, or falling back invalidates the old
+ * session so a late PDF.js callback cannot overwrite the current document.
+ */
 const pdfReader = document.querySelector("#pdf-reader");
 const pdfReaderTitle = document.querySelector("#pdf-reader-title");
 const pdfReaderClose = document.querySelector("#pdf-reader-close");
@@ -26,6 +36,34 @@ const pdfReaderToc = document.querySelector("#pdf-reader-toc");
 const pdfReaderTocTitle = document.querySelector("#pdf-reader-toc-title");
 const pdfReaderTocList = document.querySelector("#pdf-reader-toc-list");
 const PDF_ZOOM_LEVELS = [0.75, 1, 1.25, 1.5, 2];
+const PDF_LOAD_TIMEOUT_MS = 7000;
+const TOC_MIN_ITEMS = 3;
+const STAGE_INSET_PX = 16;
+const MIN_STAGE_SPACE_PX = 120;
+const MAX_DPR = 2;
+const MIN_RENDER_SCALE = 0.1;
+const MAX_RENDER_SCALE = 4;
+const PRINT_MAX_EDGE_PX = 2550;
+const PRINT_CLEANUP_FALLBACK_MS = 300_000;
+
+/**
+ * @typedef {Object} ReaderSession
+ * @property {string} title
+ * @property {string} url fast preview used by the canvas reader
+ * @property {string} downloadUrl full print-quality PDF
+ * @property {boolean} preview
+ * @property {string} placeholder first-page thumbnail
+ * @property {HTMLElement} opener link that opened the reader
+ * @property {number} page 0 until the first page finishes rendering
+ * @property {boolean} fallback true when the browser iframe owns rendering
+ * @property {number} zoom
+ * @property {Array<{ title: string, page: number | null, depth: number }>} toc
+ * @property {number} [watchdog]
+ * @property {Object} [document] PDF.js document proxy
+ * @property {Object} [loadingTask]
+ * @property {Object} [renderTask]
+ * @property {boolean} [rendering]
+ */
 
 const readerScript = document.currentScript;
 const pdfEngine = new URL("../vendor/pdfjs/", readerScript.src);
@@ -38,6 +76,8 @@ let pdfjsPromise;
 let printInProgress = false;
 let printCleanupTimer;
 
+// Load PDF.js once. A rejected attempt clears the cached promise so the next
+// click can retry instead of falling back forever.
 function loadPdfEngine() {
   if (!pdfjsPromise) {
     pdfjsPromise = import(pdfModuleUrl).then((module) => {
@@ -73,7 +113,7 @@ function setPdfControls(documentProxy, page) {
 }
 
 function updateTocVisibility(session) {
-  const available = Boolean(session?.document && !session.fallback && session.toc?.length >= 3);
+  const available = Boolean(session?.document && !session.fallback && session.toc?.length >= TOC_MIN_ITEMS);
   pdfReaderTocToggle.hidden = !available;
   if (!available) {
     pdfReaderToc.hidden = true;
@@ -176,14 +216,14 @@ async function showPdfPage(session, pageNumber) {
     if (activePdf !== session || session.fallback) return;
     const natural = page.getViewport({ scale: 1 });
     const stage = pdfReaderStage.getBoundingClientRect();
-    const availableWidth = Math.max(120, stage.width - 16);
-    const availableHeight = Math.max(120, stage.height - 16);
+    const availableWidth = Math.max(MIN_STAGE_SPACE_PX, stage.width - STAGE_INSET_PX);
+    const availableHeight = Math.max(MIN_STAGE_SPACE_PX, stage.height - STAGE_INSET_PX);
     const fit = Math.min(availableWidth / natural.width, availableHeight / natural.height);
     const zoom = session.zoom || 1;
     const displayWidth = natural.width * fit * zoom;
     const displayHeight = natural.height * fit * zoom;
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const renderScale = Math.max(0.1, Math.min(4, (displayWidth * dpr) / natural.width));
+    const dpr = Math.min(MAX_DPR, window.devicePixelRatio || 1);
+    const renderScale = Math.max(MIN_RENDER_SCALE, Math.min(MAX_RENDER_SCALE, (displayWidth * dpr) / natural.width));
     const viewport = page.getViewport({ scale: renderScale });
     const canvas = document.createElement("canvas");
     canvas.width = Math.ceil(viewport.width);
@@ -278,6 +318,8 @@ function updateReaderChrome() {
 // The page language can change while the reader is open.
 window.updatePdfReaderLanguage = updateReaderChrome;
 
+// Restore the reader after a print snapshot. Called by afterprint, a long
+// fallback timer, close, and error paths; it is intentionally idempotent.
 function cleanupPrintPage() {
   window.clearTimeout(printCleanupTimer);
   printCleanupTimer = undefined;
@@ -310,7 +352,7 @@ async function printCurrentPage() {
       return;
     }
     const natural = page.getViewport({ scale: 1 });
-    const scale = Math.min(4, 2550 / Math.max(natural.width, natural.height));
+    const scale = Math.min(MAX_RENDER_SCALE, PRINT_MAX_EDGE_PX / Math.max(natural.width, natural.height));
     const viewport = page.getViewport({ scale });
     const canvas = document.createElement("canvas");
     canvas.width = Math.ceil(viewport.width);
@@ -325,7 +367,7 @@ async function printCurrentPage() {
     pdfPrintPage.setAttribute("aria-hidden", "false");
     document.body.classList.add("printing-reader-page");
     window.addEventListener("afterprint", () => cleanupPrintPage(), { once: true });
-    printCleanupTimer = window.setTimeout(cleanupPrintPage, 300_000);
+    printCleanupTimer = window.setTimeout(cleanupPrintPage, PRINT_CLEANUP_FALLBACK_MS);
     window.print();
   } catch {
     cleanupPrintPage();
@@ -409,6 +451,8 @@ async function buildToc(session) {
   }
 }
 
+// Stop PDF.js work for a session. The caller decides whether to clear the DOM
+// and move focus (normal close) or replace it (switching documents).
 function destroyPdfSession(session) {
   if (!session) return;
   window.clearTimeout(session.watchdog);
@@ -416,11 +460,19 @@ function destroyPdfSession(session) {
   try { session.loadingTask?.destroy()?.catch?.(() => {}); } catch { /* already gone */ }
 }
 
+/**
+ * Open a PDF in the dialog. Repeated calls replace the current session safely.
+ * @param {string} url fast preview used by the canvas reader
+ * @param {string} title display title
+ * @param {HTMLElement} opener link that should regain focus on close
+ * @param {string} [downloadUrl] full print-quality PDF
+ * @param {boolean} [preview] true when url is a lightweight preview
+ * @param {string} [placeholder] first-page thumbnail URL
+ */
 async function openPdfReader(url, title, opener, downloadUrl = url, preview = false, placeholder = "") {
-  // `url` is the fast preview used by the canvas reader; `downloadUrl` stays the
-  // full print-quality PDF, including its accessibility tags.
   if (printInProgress || document.body.classList.contains("printing-reader-page")) cleanupPrintPage();
   if (activePdf) destroyPdfSession(activePdf);
+  /** @type {ReaderSession} */
   const session = { title, url, downloadUrl, preview, placeholder, opener, page: 0, fallback: false, zoom: 1, toc: [] };
   activePdf = session;
   pdfReaderTitle.textContent = title;
@@ -447,7 +499,7 @@ async function openPdfReader(url, title, opener, downloadUrl = url, preview = fa
   if (!pdfReader.open) pdfReader.showModal();
   session.watchdog = window.setTimeout(() => {
     if (activePdf === session && !session.page) showPdfFallback(session);
-  }, 7000);
+  }, PDF_LOAD_TIMEOUT_MS);
 
   try {
     const pdfjs = await loadPdfEngine();

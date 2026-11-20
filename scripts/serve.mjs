@@ -1,10 +1,10 @@
 // Small static server for local previews and Playwright smoke tests.
 import { createReadStream, existsSync, statSync } from "node:fs";
 import { createServer } from "node:http";
-import { extname, join, normalize, resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
+import { extname, join, normalize, sep } from "node:path";
+import { siteRoot } from "./lib/site-root.mjs";
 
-const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
+const root = siteRoot;
 const port = Number(process.env.PORT || 4173);
 const types = {
   ".html": "text/html; charset=utf-8",
@@ -27,7 +27,12 @@ const types = {
 };
 
 function resolveFile(urlPath) {
-  const pathname = decodeURIComponent(urlPath.split("?")[0]);
+  let pathname;
+  try {
+    pathname = decodeURIComponent(urlPath.split("?")[0]);
+  } catch {
+    return null;
+  }
   let filePath = normalize(join(root, pathname));
   if (!filePath.startsWith(root + sep) && filePath !== root) return null;
   if (existsSync(filePath) && statSync(filePath).isDirectory()) filePath = join(filePath, "index.html");
@@ -52,9 +57,12 @@ const server = createServer((request, response) => {
   if (range) {
     const match = /^bytes=(\d*)-(\d*)$/.exec(range);
     if (match) {
-      let start = match[1] ? Number(match[1]) : 0;
-      let end = match[2] ? Number(match[2]) : stat.size - 1;
-      if (start >= stat.size || end >= stat.size || start > end) {
+      const suffixLength = !match[1] && match[2] ? Number(match[2]) : null;
+      const start = suffixLength === null ? (match[1] ? Number(match[1]) : 0) : Math.max(0, stat.size - suffixLength);
+      const end = suffixLength === null
+        ? (match[2] ? Math.min(Number(match[2]), stat.size - 1) : stat.size - 1)
+        : stat.size - 1;
+      if (!Number.isFinite(start) || !Number.isFinite(end) || start >= stat.size || start > end) {
         response.writeHead(416, { ...headers, "Content-Range": `bytes */${stat.size}` });
         response.end();
         return;

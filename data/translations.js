@@ -1,4 +1,6 @@
 // Spanish interface copy. Have a fluent reviewer approve public-safety translations.
+// Keys must exactly match an authored English text node or accessible label.
+/** @type {Record<string, string>} */
 window.BOBBER_TRANSLATIONS_ES = {
   // Navigation, brand labels, and home page.
   "Skip to content": "Saltar al contenido",

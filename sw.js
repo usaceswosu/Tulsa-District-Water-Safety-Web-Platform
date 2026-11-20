@@ -1,8 +1,18 @@
-// Bobber offline shell. Registered from main.js with the current asset version.
+/*
+ * Bobber offline shell.
+ *
+ * Registered from main.js as sw.js?v=<site version>. Cache names are versioned,
+ * so activating a new worker replaces the shell and runtime by construction.
+ * PDFs and the classroom ZIP are never cached (see the fetch handler).
+ *
+ * shell:   pages, CSS/JS, images from precache.json
+ * runtime: non-precached modules such as vendor/pdfjs, trimmed to 160 entries
+ */
 const version = new URL(self.location.href).searchParams.get("v") || "v1";
 const SHELL_CACHE = `bobber-shell-${version}`;
 const RUNTIME_CACHE = `bobber-runtime-${version}`;
 const LEGACY_RUNTIME_CACHE = "bobber-runtime";
+const MAX_RUNTIME_ENTRIES = 160;
 const FALLBACK = new URL("./index.html", self.registration.scope).href;
 const CORE = [
   "./",
@@ -73,10 +83,14 @@ async function networkFirst(request, event) {
     const response = await fetch(request);
     if (response.ok) {
       const copy = response.clone();
+      // Query strings do not change these static pages. Store one entry per
+      // path so ?lang=… and campaign links do not grow the shell cache.
+      const cacheUrl = new URL(request.url);
+      cacheUrl.search = "";
       event.waitUntil((async () => {
         try {
           const cache = await caches.open(SHELL_CACHE);
-          await cache.put(request, copy);
+          await cache.put(cacheUrl.href, copy);
         } catch {
           // Cache quota failures should not break the response.
         }
@@ -101,7 +115,7 @@ async function cacheFirst(request, event) {
         try {
           const cache = await caches.open(RUNTIME_CACHE);
           await cache.put(request, copy);
-          await trimCache(RUNTIME_CACHE, 160);
+          await trimCache(RUNTIME_CACHE, MAX_RUNTIME_ENTRIES);
         } catch {
           // Cache quota failures should not break the response.
         }

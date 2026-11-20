@@ -4,3 +4,6 @@ playwright-report/
 blob-report/
 .lhci/
 *.log
+__pycache__/
+*.pyc
+.DS_Store

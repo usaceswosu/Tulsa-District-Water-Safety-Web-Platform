@@ -2,8 +2,9 @@
 // Run `npm run update:partials` after editing partials/header.html or partials/footer.html.
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { siteRoot } from "./lib/site-root.mjs";
 
-const root = new URL("..", import.meta.url).pathname;
+const root = siteRoot;
 const checkOnly = process.argv.includes("--check");
 const headerTemplate = readFileSync(join(root, "partials/header.html"), "utf8");
 const footerTemplate = readFileSync(join(root, "partials/footer.html"), "utf8");

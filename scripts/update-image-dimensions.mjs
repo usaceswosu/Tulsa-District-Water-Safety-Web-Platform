@@ -1,11 +1,11 @@
 // Fill in intrinsic width/height on local <img> tags to avoid layout shifts.
 // Run `npm run update:image-dimensions` after adding or replacing images.
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import { imageSize } from "image-size";
+import { siteRoot } from "./lib/site-root.mjs";
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const root = siteRoot;
 const pages = ["index.html", "grown-ups.html", "404.html"];
 
 for (const page of pages) {
@@ -27,7 +27,9 @@ for (const page of pages) {
     }
     if (!size?.width || !size?.height) return tag;
     changed += 1;
-    return tag.replace(/\s*\/?>$/, (end) => ` width="${size.width}" height="${size.height}"${end}`);
+    const width = /\bwidth=/.test(tag) ? "" : ` width="${size.width}"`;
+    const height = /\bheight=/.test(tag) ? "" : ` height="${size.height}"`;
+    return tag.replace(/\s*\/?>$/, (end) => `${width}${height}${end}`);
   });
   if (changed) {
     writeFileSync(pagePath, html);

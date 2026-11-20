@@ -1,4 +1,12 @@
 // Shared resource catalog and language data. Keep source filenames exactly as stored in assets.
+/**
+ * @typedef {Object} BobberResource
+ * @property {string} title English title and lookup key for the Spanish title map
+ * @property {"activity" | "poster" | "storybook"} category
+ * @property {string} file PDF path under assets/
+ * @property {string} image thumbnail filename under assets/graphics/
+ */
+/** @type {BobberResource[]} */
 window.BOBBER_RESOURCES = [
   // Printable activities and games.
   { title: "Bobber Boating Items", category: "activity", file: "pdfs/Bobber Boating Items Actitvty Sheet.pdf", image: "Bobber Boating Items Actitvty Sheet_th_L7cc.webp" },

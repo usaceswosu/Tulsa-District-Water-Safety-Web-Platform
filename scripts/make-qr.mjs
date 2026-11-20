@@ -2,8 +2,9 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import QRCode from "qrcode";
+import { siteRoot } from "./lib/site-root.mjs";
 
-const root = new URL("..", import.meta.url).pathname;
+const root = siteRoot;
 const site = "https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/";
 const targets = [
   { file: "assets/qr/bobber-site.svg", url: site },

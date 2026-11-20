@@ -1,3 +1,15 @@
+/*
+ * Bobber stylesheet
+ *
+ * Later sections intentionally refine earlier passes, so keep this order.
+ * Find a section by searching for its comment:
+ *   design tokens, header/navigation, hero, introduction, safety cards, videos,
+ *   resource library, readability pass, footer, responsive layout, dark theme,
+ *   lake checklist, controls, dialogs, game, print, motion, reader, certificate,
+ *   teacher tools, offline notices.
+ *
+ * Reader and certificate print rules live near their components at the end.
+ */
 /* Design tokens and global defaults */
 :root {
   color-scheme: light;
@@ -1268,67 +1280,6 @@ body {
     font-size: 19px;
   }
 
-  .menu-toggle {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-  }
-
-  .menu-toggle span {
-    width: 20px;
-    height: 2px;
-    background: var(--deep);
-    transition: transform .2s;
-  }
-
-  .menu-toggle[aria-expanded="true"] span:first-child {
-    transform: translateY(7px) rotate(45deg);
-  }
-
-  .menu-toggle[aria-expanded="true"] span:nth-child(2) {
-    opacity: 0;
-  }
-
-  .menu-toggle[aria-expanded="true"] span:last-child {
-    transform: translateY(-7px) rotate(-45deg);
-  }
-
-  .site-nav {
-    position: absolute;
-    top: 66px;
-    left: 0;
-    right: 0;
-    display: none;
-    align-items: stretch;
-    gap: 0;
-    padding: 8px 20px 18px;
-    background: #fffefa;
-    border-bottom: 1px solid var(--line);
-    box-shadow: 0 12px 22px #123c4510;
-  }
-
-  .site-nav.is-open {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .site-nav>a:not(.nav-cta) {
-    padding: 11px 4px;
-    border-bottom: 1px solid #edf0e9;
-  }
-
-  .nav-cta {
-    margin-top: 12px;
-    text-align: center;
-  }
-
   .hero-inner {
     min-height: unset;
     padding: 57px 24px 84px;
@@ -1845,6 +1796,8 @@ html[data-theme="dark"] .skip-link {
 
 }
 
+/* This block owns the mobile navigation structure. The <=640 block below only
+   adjusts spacing, so the menu stays aligned with the real header height. */
 @media(max-width:1200px) {
   .menu-toggle {
     width: 40px;
@@ -1866,9 +1819,21 @@ html[data-theme="dark"] .skip-link {
     transition: transform .2s;
   }
 
+  .menu-toggle[aria-expanded="true"] span:first-child {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .menu-toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-toggle[aria-expanded="true"] span:last-child {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
   .site-nav {
     position: absolute;
-    top: 76px;
+    top: 100%;
     left: 0;
     right: 0;
     display: none;
@@ -1894,7 +1859,13 @@ html[data-theme="dark"] .skip-link {
     margin-top: 12px;
     text-align: center;
   }
+}
 
+@media(max-width:640px) {
+  .site-nav {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }
 
 .closing-logo {

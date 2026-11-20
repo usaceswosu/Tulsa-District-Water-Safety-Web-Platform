@@ -4,15 +4,46 @@ https://usaceswosu.github.io/Tulsa-District-Water-Safety-Web-Platform/
 
 A responsive, static website that brings together Bobber the Water Safety Dog resources and water safety information for the U.S. Army Corps of Engineers Tulsa District. It consolidates the Bobber program page and cartoons/graphics library into one searchable, accessibility-minded experience.
 
+New maintainers: read [`ARCHITECTURE.md`](ARCHITECTURE.md) for the runtime design and [`CONTRIBUTING.md`](CONTRIBUTING.md) for change recipes. [`CONTENT_REVIEW.md`](CONTENT_REVIEW.md) tracks the remaining external reviews.
+
 ## Run locally
 
-No build tools or server-side code are required. Open `index.html` in a browser, or serve this folder with any static web server. Styles, scripts, fonts (system fonts), artwork, and PDFs load from the repository; there are no CDN or hosted font dependencies.
+Requires Node 22+ for the dev server and tests. There is no build step: the repository is the deployable site.
 
-For local preview, run `npm run serve` (or `node scripts/serve.mjs`) and open <http://127.0.0.1:4173/index.html>.
+```bash
+npm ci
+npm run serve
+# http://127.0.0.1:4173/
+```
 
-The stylesheet and scripts are linked with a `?v=` value. When you change `styles.css`, `data/resources.js`, `data/pdf-meta.js`, `data/translations.js`, `scripts/main.js`, or `scripts/pdf-reader.js`, bump that value in `index.html` and `grown-ups.html` (including the classroom-pack link), then run `npm run update:precache` so the offline shell uses the same version. The reader also uses the `main.js` version for cache-busted preview PDFs and vendor modules.
+The reader, offline shell, and GitHub Pages behavior are designed for a real HTTP origin, so use the local server rather than opening `index.html` from disk.
 
-The links to YouTube, USACE, Recreation.gov, and other official sources are outbound links only. The site itself does not need those services to load; video playback and live lake information do require visiting the respective source.
+The links to YouTube, USACE, Recreation.gov, and other official sources are outbound only; the site itself does not need them to render. Video playback and live lake information require visiting those sources.
+
+## Quality checks
+
+```bash
+npm run check   # versions, globals, content, HTML, CSS, partials, precache, PDFs
+npm test        # Playwright smoke, accessibility, reader, and offline tests
+```
+
+On Windows, the catalog/link integrity check is also available as:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-site.ps1
+```
+
+CI runs both plus Lighthouse and a scheduled link check.
+
+## Asset versions
+
+Every local stylesheet/script uses a shared `?v=` value. Do not edit those values by hand:
+
+```bash
+npm run bump:version -- 20261121a
+```
+
+The command updates both pages, the classroom-pack link, and `precache.json`, then verifies consistency. Run `npm run check` afterward.
 
 ## Publish with GitHub Pages
 
@@ -21,31 +52,30 @@ The links to YouTube, USACE, Recreation.gov, and other official sources are outb
 3. Under **Build and deployment**, choose **Deploy from a branch**.
 4. Select the `main` branch and the `/ (root)` folder, then choose **Save**.
 
-The site has no build step. GitHub Pages serves these files and folders directly. Internal asset links are relative to the project root. The final Pages address depends on the publishing account and repository name; find it under **Settings → Pages** (project pages usually follow `https://<owner>.github.io/<repository>/`).
+GitHub Pages serves the files directly. Internal links are relative to the project root; the final address depends on the publishing account and repository name (project pages usually follow `https://<owner>.github.io/<repository>/`).
 
 ## Project structure
 
-- `index.html` — the kid-facing home page: safety reminders, cartoons, AR activity, and the printable library.
-- `grown-ups.html` — lake visit planning, the district app, and educator materials.
-- `404.html` — self-contained page for missing addresses.
-- `styles.css` — design tokens, components, responsive layouts, and light/dark themes.
-- `data/resources.js` — resource metadata and Spanish display titles. Keep the official filenames exactly as stored in `assets/`.
-- `data/translations.js` — Spanish interface copy, separated from page behavior.
-- `scripts/main.js` — resource rendering, search/filter behavior, language/theme controls, navigation, and the keyboard easter egg.
-- `scripts/check-site.ps1` — verifies resource files, local links, duplicate IDs, and key accessibility hooks.
-- `.github/workflows/site-checks.yml` — runs the static integrity check for pushes and pull requests.
-- `assets/bobber-logo.png` — site brand image.
-- `assets/graphics/` — preview images for the printable library.
-- `assets/graphics/videos/` — YouTube preview images for the cartoon episodes.
-- `assets/bobber/` — Bobber artwork used on the page, including the checklist images for Bobber without his life jacket, with it, and with his buddy.
-- `assets/cards/` — official 1-2-3 Splash trading-card images that open from Bobber's pals.
-- `assets/pdfs/` — self-hosted original resource and program PDFs.
+- `index.html` — kid-facing home: safety reminders, cartoons, AR, game, printable library, reader.
+- `grown-ups.html` — lake planning, the district app, classroom materials, reader.
+- `accessibility.html` / `poster.html` / `404.html` — self-contained statement, QR poster, and not-found pages.
+- `partials/` — shared header, footer, and reader markup copied into both main pages.
+- `styles.css` — design tokens, components, responsive layouts, dark theme, and print rules (section map at the top).
+- `data/resources.js` — printable catalog and Spanish display titles.
+- `data/pdf-meta.js` — generated page counts, print sizes, and preview paths.
+- `data/content.js` — home-page tips, pal cards, checklist feedback, and quiz questions.
+- `data/translations.js` — Spanish interface dictionary.
+- `scripts/main.js` — page controller: library, language/theme, navigation, PWA banners, game/certificate.
+- `scripts/pdf-reader.js` — in-page reader, fallback viewer, TOC, zoom, and print.
+- `sw.js` + `precache.json` — versioned offline shell and runtime caching.
+- `scripts/` — maintenance, validation, versioning, QR/pack, and preview-generation tools.
+- `tests/` — Playwright suites by feature.
+- `.github/workflows/` — static checks, Lighthouse, and scheduled link check.
+- `assets/` — artwork, thumbnails, self-hosted PDFs, previews, QR codes, and the classroom ZIP.
 
 ## Updating resources
 
-Add a PDF to `assets/pdfs/` and its preview image to `assets/graphics/`, then add a record to `resources` in `data/resources.js` with a `pdfs/`-prefixed file path. Add its Spanish display title to `resourceTitlesEs` there if needed. Keep source filenames intact; the app URL-encodes spaces and punctuation when creating links. Put page-interface translations in `data/translations.js` and interactions in `scripts/main.js`.
-
-To run the integrity check locally on Windows: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-site.ps1`.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full recipe. In short: add the print PDF and thumbnail, add a `data/resources.js` entry and Spanish title, run `npm run update:pdf-meta`, optionally generate a reader preview, then bump the version and run the checks.
 
 External video and official program links point to YouTube and USACE websites. The safety reminders are educational and do not replace local rules, adult supervision, or professional guidance.
 

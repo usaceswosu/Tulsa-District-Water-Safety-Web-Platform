@@ -2,8 +2,9 @@
 // excluded; they are large and need a live connection for the reader/download.
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
+import { siteRoot } from "./lib/site-root.mjs";
 
-const root = new URL("..", import.meta.url).pathname;
+const root = siteRoot;
 const output = join(root, "precache.json");
 const checkOnly = process.argv.includes("--check");
 const pages = ["index.html", "grown-ups.html", "accessibility.html", "poster.html", "404.html"];

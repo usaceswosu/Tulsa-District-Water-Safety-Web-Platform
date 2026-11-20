@@ -1,4 +1,24 @@
-// Browser-only enhancements for the static GitHub Pages site.
+/*
+ * Bobber page controller.
+ *
+ * Loaded as a classic deferred script on index.html and grown-ups.html. Classic
+ * scripts share one global scope, so top-level names must stay unique across
+ * data/resources.js, data/content.js, scripts/pdf-reader.js, and this file.
+ * Run `npm run check:globals` after adding a top-level name.
+ *
+ * Sections: data + preferences, resource library, navigation, language/theme,
+ * PWA, tips, checklist, dialogs, game/certificate, scroll reveal, boot.
+ */
+const DAY_MS = 86_400_000;
+const RESOURCE_IDLE_TIMEOUT_MS = 1200;
+const RESOURCE_IDLE_FALLBACK_MS = 120;
+const READER_PREFETCH_MARGIN = "500px";
+const TIP_ROTATION_MS = 8000;
+const CONFETTI_LIFETIME_MS = 1800;
+const PWA_IDLE_TIMEOUT_MS = 2500;
+const PWA_REGISTER_FALLBACK_MS = 500;
+const PWA_RELOAD_FALLBACK_MS = 4000;
+
 const resources = window.BOBBER_RESOURCES;
 const categoryLabels = window.BOBBER_CATEGORY_LABELS;
 const educatorPdfLinks = [...document.querySelectorAll(".educator-card a[href$='.pdf'], .educator-note a[href$='.pdf']")];
@@ -19,6 +39,12 @@ const resourceTitlesEs = window.BOBBER_RESOURCE_TITLES_ES;
 const filterLabels = window.BOBBER_FILTER_LABELS || categoryLabels;
 const pdfMeta = window.BOBBER_PDF_META || {};
 const spanishText = window.BOBBER_TRANSLATIONS_ES;
+const pageContent = window.BOBBER_CONTENT || {};
+const bobberTips = pageContent.tips || [];
+const bobberLooks = pageContent.looks || {};
+const checklistReactions = pageContent.reactions || [];
+const palCards = pageContent.palCards || {};
+const gamePool = pageContent.gamePool || [];
 const appScript = [...document.scripts].find((script) => script.src.includes("main.js"));
 const assetVersion = appScript ? new URL(appScript.src).searchParams.get("v") || "" : "";
 // Capture authored English text once so the language toggle can switch both ways.
@@ -35,6 +61,8 @@ let activeFilter = "all";
 let currentLanguage = "en";
 let resourcesRendered = false;
 let resourcesScheduled = false;
+let renderedLanguage = null;
+let resourceCards = [];
 
 function savePreference(name, value) {
   try {
@@ -124,22 +152,40 @@ function makeCard(resource) {
   return article;
 }
 
+function resourceMatches(resource, query) {
+  const matchesCategory = activeFilter === "all" || resource.category === activeFilter;
+  if (!matchesCategory) return false;
+  if (!query) return true;
+  const searchableTitle = currentLanguage === "es"
+    ? `${resource.title} ${resourceTitlesEs[resource.title] || ""}`
+    : resource.title;
+  return searchableTitle.toLowerCase().includes(query);
+}
+
 function renderResources() {
   if (!grid || !searchInput) return;
   resourcesRendered = true;
-  const query = searchInput.value.trim().toLocaleLowerCase();
-  const visibleResources = resources.filter((resource) => {
-    const matchesCategory = activeFilter === "all" || resource.category === activeFilter;
-    const searchableTitle = currentLanguage === "es" ? `${resource.title} ${resourceTitlesEs[resource.title] || ""}` : resource.title;
-    const matchesQuery = !query || searchableTitle.toLocaleLowerCase().includes(query);
-    return matchesCategory && matchesQuery;
-  });
+  const query = searchInput.value.trim().toLowerCase();
 
-  grid.replaceChildren(...visibleResources.map(makeCard));
+  // Rebuild only when the language changes; filtering reuses the existing cards.
+  if (renderedLanguage !== currentLanguage || resourceCards.length !== resources.length) {
+    resourceCards = resources.map((resource) => ({ resource, card: makeCard(resource) }));
+    grid.replaceChildren(...resourceCards.map(({ card }) => card));
+    renderedLanguage = currentLanguage;
+  }
+
+  const visibleResources = [];
+  for (const { resource, card } of resourceCards) {
+    const visible = resourceMatches(resource, query);
+    card.hidden = !visible;
+    if (visible) visibleResources.push(resource);
+  }
+
   emptyState.hidden = visibleResources.length !== 0;
+  const count = visibleResources.length;
   resultsMessage.textContent = currentLanguage === "es"
-    ? `${visibleResources.length} ${visibleResources.length === 1 ? "recurso" : "recursos"}${query ? ` para “${searchInput.value.trim()}”` : ""}`
-    : `${visibleResources.length} ${visibleResources.length === 1 ? "resource" : "resources"}${query ? ` matching “${searchInput.value.trim()}”` : ""}`;
+    ? `${count} ${count === 1 ? "recurso" : "recursos"}${query ? ` para “${searchInput.value.trim()}”` : ""}`
+    : `${count} ${count === 1 ? "resource" : "resources"}${query ? ` matching “${searchInput.value.trim()}”` : ""}`;
 }
 
 function scheduleResources() {
@@ -149,8 +195,8 @@ function scheduleResources() {
     resourcesScheduled = false;
     if (!resourcesRendered) renderResources();
   };
-  if ("requestIdleCallback" in window) window.requestIdleCallback(run, { timeout: 1200 });
-  else window.setTimeout(run, 120);
+  if ("requestIdleCallback" in window) window.requestIdleCallback(run, { timeout: RESOURCE_IDLE_TIMEOUT_MS });
+  else window.setTimeout(run, RESOURCE_IDLE_FALLBACK_MS);
 }
 
 function warmPdfEngine() {
@@ -199,7 +245,7 @@ if (readerWarmTarget && "IntersectionObserver" in window) {
       warmPdfEngine();
       readerWarmObserver.disconnect();
     }
-  }, { rootMargin: "500px" });
+  }, { rootMargin: READER_PREFETCH_MARGIN });
   readerWarmObserver.observe(readerWarmTarget);
 }
 
@@ -267,6 +313,8 @@ function updateExternalLinkLabels() {
 function setLanguage(language) {
   currentLanguage = language;
   const isSpanish = language === "es";
+
+  // Document metadata and URL.
   document.documentElement.lang = language;
   document.documentElement.dataset.locale = language;
   savePreference("bobber-language", language);
@@ -295,6 +343,7 @@ function setLanguage(language) {
     }
   }
 
+  // Authored text captured at boot. Dynamic widgets are handled below.
   for (const { node, original } of staticEnglishTextNodes) {
     if (!node.isConnected) continue;
     const text = original.trim();
@@ -311,6 +360,7 @@ function setLanguage(language) {
     if (heroTitle.innerHTML !== nextTitle) heroTitle.innerHTML = nextTitle;
   }
 
+  // Header, navigation, and accessible names.
   const languageCode = headerLanguageToggle.querySelector(".language-code");
   const languageName = headerLanguageToggle.querySelector(".language-name");
   languageCode.textContent = isSpanish ? "EN" : "ES";
@@ -336,6 +386,7 @@ function setLanguage(language) {
   const noteImage = document.querySelector(".bobber-note img");
   if (noteImage) noteImage.alt = isSpanish ? "Bobber, el perro de seguridad acuática" : "Bobber the Water Safety Dog";
 
+  // Card-level language panels.
   englishSafetyCopy.forEach((copy) => { copy.hidden = isSpanish; });
   spanishSafetyCopy.forEach((copy) => { copy.hidden = !isSpanish; });
   spanishSafetyCopy.forEach((copy) => {
@@ -343,6 +394,7 @@ function setLanguage(language) {
     if (label) label.textContent = isSpanish ? "BORRADOR · TRADUCCIÓN" : "ESPAÑOL · BORRADOR";
   });
 
+  // Library, widgets, and cross-page labels.
   filterButtons.forEach((button) => {
     const key = button.dataset.filter;
     const label = button.querySelector("span");
@@ -418,7 +470,7 @@ function setupPwa() {
     const waiting = swRegistration?.waiting;
     if (waiting) {
       waiting.postMessage({ type: "SKIP_WAITING" });
-      window.setTimeout(() => { if (pwaReloadRequested) location.reload(); }, 4000);
+      window.setTimeout(() => { if (pwaReloadRequested) location.reload(); }, PWA_RELOAD_FALLBACK_MS);
     } else {
       location.reload();
     }
@@ -437,9 +489,7 @@ function setupPwa() {
   window.addEventListener("load", () => {
     const register = async () => {
       try {
-        const mainScript = [...document.scripts].find((script) => script.src.includes("main.js"));
-        const version = mainScript ? new URL(mainScript.src).searchParams.get("v") : "";
-        swRegistration = await navigator.serviceWorker.register(`sw.js${version ? `?v=${encodeURIComponent(version)}` : ""}`);
+        swRegistration = await navigator.serviceWorker.register(`sw.js${assetVersion ? `?v=${encodeURIComponent(assetVersion)}` : ""}`);
         if (swRegistration.waiting) showUpdateBanner();
         swRegistration.addEventListener("updatefound", () => {
           const worker = swRegistration.installing;
@@ -451,8 +501,8 @@ function setupPwa() {
         // Offline support is an enhancement; the site works without it.
       }
     };
-    if ("requestIdleCallback" in window) window.requestIdleCallback(register, { timeout: 2500 });
-    else window.setTimeout(register, 500);
+    if ("requestIdleCallback" in window) window.requestIdleCallback(register, { timeout: PWA_IDLE_TIMEOUT_MS });
+    else window.setTimeout(register, PWA_REGISTER_FALLBACK_MS);
   });
 }
 
@@ -554,25 +604,12 @@ themeToggle.addEventListener("click", () => {
   updateThemeControl();
 });
 // Bobber starts with the tip of the day, then keeps sharing more reminders while the page is open.
-const bobberTips = [
-  { en: "Wear your life jacket every time!", es: "¡Usa tu chaleco salvavidas siempre!" },
-  { en: "Swim with a buddy!", es: "¡Nada acompañado!" },
-  { en: "Reach or throw. Don’t go!", es: "¡Alcanza o lanza; no te metas!" },
-  { en: "Cold water is sneaky—stay alert!", es: "Agua fría: ¡mantente alerta!" },
-  { en: "Ask a grown-up before you go!", es: "¡Pregunta a un adulto antes de ir!" },
-  { en: "Look out for each other!", es: "¡Cuídense entre todos!" },
-  { en: "Check the weather before you go!", es: "¡Revisa el clima antes de salir!" },
-  { en: "Jump in feet first!", es: "¡Salta con los pies primero!" },
-  { en: "Stay in a grown-up’s sight!", es: "¡Quédate a la vista de un adulto!" },
-  { en: "Take breaks and drink water!", es: "¡Toma descansos y bebe agua!" },
-  { en: "Leave the water if you feel cold!", es: "¡Sal del agua si tienes frío!" },
-  { en: "Look before you leap!", es: "¡Mira antes de saltar!" }
-];
 const speechBubble = document.querySelector(".speech-bubble");
-let tipIndex = Math.floor(Date.now() / 86400000) % bobberTips.length;
+let tipIndex = bobberTips.length ? Math.floor(Date.now() / DAY_MS) % bobberTips.length : 0;
 
 function renderSpeechBubble() {
-  if (speechBubble) speechBubble.textContent = bobberTips[tipIndex][currentLanguage];
+  if (!speechBubble || !bobberTips.length) return;
+  speechBubble.textContent = bobberTips[tipIndex % bobberTips.length][currentLanguage];
 }
 
 function updateSpeechBubble() {
@@ -581,6 +618,7 @@ function updateSpeechBubble() {
 }
 
 function advanceSpeechBubble() {
+  if (!bobberTips.length) return;
   tipIndex = (tipIndex + 1) % bobberTips.length;
   renderSpeechBubble();
   if (speechBubble && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -593,8 +631,8 @@ function advanceSpeechBubble() {
 
 let speechTimer = null;
 function startSpeechRotation() {
-  if (!speechBubble || speechTimer) return;
-  speechTimer = window.setInterval(advanceSpeechBubble, 8000);
+  if (!speechBubble || !bobberTips.length || speechTimer) return;
+  speechTimer = window.setInterval(advanceSpeechBubble, TIP_ROTATION_MS);
 }
 
 function stopSpeechRotation() {
@@ -626,7 +664,7 @@ function burstConfetti(container) {
     layer.append(piece);
   }
   container.append(layer);
-  window.setTimeout(() => layer.remove(), 1800);
+  window.setTimeout(() => layer.remove(), CONFETTI_LIFETIME_MS);
 }
 
 const readyBoxes = [...document.querySelectorAll(".lake-check-list input")];
@@ -637,11 +675,6 @@ const readyBobber = document.querySelector(".lake-check-bobber");
 const readyBobberImg = document.querySelector("#lake-check-bobber-img");
 const readySay = document.querySelector("#lake-check-say");
 const reactions = [...document.querySelectorAll(".reaction")];
-const bobberLooks = {
-  bare: "assets/bobber/bobber-no-jacket.webp",
-  jacket: "assets/bobber/bobber-sitting.webp",
-  buddy: "assets/bobber/bobber-buddy.webp"
-};
 Object.values(bobberLooks).forEach((src) => { const preload = new Image(); preload.src = src; });
 
 // Bobber starts without his life jacket; ticking the boxes dresses him and adds his buddy.
@@ -650,17 +683,9 @@ function updateBobberLook() {
   const jacketOn = Boolean(readyBoxes[0]?.checked);
   const buddyOn = Boolean(readyBoxes[1]?.checked);
   const next = buddyOn ? bobberLooks.buddy : jacketOn ? bobberLooks.jacket : bobberLooks.bare;
-  if (readyBobberImg.getAttribute("src") !== next) readyBobberImg.src = next;
+  if (next && readyBobberImg.getAttribute("src") !== next) readyBobberImg.src = next;
   readyBobber?.classList.toggle("is-buddy", buddyOn);
 }
-
-// Each tick makes Bobber react: he hops, and the matching prop pops in beside him.
-const checklistReactions = [
-  { say: { en: "Life jacket on! You look great.", es: "¡Chaleco puesto! Te ves muy bien." } },
-  { say: { en: "Buddy by your side!", es: "¡Tu compañero está contigo!" } },
-  { say: { en: "A grown-up is watching. Nice!", es: "Un adulto está vigilando. ¡Bien!" } },
-  { say: { en: "Reach or throw, not go!", es: "¡Alcanza o lanza, no te metas!" } }
-];
 
 function updateChecklist(reactedBox) {
   if (!readyProgress) return;
@@ -705,35 +730,6 @@ const infoTitle = document.querySelector("#info-title");
 const infoCopy = document.querySelector("#info-copy");
 const infoClose = document.querySelector("#info-close");
 const infoLink = document.querySelector("#info-link");
-
-// Each pal opens their official 1-2-3 Splash trading card.
-const palCards = {
-  "Ranger Buck": {
-    art: "assets/cards/splash/card-2.webp",
-    page: 4,
-    rule: { en: "Learn to swim and float well!", es: "¡Aprende a nadar y flotar bien!" }
-  },
-  "Ranger Jane": {
-    art: "assets/cards/splash/card-3.webp",
-    page: 5,
-    rule: { en: "Get outdoors and play it safe!", es: "¡Disfruta al aire libre con seguridad!" }
-  },
-  "Ranger Toro": {
-    art: "assets/cards/splash/card-4.webp",
-    page: 6,
-    rule: { en: "Learn to swim and float well!", es: "¡Aprenda a nadar y flotar bien!" }
-  },
-  "Corkey": {
-    art: "assets/cards/splash/card-7.webp",
-    page: 9,
-    rule: { en: "Always swim with a buddy!", es: "¡Nada siempre acompañado!" }
-  },
-  "Sinker": {
-    art: "assets/cards/splash/card-8.webp",
-    page: 10,
-    rule: { en: "Don’t trust inflatable toys!", es: "¡No confíes en los juguetes inflables!" }
-  }
-};
 
 function openInfoCard({ art, kicker, title, copy, link }) {
   if (!infoDialog) return;
@@ -808,129 +804,6 @@ if (infoDialog) {
   });
 }
 
-// Bobber's safety game: four picture questions with instant feedback.
-const gamePool = [
-  {
-    art: "assets/bobber/bobber-jacket-rack.webp",
-    alt: { en: "Bobber next to a rack of life jackets", es: "Bobber junto a un perchero de chalecos salvavidas" },
-    question: { en: "What should you put on before you get in a boat?", es: "¿Qué debes ponerte antes de subir a un bote?" },
-    options: [
-      { en: "A life jacket", es: "Un chaleco salvavidas", correct: true },
-      { en: "A raincoat", es: "Un impermeable" },
-      { en: "Sunglasses", es: "Gafas de sol" }
-    ]
-  },
-  {
-    art: "assets/bobber/bobber-lifebuoy.webp",
-    alt: { en: "Bobber throwing a lifebuoy from a dock", es: "Bobber lanzando un salvavidas desde un muelle" },
-    question: { en: "What should you do if someone is in trouble in the water?", es: "¿Qué debes hacer si alguien está en peligro en el agua?" },
-    options: [
-      { en: "Reach or throw something that floats", es: "Alcanzar o lanzar algo que flote", correct: true },
-      { en: "Jump in to help", es: "Saltar al agua para ayudar" },
-      { en: "Wait and do nothing", es: "Esperar sin hacer nada" }
-    ]
-  },
-  {
-    art: "assets/bobber/bobber-swim.webp",
-    alt: { en: "Bobber swimming with a buddy", es: "Bobber nadando con un compañero" },
-    question: { en: "Who should you swim with?", es: "¿Con quién debes nadar?" },
-    options: [
-      { en: "A buddy", es: "Con un compañero", correct: true },
-      { en: "Nobody", es: "Con nadie" },
-      { en: "A beach toy", es: "Con un juguete de playa" }
-    ]
-  },
-  {
-    art: "assets/bobber/bobber-boat.webp",
-    alt: { en: "Bobber rowing a boat", es: "Bobber remando en un bote" },
-    question: { en: "What should you check before a lake day?", es: "¿Qué debes revisar antes de un día en el lago?" },
-    options: [
-      { en: "The weather and water conditions", es: "El clima y las condiciones del agua", correct: true },
-      { en: "Only the snack bag", es: "Solo la bolsa de bocadillos" },
-      { en: "Nothing at all", es: "Nada" }
-    ]
-  },
-  {
-    art: "assets/bobber/bobber-jacket-rack.webp",
-    alt: { en: "Bobber next to a rack of life jackets", es: "Bobber junto a un perchero de chalecos salvavidas" },
-    question: { en: "How should a life jacket fit?", es: "¿Cómo debe quedar el chaleco salvavidas?" },
-    options: [
-      { en: "Snug and buckled", es: "Ajustado y abrochado", correct: true },
-      { en: "Loose and open", es: "Suelto y abierto" },
-      { en: "Two sizes too big", es: "Dos tallas más grande" }
-    ]
-  },
-  {
-    art: "assets/bobber/bobber-swim.webp",
-    alt: { en: "Bobber swimming with a buddy", es: "Bobber nadando con un compañero" },
-    question: { en: "What should you check before you jump into the water?", es: "¿Qué debes revisar antes de saltar al agua?" },
-    options: [
-      { en: "How deep it is", es: "Qué tan profunda es", correct: true },
-      { en: "Whether your friends dare you", es: "Si tus amigos te animan" },
-      { en: "Nothing—just jump", es: "Nada, solo saltar" }
-    ]
-  },
-  {
-    art: "assets/bobber/bobber-cold-water.webp",
-    alt: { en: "Bobber beside cold water with a danger sign", es: "Bobber junto a agua fría con un letrero de peligro" },
-    question: { en: "What should you do if you feel cold in the water?", es: "¿Qué debes hacer si sientes frío en el agua?" },
-    options: [
-      { en: "Get out and warm up", es: "Salir y calentarte", correct: true },
-      { en: "Stay in longer", es: "Quedarte más tiempo" },
-      { en: "Swim farther out", es: "Nadar más lejos" }
-    ]
-  },
-  {
-    art: "assets/bobber/bobber-swim.webp",
-    alt: { en: "Bobber swimming with a buddy", es: "Bobber nadando con un compañero" },
-    question: { en: "Can an inflatable toy replace a life jacket?", es: "¿Puede un juguete inflable sustituir un chaleco salvavidas?" },
-    options: [
-      { en: "No, never", es: "No, nunca", correct: true },
-      { en: "Yes, always", es: "Sí, siempre" },
-      { en: "Only in deep water", es: "Solo en agua profunda" }
-    ]
-  },
-  {
-    art: "assets/bobber/bobber-boat.webp",
-    alt: { en: "Bobber rowing a boat", es: "Bobber remando en un bote" },
-    question: { en: "What should you do when you hear thunder?", es: "¿Qué debes hacer cuando oyes truenos?" },
-    options: [
-      { en: "Leave the water right away", es: "Salir del agua de inmediato", correct: true },
-      { en: "Keep swimming", es: "Seguir nadando" },
-      { en: "Wait for the rain to stop", es: "Esperar a que pare la lluvia" }
-    ]
-  },
-  {
-    art: "assets/bobber/bobber-swim.webp",
-    alt: { en: "Bobber swimming with a buddy", es: "Bobber nadando con un compañero" },
-    question: { en: "Where should you swim?", es: "¿Dónde debes nadar?" },
-    options: [
-      { en: "In a designated swimming area", es: "En una zona designada para nadar", correct: true },
-      { en: "Near a boat ramp", es: "Cerca de una rampa de botes" },
-      { en: "Anywhere you like", es: "Donde quieras" }
-    ]
-  },
-  {
-    art: "assets/bobber/bobber-swim.webp",
-    alt: { en: "Bobber swimming with a buddy", es: "Bobber nadando con un compañero" },
-    question: { en: "What should you do before you swim?", es: "¿Qué debes hacer antes de nadar?" },
-    options: [
-      { en: "Ask a grown-up to watch", es: "Pedirle a un adulto que te vigile", correct: true },
-      { en: "Swim first, tell later", es: "Nadar primero y avisar después" },
-      { en: "Turn off the lights", es: "Apagar las luces" }
-    ]
-  },
-  {
-    art: "assets/bobber/bobber-boat.webp",
-    alt: { en: "Bobber rowing a boat", es: "Bobber remando en un bote" },
-    question: { en: "What should you wear when fishing from a boat?", es: "¿Qué debes llevar puesto cuando pescas desde un bote?" },
-    options: [
-      { en: "A life jacket", es: "Un chaleco salvavidas", correct: true },
-      { en: "Heavy boots", es: "Botas pesadas" },
-      { en: "A backpack", es: "Una mochila" }
-    ]
-  }
-];
 const GAME_ROUNDS = 4;
 
 const gameArt = document.querySelector("#game-art");
@@ -978,6 +851,7 @@ function shuffle(values) {
 }
 
 function startGame() {
+  if (!gamePool.length) return;
   const picks = shuffle(gamePool.map((_, index) => index)).slice(0, GAME_ROUNDS);
   gameState.rounds = picks.map((index) => gamePool[index]);
   gameState.orders = gameState.rounds.map((round) => shuffle(round.options.map((_, index) => index)));
@@ -990,7 +864,7 @@ function startGame() {
 }
 
 function renderGame() {
-  if (!gameOptions) return;
+  if (!gameOptions || !gamePool.length) return;
   if (!gameState.rounds.length) startGame();
   const total = gameState.rounds.length;
 

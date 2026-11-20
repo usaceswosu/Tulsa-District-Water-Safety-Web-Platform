@@ -2,8 +2,9 @@
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import JSZip from "jszip";
+import { siteRoot } from "./lib/site-root.mjs";
 
-const root = new URL("..", import.meta.url).pathname;
+const root = siteRoot;
 const outputDir = join(root, "assets/downloads");
 const output = join(outputDir, "Bobber_Classroom_Pack_2026.zip");
 const folderName = "Bobber_Classroom_Pack";

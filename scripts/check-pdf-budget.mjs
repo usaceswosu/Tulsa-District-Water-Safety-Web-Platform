@@ -1,8 +1,9 @@
 // Guard against accidentally shipping huge PDFs.
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { siteRoot } from "./lib/site-root.mjs";
 
-const root = new URL("..", import.meta.url).pathname;
+const root = siteRoot;
 const MB = 1048576;
 const readPdfs = (dir) =>
   readdirSync(dir)
