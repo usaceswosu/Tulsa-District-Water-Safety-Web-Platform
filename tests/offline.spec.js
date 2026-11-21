@@ -12,6 +12,7 @@ test("the offline shell loads after installation", async ({ page, context }) => 
   await page.reload({ waitUntil: "domcontentloaded" });
   await expect(page).toHaveTitle(/Bobber/);
   await expect(page.locator("h1")).toContainText("Big fun");
+  await expect(page.locator(".resource-card")).toHaveCount(42);
   await expect(page.locator(".pwa-banner").filter({ hasText: /offline/i })).toBeVisible();
   expect(await page.evaluate(() => getComputedStyle(document.querySelector(".site-header")).position)).toBe("sticky");
 

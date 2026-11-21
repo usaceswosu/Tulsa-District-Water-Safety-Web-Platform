@@ -54,7 +54,11 @@ const staticEnglishTextNodes = [];
 const textWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
 while (textWalker.nextNode()) {
   const node = textWalker.currentNode;
-  if (!node.nodeValue.trim() || ["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"].includes(node.parentElement?.tagName)) continue;
+  const parent = node.parentElement;
+  if (!parent || !node.nodeValue.trim() || ["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"].includes(parent.tagName)) continue;
+  // Library cards are rebuilt for each language, so do not translate the
+  // static English copies first.
+  if (parent.closest(".resource-grid")) continue;
   staticEnglishTextNodes.push({ node, original: node.nodeValue });
 }
 
@@ -209,13 +213,13 @@ function wireResourceCard(resource, article) {
   if (!link || link.dataset.readerWired === "true") return;
   const displayTitle = currentLanguage === "es" ? (resourceTitlesEs[resource.title] || resource.title) : resource.title;
   const { meta, printFile, previewFile, placeholderFile } = cardReaderTargets(resource);
+  const readerReady = typeof pdfReader !== "undefined" && pdfReader && "showModal" in pdfReader && typeof openPdfReader === "function";
   link.href = printFile;
   link.target = "_blank";
   link.rel = "noopener";
-  link.setAttribute("aria-haspopup", "dialog");
+  if (readerReady) link.setAttribute("aria-haspopup", "dialog");
   link.dataset.readerWired = "true";
   link.addEventListener("click", (event) => {
-    const readerReady = typeof pdfReader !== "undefined" && pdfReader && "showModal" in pdfReader && typeof openPdfReader === "function";
     if (!readerReady || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     openPdfReader(previewFile, displayTitle, link, printFile, Boolean(meta.webFile), placeholderFile);
@@ -299,9 +303,9 @@ function normalizeSearchText(value) {
 // uses a different term.
 const RESOURCE_SEARCH_ALIASES = [
   { matches: () => true, terms: "printable print pdf download" },
-  { matches: (resource) => resource.category === "activity", terms: "worksheet activity sheet game" },
-  { matches: (resource) => resource.category === "poster", terms: "coloring colouring poster page" },
-  { matches: (resource) => resource.category === "storybook", terms: "story book reading" },
+  { matches: (resource) => resource.category === "activity", terms: "worksheet activity sheet" },
+  { matches: (resource) => resource.category === "poster", terms: "coloring colouring poster" },
+  { matches: (resource) => resource.category === "storybook", terms: "story reading" },
   { matches: (resource) => /life\s*jacket|life\s*vest|vest|boating|pfd/i.test(resource.title), terms: "life vest lifejacket pfd personal flotation device" },
   { matches: (resource) => /cold water/i.test(resource.title), terms: "hypothermia" },
   { matches: (resource) => /swim|buddy/i.test(resource.title), terms: "swimming buddy" }
@@ -343,13 +347,10 @@ function adoptStaticCards() {
   if (!grid) return [];
   const cards = [...grid.querySelectorAll(".resource-card")];
   if (cards.length !== resources.length) return [];
-  const byFile = new Map(resources.map((resource) => [resource.file, resource]));
-  const seen = new Set();
   const adopted = [];
-  for (const card of cards) {
-    const resource = byFile.get(card.dataset.resourceFile);
-    if (!resource || seen.has(resource.file)) return [];
-    seen.add(resource.file);
+  for (const [index, card] of cards.entries()) {
+    const resource = resources[index];
+    if (card.dataset.resourceFile !== resource.file || !card.querySelector(".resource-link")) return [];
     wireResourceCard(resource, card);
     adopted.push({
       resource,

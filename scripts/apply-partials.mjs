@@ -77,7 +77,7 @@ function render(html, data) {
   const header = indent(
     headerTemplate
       .replaceAll("{{HOME}}", data.home)
-      .replace("{{NAV_LINKS}}", data.nav.map(navLink).join("\n"))
+      .replaceAll("{{NAV_LINKS}}", data.nav.map(navLink).join("\n"))
   ).trimEnd();
   const footer = indent(
     footerTemplate

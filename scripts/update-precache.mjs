@@ -23,7 +23,7 @@ for (const page of pages) {
   for (const match of html.matchAll(/(?:src|href)="([^"]+\.(?:css|js|mjs)(?:\?[^"]*)?)"/g)) {
     if (!/^(?:https?:|data:|#)/.test(match[1])) urls.add(`./${match[1]}`);
   }
-  for (const match of html.matchAll(/srcset="([^"]+)"/g)) {
+  for (const match of html.matchAll(/(?:srcset|imagesrcset)="([^"]+)"/g)) {
     for (const candidate of match[1].split(",")) {
       const path = candidate.trim().split(/\s+/)[0];
       if (path && !/^(?:https?:|data:)/.test(path)) urls.add(`./${path}`);

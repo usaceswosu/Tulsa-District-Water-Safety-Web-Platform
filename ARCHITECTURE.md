@@ -168,7 +168,7 @@ The public base URL lives in `site.config.json`. `npm run update:site-url -- <ur
 
 | Path | Responsibility |
 | --- | --- |
-| `index.html` | Kid-facing home: hero, safety cards, videos, game, library, reader |
+| `index.html` | Kid-facing home: hero, safety cards, videos, game, static library, reader |
 | `grown-ups.html` | Lake planning, educator materials, grown-ups reader |
 | `accessibility.html` | Accessibility/privacy statement, English + Spanish |
 | `poster.html` | Printable English/Spanish QR posters |
@@ -198,7 +198,7 @@ The public base URL lives in `site.config.json`. `npm run update:site-url -- <ur
 ## Known limitations
 
 - Offline mode caches the shell and images; PDFs/ZIPs still require a connection.
-- The library is rendered by JavaScript; no-JS users cannot browse cards.
+- English library cards are static; Spanish cards are rebuilt at runtime, so a no-JS Spanish view still shows the English cards.
 - Reader previews are raster images; print PDFs keep the original vector/accessibility content.
 - Spanish safety copy and the Spanish interface still need district/fluent review.
 - Formal Section 508 and Public Affairs review is external to this repository.

@@ -93,6 +93,17 @@ for (const page of pages) {
     }
   }
 
+  for (const match of html.matchAll(/(?:srcset|imagesrcset)="([^"]+)"/g)) {
+    for (const candidate of match[1].split(",")) {
+      const url = candidate.trim().split(/\s+/)[0];
+      if (!url || skipReference(url)) continue;
+      localReferences += 1;
+      if (!existsSync(resolveLocal(url)) || !statSync(resolveLocal(url)).isFile()) {
+        fail(`Missing local srcset asset in ${page}: ${url}`);
+      }
+    }
+  }
+
   if (scriptOrder[page]) {
     let previous = -1;
     for (const script of scriptOrder[page]) {
@@ -115,9 +126,15 @@ if (!Array.isArray(resources) || !resources.length) {
   fail("The shared resource data could not be read.");
 } else {
   const seenTitles = new Set();
+  const seenFiles = new Set();
+  const seenImages = new Set();
   for (const resource of resources) {
     if (seenTitles.has(resource.title)) fail(`Duplicate resource title: ${resource.title}`);
     seenTitles.add(resource.title);
+    if (seenFiles.has(resource.file)) fail(`Duplicate resource PDF: ${resource.file}`);
+    seenFiles.add(resource.file);
+    if (seenImages.has(resource.image)) fail(`Duplicate resource image: ${resource.image}`);
+    seenImages.add(resource.image);
     if (!["activity", "poster", "storybook"].includes(resource.category)) {
       fail(`Unknown resource category for ${resource.title}`);
     }
@@ -131,7 +148,12 @@ if (!Array.isArray(resources) || !resources.length) {
     }
     if (!spanishTitles || !(resource.title in spanishTitles)) {
       fail(`Missing Spanish display title for ${resource.title}`);
+    } else if (typeof spanishTitles[resource.title] !== "string" || !spanishTitles[resource.title].trim()) {
+      fail(`Empty Spanish display title for ${resource.title}`);
     }
+  }
+  for (const title of Object.keys(spanishTitles || {})) {
+    if (!seenTitles.has(title)) fail(`Stale Spanish display title: ${title}`);
   }
 }
 

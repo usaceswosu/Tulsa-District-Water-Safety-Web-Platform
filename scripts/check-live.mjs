@@ -41,6 +41,7 @@ try {
       return {
         version: script ? new URL(script.src).searchParams.get("v") : "",
         cards: document.querySelectorAll(".resource-card").length,
+        staticCards: document.querySelectorAll(".resource-card[data-resource-file]").length,
         frozen: Object.isFrozen(window.BOBBER_CONTENT),
         firstMeta: document.querySelector(".resource-meta")?.textContent || "",
         canonical: document.querySelector('link[rel="canonical"]')?.href || "",
@@ -59,6 +60,7 @@ try {
 
   assert(state.version === expectedVersion, `Live version ${state.version} does not match repository version ${expectedVersion}.`);
   assert(state.cards === 42, `Expected 42 resource cards, found ${state.cards}.`);
+  assert(state.staticCards === 42, `Expected 42 adopted static cards, found ${state.staticCards}.`);
   assert(state.frozen, "Home-page content is not frozen.");
   assert(state.firstMeta.includes("preview") && state.firstMeta.includes("print"), `Unexpected card metadata: ${state.firstMeta}`);
   assert(state.canonical.startsWith(siteUrl), `Unexpected canonical URL: ${state.canonical}`);

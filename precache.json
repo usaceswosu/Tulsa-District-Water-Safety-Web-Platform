@@ -80,15 +80,15 @@
   "./assets/qr/bobber-site-es.svg",
   "./assets/qr/bobber-site.svg",
   "./assets/social/bobber-share.png",
-  "./data/content.js?v=20261120s",
-  "./data/pdf-meta.js?v=20261120s",
-  "./data/resources.js?v=20261120s",
-  "./data/translations.js?v=20261120s",
+  "./data/content.js?v=20261120t",
+  "./data/pdf-meta.js?v=20261120t",
+  "./data/resources.js?v=20261120t",
+  "./data/translations.js?v=20261120t",
   "./grown-ups.html",
   "./index.html",
   "./manifest.webmanifest",
   "./poster.html",
-  "./scripts/main.js?v=20261120s",
-  "./scripts/pdf-reader.js?v=20261120s",
-  "./styles.css?v=20261120s"
+  "./scripts/main.js?v=20261120t",
+  "./scripts/pdf-reader.js?v=20261120t",
+  "./styles.css?v=20261120t"
 ]

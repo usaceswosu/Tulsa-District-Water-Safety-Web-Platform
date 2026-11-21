@@ -64,6 +64,8 @@ python3 -m pip install pypdfium2 img2pdf pillow
 python3 scripts/generate-preview-pdf.py \
   "assets/pdfs/Foo.pdf" "assets/pdfs/web/Foo-web.pdf" --dpi 120 --quality 72
 npm run update:pdf-meta
+npm run update:library
+npm run update:resource-schema
 ```
 
 To regenerate the current twelve previews on macOS/Linux:

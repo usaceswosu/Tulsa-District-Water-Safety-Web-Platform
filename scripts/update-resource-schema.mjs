@@ -54,6 +54,8 @@ const schema = {
 };
 
 const json = JSON.stringify(schema, null, 2)
+  // Keep authored metadata from closing the surrounding script element.
+  .replaceAll("<", "\\u003c")
   .split("\n")
   .map((line) => `    ${line}`)
   .join("\n");

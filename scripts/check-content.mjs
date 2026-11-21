@@ -41,6 +41,16 @@ for (const [name, card] of Object.entries(pals)) {
   if (!Number.isInteger(card.page) || card.page < 1) problems.push(`palCards.${name}.page must be a positive page number.`);
 }
 
+const homeHtml = readFileSync(join(siteRoot, "index.html"), "utf8");
+const friendsRow = homeHtml.match(/<ul class="friends-row">([\s\S]*?)<\/ul>/)?.[1] || "";
+const friendNames = [...friendsRow.matchAll(/<strong>([^<]+)<\/strong>/g)].map((match) => match[1].trim());
+for (const name of friendNames) {
+  if (!pals[name]) problems.push(`index.html friend "${name}" has no palCards entry.`);
+}
+for (const name of Object.keys(pals)) {
+  if (!friendNames.includes(name)) problems.push(`palCards entry "${name}" is not in the friends row.`);
+}
+
 if (!Array.isArray(content.gamePool) || content.gamePool.length < 4) problems.push("gamePool should contain at least four questions.");
 else {
   content.gamePool.forEach((round, index) => {

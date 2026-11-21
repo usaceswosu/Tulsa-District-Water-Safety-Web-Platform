@@ -242,8 +242,32 @@ test("the whole library card opens the reader", async ({ page }) => {
   await page.click("#pdf-reader-close");
 });
 
+test("boot adopts the static library cards", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".resource-card[data-resource-file]")).toHaveCount(42);
+  await expect(page.locator("#count-all")).toHaveText("42");
+});
+
+test("static and runtime cards render the same content", async ({ page }) => {
+  await page.goto("/");
+  const snapshot = () => page.evaluate(() => [...document.querySelectorAll(".resource-card")].map((card) => ({
+    title: card.querySelector("h3")?.textContent || "",
+    meta: card.querySelector(".resource-meta")?.textContent || "",
+    type: card.querySelector(".resource-type")?.textContent || "",
+    alt: card.querySelector("img")?.getAttribute("alt") || "",
+    src: card.querySelector("img")?.getAttribute("src") || "",
+    href: card.querySelector(".resource-link")?.getAttribute("href") || "",
+    label: card.querySelector(".resource-link")?.getAttribute("aria-label") || "",
+    description: card.querySelector(".resource-description")?.textContent || "",
+    badges: [...card.querySelectorAll(".resource-badge")].map((badge) => badge.textContent)
+  })));
+  const staticCards = await snapshot();
+  await page.evaluate(() => { renderedLanguage = null; renderResources(); });
+  expect(await snapshot()).toEqual(staticCards);
+});
+
 test("the library is usable without JavaScript", async ({ browser }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false });
+  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto("/");
   await expect(page.locator(".resource-card")).toHaveCount(42);
@@ -252,7 +276,20 @@ test("the library is usable without JavaScript", async ({ browser }) => {
     "href",
     /assets\/pdfs\/.+\.pdf$/
   );
-  await expect(page.locator("noscript p")).toHaveText("Search and filters need JavaScript. All resources are listed below.");
+  await expect(page.locator(".library-tools")).toBeHidden();
+  await expect(page.locator("#menu-toggle")).toBeHidden();
+  await expect(page.locator("#header-language-toggle")).toBeHidden();
+  await expect(page.locator("#theme-toggle")).toBeHidden();
+  await expect(page.locator(".noscript-nav")).toBeVisible();
+  await expect(page.locator(".noscript-nav a")).toHaveCount(6);
+  await expect(page.locator(".library-section noscript p")).toHaveText("Search and filters need JavaScript. All resources are listed below.");
+  await expect(page.locator(".game-card")).toBeHidden();
+  await expect(page.locator(".game-section noscript p")).toContainText("The safety game needs JavaScript.");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+
+  await page.goto("/grown-ups.html");
+  await expect(page.locator(".noscript-nav")).toBeVisible();
+  await expect(page.locator(".noscript-nav a")).toHaveCount(6);
   await context.close();
 });
 

@@ -170,6 +170,40 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   display: none;
 }
 
+.noscript-nav {
+  display: none;
+}
+
+@media print {
+  .noscript-nav {
+    display: none !important;
+  }
+}
+
+@media(max-width:1200px) {
+  .noscript-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    padding: 10px 20px 14px;
+    background: var(--paper);
+    border-bottom: 3px solid var(--outline);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .noscript-nav a {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .noscript-nav .nav-cta {
+    padding: 7px 12px;
+    color: #fff;
+  }
+}
+
 /* Home hero */
 .hero {
   position: relative;
@@ -971,6 +1005,20 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   margin: 21px 0 0;
   color: #778782;
   font-size: 10px;
+}
+
+.noscript-note {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  background: var(--mint);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.noscript-note a {
+  text-decoration: underline;
 }
 
 html[data-theme="dark"] .library-note a {

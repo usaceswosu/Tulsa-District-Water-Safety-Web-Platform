@@ -26,6 +26,12 @@ const limits = {
   downloadMax: 25 * MB
 };
 const problems = [];
+for (const file of preview) {
+  const printName = file.name.replace(/-web\.pdf$/i, ".pdf");
+  if (!existsSync(join(root, "assets/pdfs", printName))) {
+    problems.push(`Preview has no matching print PDF: ${file.name}`);
+  }
+}
 if (largest(print) > limits.printMax) problems.push(`Largest print PDF is ${(largest(print) / MB).toFixed(1)} MB (limit 22 MB).`);
 if (total(print) > limits.printTotal) problems.push(`Print PDFs total ${(total(print) / MB).toFixed(1)} MB (limit 95 MB).`);
 if (largest(preview) > limits.previewMax) problems.push(`Largest preview is ${(largest(preview) / MB).toFixed(1)} MB (limit 11 MB).`);

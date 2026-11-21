@@ -63,6 +63,7 @@ const PRINT_CLEANUP_FALLBACK_MS = 300_000;
  * @property {Object} [loadingTask]
  * @property {Object} [renderTask]
  * @property {boolean} [rendering]
+ * @property {boolean} [needsResize]
  */
 
 const readerScript = document.currentScript;
@@ -252,6 +253,10 @@ async function showPdfPage(session, pageNumber) {
     if (activePdf === session && session.page && !session.fallback) {
       setPdfControls(session.document, session.page);
       updateReaderTools(session, session.page);
+      if (session.needsResize) {
+        session.needsResize = false;
+        showPdfPage(session, session.page);
+      }
     }
   }
 }
@@ -560,9 +565,14 @@ pdfReaderTocToggle.addEventListener("click", () => {
 
 let readerResizeTimer;
 window.addEventListener("resize", () => {
-  if (!activePdf?.document || activePdf.fallback || !activePdf.page || activePdf.rendering) return;
+  if (!activePdf?.document || activePdf.fallback || !activePdf.page) return;
+  activePdf.needsResize = true;
   window.clearTimeout(readerResizeTimer);
-  readerResizeTimer = window.setTimeout(() => showPdfPage(activePdf, activePdf.page), 150);
+  readerResizeTimer = window.setTimeout(() => {
+    if (!activePdf?.document || activePdf.fallback || !activePdf.page || activePdf.rendering) return;
+    activePdf.needsResize = false;
+    showPdfPage(activePdf, activePdf.page);
+  }, 150);
 });
 pdfReaderClose.addEventListener("click", () => pdfReader.close());
 pdfReader.addEventListener("keydown", (event) => {

@@ -70,6 +70,16 @@ foreach ($page in $pages) {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { Add-SiteProblem "Missing local asset in ${name}: $url" }
   }
 
+  foreach ($match in [regex]::Matches($html, '(?:srcset|imagesrcset)="([^"]+)"')) {
+    foreach ($candidate in $match.Groups[1].Value.Split(",")) {
+      $url = ($candidate.Trim() -split '\s+')[0]
+      if (-not $url -or $url -match '^(?:https?:|data:)') { continue }
+      $localReferences++
+      $path = Resolve-SiteFile $url
+      if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { Add-SiteProblem "Missing local srcset asset in ${name}: $url" }
+    }
+  }
+
   # 404.html is intentionally self-contained; GitHub Pages serves it from any missing path.
   if ($name -notin @('404.html', 'accessibility.html', 'poster.html')) {
     $scriptOrder = @('data/resources.js', 'data/translations.js', 'scripts/main.js')
@@ -88,7 +98,7 @@ if (-not $resourceMatch.Success -or -not $titleMatch.Success) {
   Add-SiteProblem "The shared resource data could not be read."
 } else {
   $resourceJson = $resourceMatch.Groups[1].Value -replace '(?m)^\s*//.*$', ''
-  $resourceJson = $resourceJson -replace '([{,])\s*(title|category|file|image)\s*:', '$1"$2":'
+  $resourceJson = $resourceJson -replace '([{,])\s*(title|category|file|image|languages|gradeRange|description|en|es)\s*:', '$1"$2":'
   try {
     $resources = ConvertFrom-Json -InputObject $resourceJson
     $spanishTitles = ConvertFrom-Json -InputObject $titleMatch.Groups[1].Value
@@ -99,9 +109,15 @@ if (-not $resourceMatch.Success -or -not $titleMatch.Success) {
   }
 
   $seenTitles = @{}
+  $seenFiles = @{}
+  $seenImages = @{}
   foreach ($resource in $resources) {
     if ($seenTitles.ContainsKey($resource.title)) { Add-SiteProblem "Duplicate resource title: $($resource.title)" }
     $seenTitles[$resource.title] = $true
+    if ($seenFiles.ContainsKey($resource.file)) { Add-SiteProblem "Duplicate resource PDF: $($resource.file)" }
+    $seenFiles[$resource.file] = $true
+    if ($seenImages.ContainsKey($resource.image)) { Add-SiteProblem "Duplicate resource image: $($resource.image)" }
+    $seenImages[$resource.image] = $true
     if ($resource.category -notin @("activity", "poster", "storybook")) { Add-SiteProblem "Unknown resource category for $($resource.title)" }
     foreach ($relativeFile in @($resource.file, "graphics/$($resource.image)")) {
       $path = Join-Path $siteRoot (Join-Path "assets" ($relativeFile.Replace("/", [IO.Path]::DirectorySeparatorChar)))

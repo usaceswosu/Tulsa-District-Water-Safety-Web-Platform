@@ -4,6 +4,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { runInNewContext } from "node:vm";
+import { imageSize } from "image-size";
 import { siteRoot } from "./lib/site-root.mjs";
 
 const root = siteRoot;
@@ -20,6 +21,19 @@ const pdfMeta = sandbox.window.BOBBER_PDF_META || {};
 const LANGUAGE_NAMES = { en: "English", es: "Spanish" };
 const number = new Intl.NumberFormat("en");
 const decimal = new Intl.NumberFormat("en", { maximumFractionDigits: 1 });
+const dimensions = new Map();
+
+function imageDimensions(filename) {
+  if (!dimensions.has(filename)) {
+    try {
+      const size = imageSize(readFileSync(join(root, "assets", ...filename.split("/"))));
+      dimensions.set(filename, size);
+    } catch {
+      dimensions.set(filename, {});
+    }
+  }
+  return dimensions.get(filename);
+}
 
 function escapeHtml(value) {
   return String(value)
@@ -47,15 +61,18 @@ function formatResourceMeta(resource) {
   const printSize = formatFileSize(meta.bytes);
   const printLabel = printSize ? `${printSize} print` : "";
   const previewSize = meta.webFile && meta.webBytes ? formatFileSize(meta.webBytes) : "";
-  const sizeLabel = previewSize
-    ? `${previewSize} preview · ${printLabel}`
-    : printLabel;
-  return [pages, sizeLabel].filter(Boolean).join(" · ");
+  const previewLabel = previewSize ? `${previewSize} preview` : "";
+  return [pages, previewLabel, printLabel].filter(Boolean).join(" · ");
 }
 
 function makeCard(resource) {
   const title = escapeHtml(resource.title);
-  const image = escapeHtml(assetPath(`graphics/${resource.image}`));
+  const imageFile = `graphics/${resource.image}`;
+  const image = escapeHtml(assetPath(imageFile));
+  const size = imageDimensions(imageFile);
+  const imageSizeAttrs = size.width && size.height
+    ? ` width="${size.width}" height="${size.height}"`
+    : "";
   const href = escapeHtml(assetPath(resource.file));
   const type = escapeHtml(categoryLabels.en[resource.category]);
   const description = escapeHtml(resource.description?.en || "");
@@ -68,7 +85,7 @@ function makeCard(resource) {
   const lines = [
     `          <article class="resource-card" data-resource-file="${escapeHtml(resource.file)}">`,
     `            <div class="resource-thumb">`,
-    `              <img src="${image}" alt="${title} printable preview" loading="lazy" decoding="async">`,
+    `              <img src="${image}" alt="${title} printable preview"${imageSizeAttrs} loading="lazy" decoding="async">`,
     `              <span class="resource-type">${type}</span>`,
     `            </div>`,
     `            <div class="resource-body">`,
@@ -83,7 +100,7 @@ function makeCard(resource) {
   }
   if (meta) lines.push(`              <p class="resource-meta">${meta}</p>`);
   lines.push(
-    `              <a class="resource-link" href="${href}" target="_blank" rel="noopener" aria-haspopup="dialog" aria-label="${ariaLabel}">`,
+    `              <a class="resource-link" href="${href}" target="_blank" rel="noopener" aria-label="${ariaLabel}">`,
     `                <span>${linkLabel}</span>`,
     `                <span aria-hidden="true">→</span>`,
     `              </a>`,
