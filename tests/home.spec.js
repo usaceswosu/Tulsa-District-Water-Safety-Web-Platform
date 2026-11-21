@@ -37,6 +37,8 @@ test("Spanish deep links work and the URL follows the language toggle", async ({
   await expect(page.locator(".resource-meta").first()).toContainText("vista previa");
   await expect(page.locator('.footer-bottom a[href*="accessibility.html"]')).toHaveAttribute("href", "accessibility.html#espanol");
   await expect(page.locator("#header-language-toggle")).toHaveAccessibleName("EN Inglés — cambiar toda la página a inglés");
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", /perro de seguridad acuática/i);
+  await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute("content", "es_US");
   expect(page.url()).toContain("lang=es");
 
   await page.click("#header-language-toggle");
@@ -44,6 +46,8 @@ test("Spanish deep links work and the URL follows the language toggle", async ({
   expect(page.url()).not.toContain("lang=es");
   await expect(page.locator('.footer-bottom a[href*="accessibility.html"]')).toHaveAttribute("href", "accessibility.html");
   await expect(page.locator("#header-language-toggle")).toHaveAccessibleName("ES Español — switch the entire page to Spanish");
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", "Bobber the Water Safety Dog | Tulsa District, USACE");
+  await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute("content", "en_US");
 
   await page.click("#header-language-toggle");
   expect(page.url()).toContain("lang=es");

@@ -35,7 +35,13 @@ function walk(directory) {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
-      if (path.includes(`${join("assets", "pdfs")}`) || path.includes(`${join("assets", "downloads")}`)) continue;
+      // Large documents, downloads, and the social-sharing image are not part
+      // of the offline app shell.
+      if (
+        path.includes(`${join("assets", "pdfs")}`) ||
+        path.includes(`${join("assets", "downloads")}`) ||
+        path.includes(`${join("assets", "social")}`)
+      ) continue;
       walk(path);
     } else if (/\.(?:webp|png|jpe?g|gif|svg|ico|avif)$/i.test(entry.name)) {
       urls.add(`./${relative(root, path).replaceAll("\\", "/")}`);

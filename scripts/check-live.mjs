@@ -61,6 +61,10 @@ try {
   assert(state.version === expectedVersion, `Live version ${state.version} does not match repository version ${expectedVersion}.`);
   assert(state.cards === 42, `Expected 42 resource cards, found ${state.cards}.`);
   assert(state.staticCards === 42, `Expected 42 adopted static cards, found ${state.staticCards}.`);
+  const rawHome = await context.request.get(home, { failOnStatusCode: false });
+  const rawHtml = await rawHome.text();
+  assert(rawHome.ok(), `Home HTML request failed (${rawHome.status()}).`);
+  assert((rawHtml.match(/<article class="resource-card"/g) || []).length === 42, "Home HTML is missing static library cards.");
   assert(state.frozen, "Home-page content is not frozen.");
   assert(state.firstMeta.includes("preview") && state.firstMeta.includes("print"), `Unexpected card metadata: ${state.firstMeta}`);
   assert(state.canonical.startsWith(siteUrl), `Unexpected canonical URL: ${state.canonical}`);
@@ -79,7 +83,7 @@ try {
   assert(libraryNode.itemListElement.every((entry) => entry.item?.url?.startsWith(`${siteUrl}/assets/`)), "JSON-LD library item URL is stale.");
 
   const versionDate = `${expectedVersion.slice(0, 4)}-${expectedVersion.slice(4, 6)}-${expectedVersion.slice(6, 8)}`;
-  for (const path of ["/accessibility.html", "/poster.html", "/manifest.webmanifest", "/assets/qr/bobber-site.svg", "/assets/qr/bobber-site-es.svg", "/assets/downloads/Bobber_Classroom_Pack_2026.zip"]) {
+  for (const path of ["/accessibility.html", "/poster.html", "/manifest.webmanifest", "/assets/social/bobber-share.png", "/assets/qr/bobber-site.svg", "/assets/qr/bobber-site-es.svg", "/assets/downloads/Bobber_Classroom_Pack_2026.zip"]) {
     const response = await context.request.head(`${target}${path}`, { failOnStatusCode: false });
     assert(response.ok(), `Critical URL failed (${response.status()}): ${path}`);
   }

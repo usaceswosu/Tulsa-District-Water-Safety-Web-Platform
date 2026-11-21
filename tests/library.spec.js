@@ -227,9 +227,17 @@ test("zero results offer category shortcuts", async ({ page }) => {
 
   await page.locator(".empty-suggestion").filter({ hasText: "Posters & coloring" }).click();
   await expect(page.locator("#resource-search")).toHaveValue("");
+  await expect(page.locator("#resource-search")).toBeFocused();
   await expect(page.locator("#empty-state")).toBeHidden();
   await expect(page.locator(".resource-card:visible")).toHaveCount(23);
   await expect(page.locator('[data-filter="poster"]')).toHaveAttribute("aria-pressed", "true");
+
+  await page.fill("#resource-search", "zzzz-not-a-resource");
+  await page.click("#header-language-toggle");
+  await expect(page.locator(".empty-suggestion").first()).toHaveText("Actividades");
+  await expect(page.locator("#results-message")).toContainText("0 recursos");
+  await page.setViewportSize({ width: 320, height: 900 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
 });
 
 test("the whole library card opens the reader", async ({ page }) => {
@@ -285,6 +293,7 @@ test("the library is usable without JavaScript", async ({ browser }) => {
   await expect(page.locator(".library-section noscript p")).toHaveText("Search and filters need JavaScript. All resources are listed below.");
   await expect(page.locator(".game-card")).toBeHidden();
   await expect(page.locator(".game-section noscript p")).toContainText("The safety game needs JavaScript.");
+  await expect(page.locator("#lake-check-progress")).toBeHidden();
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
 
   await page.goto("/grown-ups.html");

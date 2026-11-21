@@ -133,7 +133,7 @@ Key invariants:
 `sw.js` is registered from `main.js` as `sw.js?v=<site version>`.
 
 - Cache names include the site version: `bobber-shell-<version>` and `bobber-runtime-<version>`.
-- **Shell:** pages, CSS/JS, images, manifest, and the reader’s thumbnail placeholders from `precache.json`.
+- **Shell:** pages, CSS/JS, site images, manifest, and the reader’s thumbnails from `precache.json`; the social-sharing card is intentionally excluded.
 - **Runtime:** non-precached modules such as `vendor/pdfjs` (trimmed to 160 entries).
 - **Never cached:** PDFs, preview PDFs, and the classroom ZIP. Offline mode provides the safety shell, not document downloads.
 - Navigation uses network-first; offline fallback ignores query strings so `grown-ups.html?lang=es` still returns the grown-ups page.

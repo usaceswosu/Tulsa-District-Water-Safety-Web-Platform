@@ -18,6 +18,7 @@ const CONFETTI_LIFETIME_MS = 1800;
 const PWA_IDLE_TIMEOUT_MS = 2500;
 const PWA_REGISTER_FALLBACK_MS = 500;
 const PWA_RELOAD_FALLBACK_MS = 4000;
+const CERTIFICATE_PRINT_CLEANUP_MS = 300_000;
 
 const resources = window.BOBBER_RESOURCES;
 const categoryLabels = window.BOBBER_CATEGORY_LABELS;
@@ -585,6 +586,15 @@ function setLanguage(language) {
         : "Meet Bobber the Water Safety Dog. Explore family-friendly water safety videos, printable activities, posters, coloring sheets, and storybooks from the U.S. Army Corps of Engineers Tulsa District.";
     }
   }
+
+  const ogTitle = document.querySelector('meta[property="og:title"]');
+  if (ogTitle) ogTitle.content = document.title;
+  const ogDescription = document.querySelector('meta[property="og:description"]');
+  if (ogDescription && description) ogDescription.content = description.content;
+  const ogLocale = document.querySelector('meta[property="og:locale"]');
+  if (ogLocale) ogLocale.content = isSpanish ? "es_US" : "en_US";
+  const ogLocaleAlternate = document.querySelector('meta[property="og:locale:alternate"]');
+  if (ogLocaleAlternate) ogLocaleAlternate.content = isSpanish ? "en_US" : "es_US";
 
   // Authored text captured at boot. Dynamic widgets are handled below.
   for (const { node, original } of staticEnglishTextNodes) {
@@ -1289,16 +1299,26 @@ function openCertificateDialog() {
   certificateName.select();
 }
 
+let certificatePrintTimer;
+function cleanupCertificatePrint() {
+  window.clearTimeout(certificatePrintTimer);
+  certificatePrintTimer = undefined;
+  document.body.classList.remove("printing-certificate");
+  certificatePrintSection?.setAttribute("aria-hidden", "true");
+}
+
 function printCertificate() {
   if (!certificatePrintSection) return;
   updateCertificatePrintSheet();
   certificatePrintSection.setAttribute("aria-hidden", "false");
   document.body.classList.add("printing-certificate");
-  window.addEventListener("afterprint", () => {
-    document.body.classList.remove("printing-certificate");
-    certificatePrintSection.setAttribute("aria-hidden", "true");
-  }, { once: true });
-  window.print();
+  window.addEventListener("afterprint", cleanupCertificatePrint, { once: true });
+  certificatePrintTimer = window.setTimeout(cleanupCertificatePrint, CERTIFICATE_PRINT_CLEANUP_MS);
+  try {
+    window.print();
+  } catch {
+    cleanupCertificatePrint();
+  }
 }
 
 if (certificateDialog && gameCertificate) {

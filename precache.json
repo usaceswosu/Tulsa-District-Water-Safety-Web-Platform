@@ -79,16 +79,15 @@
   "./assets/images/swosu-logo.png",
   "./assets/qr/bobber-site-es.svg",
   "./assets/qr/bobber-site.svg",
-  "./assets/social/bobber-share.png",
-  "./data/content.js?v=20261120t",
-  "./data/pdf-meta.js?v=20261120t",
-  "./data/resources.js?v=20261120t",
-  "./data/translations.js?v=20261120t",
+  "./data/content.js?v=20261120u",
+  "./data/pdf-meta.js?v=20261120u",
+  "./data/resources.js?v=20261120u",
+  "./data/translations.js?v=20261120u",
   "./grown-ups.html",
   "./index.html",
   "./manifest.webmanifest",
   "./poster.html",
-  "./scripts/main.js?v=20261120t",
-  "./scripts/pdf-reader.js?v=20261120t",
-  "./styles.css?v=20261120t"
+  "./scripts/main.js?v=20261120u",
+  "./scripts/pdf-reader.js?v=20261120u",
+  "./styles.css?v=20261120u"
 ]
