@@ -23,9 +23,10 @@ This checklist is for district staff reviewing the Bobber water-safety site befo
 - [ ] Complete a Section 508 / WCAG 2.2 AA review with keyboard-only and screen-reader testing.
 - [ ] Check focus visibility, color contrast in both themes, 200% zoom, narrow mobile widths, and Spanish text pronunciation/language changes.
 - [ ] Verify that each cartoon has accurate English and Spanish captions; add transcripts or accessible alternatives where available.
+- [ ] Work through `PDF_ACCESSIBILITY.md`. Prioritize the three files with no extractable text: the Birthday Story, Best Friend poster, and Goes to the Beach storybook.
 - [ ] Confirm printable PDFs are accessible or provide an accessible alternative when one is available.
 - [ ] Review `accessibility.html` with Public Affairs: official-status wording, contact routes, and the privacy statement.
-- [ ] Confirm the rasterized in-page PDF previews and print-quality downloads are acceptable for the library. The previews are for on-screen reading; tagged print originals are preserved for download.
+- [ ] Confirm the rasterized in-page PDF previews and print-quality downloads are acceptable for the library. The previews are for on-screen reading; tagged print originals are preserved where available.
 - [ ] Confirm the Spanish `?lang=es` URL and hreflang metadata match the district's bilingual publishing plan.
 
 ## Outreach tools

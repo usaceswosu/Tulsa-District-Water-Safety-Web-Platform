@@ -199,6 +199,7 @@ function showPdfFallback(session) {
   frame.className = "pdf-reader-frame";
   frame.src = session.url;
   frame.title = `${session.title} PDF`;
+  pdfReaderStage.classList.add("is-fallback");
   pdfReaderStage.replaceChildren(frame);
   pdfReaderStatus.textContent = readerCopy(
     "Showing this PDF in your browser’s viewer. You can also download it.",
@@ -484,6 +485,7 @@ async function openPdfReader(url, title, opener, downloadUrl = url, preview = fa
   updateReaderChrome();
   pdfReaderDownload.href = session.downloadUrl;
   pdfReaderDownload.setAttribute("download", "");
+  pdfReaderStage.classList.remove("is-fallback");
   pdfReaderStage.replaceChildren();
   if (placeholder) {
     const image = document.createElement("img");
@@ -502,6 +504,7 @@ async function openPdfReader(url, title, opener, downloadUrl = url, preview = fa
   pdfReaderPrevious.hidden = false;
   pdfReaderNext.hidden = false;
   if (!pdfReader.open) pdfReader.showModal();
+  document.documentElement.classList.add("reader-open");
   session.watchdog = window.setTimeout(() => {
     if (activePdf === session && !session.page) showPdfFallback(session);
   }, PDF_LOAD_TIMEOUT_MS);
@@ -590,6 +593,8 @@ pdfReader.addEventListener("close", () => {
   if (pdfReader.open) return;
   const session = activePdf;
   activePdf = null;
+  document.documentElement.classList.remove("reader-open");
+  pdfReaderStage.classList.remove("is-fallback");
   cleanupPrintPage();
   destroyPdfSession(session);
   pdfReaderStage.replaceChildren();

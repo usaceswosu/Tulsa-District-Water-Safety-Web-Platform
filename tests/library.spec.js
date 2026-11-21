@@ -14,6 +14,7 @@ test("the library opens a fast preview and keeps the print PDF for download", as
   const previewRequest = page.waitForRequest((request) => request.url().includes("-web.pdf"), { timeout: 15_000 });
   await page.locator(".resource-link").first().click();
   await expect(page.locator("#pdf-reader")).toHaveJSProperty("open", true);
+  await expect(page.locator("html")).toHaveClass(/reader-open/);
   await expect(page.locator(".pdf-reader-placeholder")).toBeVisible();
   await expect(page.locator("#pdf-reader-print-page")).toBeDisabled();
   await expect(page.locator("#pdf-reader-download")).toHaveText("Download print PDF");
@@ -67,10 +68,12 @@ test("the library opens a fast preview and keeps the print PDF for download", as
     await expect(page.locator("#pdf-print-page canvas")).toHaveCount(0);
   } else {
     await expect(page.locator("#pdf-reader-status")).toContainText("Showing this PDF");
+    await expect(page.locator("#pdf-reader-stage")).toHaveClass(/is-fallback/);
   }
   expect((await previewRequest).url()).toMatch(/-web\.pdf\?v=[0-9a-z]+$/);
   await page.click("#pdf-reader-close");
   await expect(page.locator("#pdf-reader")).not.toHaveAttribute("open", "");
+  await expect(page.locator("html")).not.toHaveClass(/reader-open/);
 
   await page.click("#header-language-toggle");
   await page.locator(".resource-link").first().click();

@@ -16,7 +16,13 @@ npm run serve
 # http://127.0.0.1:4173/
 ```
 
+A minimal Python fallback is available with `python scripts/serve.py 8000` if Node is unavailable.
+
 The reader, offline shell, and GitHub Pages behavior are designed for a real HTTP origin, so use the local server rather than opening `index.html` from disk.
+
+## Browser support
+
+The site targets evergreen browsers from 2022 or later: Chrome 93+, Firefox 98+, and Safari 15.4+. It relies on native `<dialog>`, modern JavaScript, and current CSS without a legacy bundle. Some visual enhancements, such as balanced text wrapping and backdrop blur, are progressive and degrade gracefully. There is no build step or transpilation layer.
 
 The links to YouTube, USACE, Recreation.gov, and other official sources are outbound only; the site itself does not need them to render. Video playback and live lake information require visiting those sources.
 
@@ -26,6 +32,7 @@ The links to YouTube, USACE, Recreation.gov, and other official sources are outb
 npm run check       # versions, globals, content, translations, metadata, URL/schema/library/sitemap, QR/pack, HTML, CSS/budgets, partials, precache, PDFs
 npm test            # Chromium, Firefox, WebKit + Pixel/iPhone mobile smoke tests
 npm run check:live  # post-deploy smoke test against the public URL
+npm run report:pdf-accessibility  # refresh PDF_ACCESSIBILITY.md
 ```
 
 The catalog/link integrity check is cross-platform (`npm run check:site`). CI also runs `scripts/check-site.ps1` with PowerShell as a second opinion, alongside Lighthouse, a live deployment smoke test, and a scheduled link check.
@@ -79,6 +86,7 @@ GitHub Pages serves the files directly. Internal links are relative to the proje
 - `scripts/` — maintenance, validation, versioning, URL/schema/sitemap, QR/pack, preview, and live-smoke tools.
 - `tests/` — Playwright suites by feature, run in Chromium, Firefox, and WebKit.
 - `.github/workflows/` — static checks, Lighthouse, live deployment smoke test, and scheduled link check.
+- `PDF_ACCESSIBILITY.md` — generated inventory of extractable text and structure tags in the print PDFs.
 - `assets/` — artwork, thumbnails, self-hosted PDFs, previews, QR codes, and the classroom ZIP.
 
 ## Updating resources

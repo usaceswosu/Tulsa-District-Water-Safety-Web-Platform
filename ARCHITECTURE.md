@@ -187,6 +187,7 @@ The public base URL lives in `site.config.json`. `npm run update:site-url -- <ur
 | `scripts/check-site.mjs` | Cross-platform catalog/assets/page-link check |
 | `scripts/check-site.ps1` | PowerShell second-opinion copy of the site-integrity check |
 | `scripts/check-live.mjs` | Post-deploy reader/offline/version smoke test |
+| `scripts/report-pdf-accessibility.mjs` | Generated `PDF_ACCESSIBILITY.md` inventory |
 | `scripts/bump-version.mjs` | Version bump + sitemap/precache regeneration |
 | `scripts/update-resource-schema.mjs` | Generated `ItemList` JSON-LD for the printable library |
 | `scripts/render-library.mjs` | Generated English library cards in `index.html` |
@@ -199,6 +200,6 @@ The public base URL lives in `site.config.json`. `npm run update:site-url -- <ur
 
 - Offline mode caches the shell and images; PDFs/ZIPs still require a connection.
 - English library cards and a mobile page-nav fallback work without JavaScript. Search, filters, the quiz, checklist progress, and Spanish remain JavaScript-only, so a no-JS Spanish URL still shows the English view.
-- Reader previews are raster images; print PDFs keep the original vector/accessibility content.
+- Reader previews are raster images; print PDFs keep the original source files. `PDF_ACCESSIBILITY.md` currently records only 6 of 46 print PDFs as marked and 3 with no extractable text.
 - Spanish safety copy and the Spanish interface still need district/fluent review.
 - Formal Section 508 and Public Affairs review is external to this repository.

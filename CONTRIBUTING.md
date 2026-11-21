@@ -12,7 +12,7 @@ npm run serve      # http://127.0.0.1:4173/
 npm test           # Playwright: Chromium, Firefox, WebKit, Pixel 7, iPhone 13
 ```
 
-Python is only needed if you regenerate reader previews.
+Python is optional. It is only needed to regenerate reader previews or to use the alternate `scripts/serve.py` server.
 
 ## Before every commit
 
@@ -53,7 +53,8 @@ npm run check:live -- http://127.0.0.1:4173
 5. Run `npm run update:resource-schema`.
 6. Run `npm run update:library`.
 7. If the PDF is large, create a preview (below), then repeat steps 4–6.
-8. Bump the version and test.
+8. Run `npm run report:pdf-accessibility` and review the updated `PDF_ACCESSIBILITY.md`.
+9. Bump the version and test.
 
 ### Generate a lightweight reader preview
 

@@ -16,11 +16,28 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
         **SimpleHTTPRequestHandler.extensions_map,
         ".mjs": "text/javascript",
         ".wasm": "application/wasm",
+        ".webmanifest": "application/manifest+json",
+        ".zip": "application/zip",
+        ".avif": "image/avif",
     }
 
     def end_headers(self):
         self.send_header("Cache-Control", "no-store, max-age=0")
         super().end_headers()
+
+    def send_error(self, code, message=None, explain=None):
+        if code == 404:
+            page = ROOT / "404.html"
+            if page.is_file():
+                body = page.read_bytes()
+                self.send_response(404)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                if self.command != "HEAD":
+                    self.wfile.write(body)
+                return
+        super().send_error(code, message, explain)
 
 
 def main() -> None:
