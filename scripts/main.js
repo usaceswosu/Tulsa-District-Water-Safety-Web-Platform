@@ -709,6 +709,9 @@ function showUpdateBanner() {
 
 function setupPwa() {
   if (!("serviceWorker" in navigator) || !/^https?:$/.test(location.protocol)) return;
+  // Respect an explicit data-saving preference instead of installing a
+  // multi-megabyte offline shell in the background.
+  if (navigator.connection?.saveData) return;
   const stack = document.createElement("div");
   stack.className = "pwa-stack";
   offlineBanner = document.createElement("div");

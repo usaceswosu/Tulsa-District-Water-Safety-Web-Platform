@@ -1,5 +1,20 @@
 import { test, expect } from "@playwright/test";
 
+test("Save-Data skips the offline shell", async ({ browser }) => {
+  const context = await browser.newContext();
+  await context.addInitScript(() => {
+    Object.defineProperty(navigator, "connection", {
+      configurable: true,
+      value: { saveData: true }
+    });
+  });
+  const page = await context.newPage();
+  await page.goto("/");
+  await page.waitForTimeout(3000);
+  expect(await page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(0);
+  await context.close();
+});
+
 test("the offline shell loads after installation", async ({ page, context }) => {
   await page.goto("/?offline=" + Date.now(), { waitUntil: "load" });
   await page.evaluate(async () => {

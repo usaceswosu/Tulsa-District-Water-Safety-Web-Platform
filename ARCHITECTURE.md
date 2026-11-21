@@ -130,7 +130,7 @@ Key invariants:
 
 ## Offline shell / service worker
 
-`sw.js` is registered from `main.js` as `sw.js?v=<site version>`.
+`sw.js` is registered from `main.js` as `sw.js?v=<site version>`. Registration is skipped when the browser reports `navigator.connection.saveData`, so an explicit data-saving preference is not overridden by the background shell download.
 
 - Cache names include the site version: `bobber-shell-<version>` and `bobber-runtime-<version>`.
 - **Shell:** pages, CSS/JS, site images, manifest, and the reader’s thumbnails from `precache.json`; the social-sharing card is intentionally excluded.
@@ -198,7 +198,7 @@ The public base URL lives in `site.config.json`. `npm run update:site-url -- <ur
 ## Known limitations
 
 - Offline mode caches the shell and images; PDFs/ZIPs still require a connection.
-- English library cards are static; Spanish cards are rebuilt at runtime, so a no-JS Spanish view still shows the English cards.
+- English library cards and a mobile page-nav fallback work without JavaScript. Search, filters, the quiz, checklist progress, and Spanish remain JavaScript-only, so a no-JS Spanish URL still shows the English view.
 - Reader previews are raster images; print PDFs keep the original vector/accessibility content.
 - Spanish safety copy and the Spanish interface still need district/fluent review.
 - Formal Section 508 and Public Affairs review is external to this repository.
